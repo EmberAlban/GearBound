@@ -1,0 +1,16 @@
+{
+  "name": "GearBound — Steam & Thunder Artillery",
+  "short_name": "GearBound",
+  "description": "Turn-based rig artillery: ride your rig, read the wind, rule the sky.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "landscape",
+  "background_color": "#070a18",
+  "theme_color": "#1a1430",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
