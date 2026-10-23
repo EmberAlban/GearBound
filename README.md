@@ -9,7 +9,7 @@ destructible terrain, and delay-based turn order. All names, art and text are or
 **Play:** open `index.html`, or the single-file build **`dist/gearbound.html`** (works offline from file://; `dist/game.html` is a legacy copy).
 For phones, tablets and online play over the internet, host the folder **`dist/web/`** on any static https host (see *Deploying*).
 
-**Flow:** Title (type a pilot name, pick an avatar; no sign-in of any kind) → **Main lobby** (room list, create / join-by-code / recent rooms,
+**Flow:** Title (type a pilot name once — it sticks — and pick an avatar; no sign-in of any kind) → **Main lobby** (room list, create / join-by-code / recent rooms,
 scrolling **rankings panel**, shop icon) → **Waiting room** (Team A vs Team B up to 4v4, rigs, items, map, chat, ready toggles, **10→0 countdown**)
 → painted **loading screen** → **Battle** → **Results** (stats, gold, XP and rank-up) → back to the room.
 Your profile (pilots, gold, XP, owned items, loadout) and settings are saved on the device in `localStorage`.
@@ -25,7 +25,8 @@ Your profile (pilots, gold, XP, owned items, loadout) and settings are saved on 
 | W A S D / mouse drag | Scroll the camera. **C** re-centers it |
 | M | Mute all sound |
 | 5–8 | Use the power-up in that item slot (before you fire) |
-| Enter | Chat (online) |
+| Enter | Chat (online): All/Team toggle, quick chats, Esc closes |
+| Esc / ⚙ → ⏏ Leave match | Exit the match (with a confirm: *Stay* / *Leave match*). Offline or as a client you forfeit (no XP/gold, used items stay spent; online the others play on); as host it ends the match for everyone |
 | ⚙ (top right) | Settings: **Music**/**Effects** volume, mute, Graphics quality (Auto/High/Low), on-screen touch controls, TURN relay (server/user/password) |
 
 **Touch (phones/tablets, auto-detected):** ◀ ▶ drive, ▲ ▼ aim, hold the big **FIRE** button to charge and release to shoot,
@@ -63,12 +64,14 @@ tap the minimap to jump the camera. Phones in portrait get a "rotate your device
 | **Flak** | Area denial | 1000 | 15% | Flak Burst (airburst, 6 shards) | Oil Bomb (burning oil, 3 turns) | Shrapnel Rain (12 shards) |
 | **Gyro** | Skirmisher | 900 | 10% | Boomerang (curves back) | Twin Rang | Gyre Wheel |
 | **Orrery** | Field control | 900 | 10% | Pulse Orb | Gravity Well (bends every shell for 2 turns) | Singularity |
-| **Spindle** | Tunneler | 920 | 12% | Auger Shell (burrows 150px into ground, then erupts) | Spiderlings (3 small burrowers fan out underground) | Deep Eruption (steers under the nearest enemy and erupts beneath it) |
+| **Spindle** | Tunneler | 920 | 12% | Auger Shell (skims under the surface, then erupts) | Spiderlings (3 small skimmers, staggered eruptions) | Deep Eruption (skims deeper, steers under the nearest enemy and erupts) |
 
-**Spindle** is a brass spider walker with the pilot riding in an open hatch on top. Its shells do not stop at the ground:
-on contact they keep their heading and tunnel at a fixed speed (no gravity, wind, weather columns or wells underground),
-carving a tunnel. If a shell breaks out of the far side of a hill before its burrow length runs out it flies on and
-explodes on its next contact; otherwise it *erupts*: it climbs straight up to the surface (carving a shaft) and explodes there.
+**Spindle** is a brass spider walker with the pilot riding in an open hatch on top and its drill cannon mounted on the
+**back of the abdomen**, behind the pilot (shells leave from that rear muzzle). Its shells do not stop at the ground: on contact
+they dive to a shallow depth and **skim along just under the surface** (following the ground, carving a tunnel, kicking up dirt),
+then **erupt** upward near the end of their run (or when they pass under an enemy) and explode at the surface. If the ground ends
+under a skim (cliff, cave) the shell flies on and explodes on its next contact. Spiderlings split into 3 small skimmers that
+erupt at staggered distances (they drill through each other's tunnels and the shared entry crater instead of mistaking them for open air); Deep Eruption skims deeper and steers into the nearest enemy.
 Everything is deterministic, and online play syncs the tunnels like any other crater. A Teleport Shot from Spindle teleports normally.
 
 `node tools/shotstest.js` fires every shot of every rig and reports projectile kinds, damage, delay added, pushes and hazards.
@@ -127,15 +130,81 @@ profile) that you can paste into *Import* on another device. Real cross-device s
 own (e.g. a username + PIN or a one-time transfer code backed by a tiny database); no Big-Tech sign-in is planned.
 Because profiles are local, gold/XP can be edited by a determined player; online, XP and gold are self-reported.
 
+**Sticky pilot name:** the name is asked for once. Returning pilots see *Welcome back, <name>* and go straight in; the name is also
+kept in its own key (`gearbound.pilotName`) so it survives a lost/reset profile. Rename only in ⚙ Settings → Pilot name.
+
+## Family-friendly filter
+`js/namefilter.js` (offline word list, leetspeak/spacing/repeat-letter folding, Scunthorpe-safe word boundaries) is applied to:
+pilot names (refused with a message), names received from other players (masked to a safe name on the host *and* every
+client, so a hacked client can't push a bad name), room names (masked), chat and gift messages (bad words → `****`). `node tools/filtertest.js`.
+
 ## Online play
 Peer-to-peer over WebRTC using PeerJS (vendored in `js/vendor/`), **host-authoritative**: the host runs the simulation and
 streams snapshots (positions, HP, projectiles, effects, sounds, terrain carves) to everyone; clients send inputs only.
 - **Main lobby:** live room directory (via the PeerJS broker), *Create room*, *Join by 5-letter code*, recent rooms.
+- **Rig picker** (lobby and waiting room): one tap on a rig card selects *and* applies it (no extra confirm); **Done** stays
+  visible at the top on phones in both orientations.
 - **Waiting room:** up to 4v4, team switching, rig/item picks, map pick (host), chat, ready toggles; when everyone is ready the
   host starts a **10→0 countdown** (un-readying cancels it).
-- If a pilot leaves or their connection goes silent for 15 s, the host drops them and **skips their turns**. Closing the tab sends a "bye" immediately.
+- If a pilot leaves (or forfeits, or doesn't come back within the 60 s reconnect grace), the host **skips their turns**. Closing the tab sends a "bye" immediately.
 - Uses the public PeerJS cloud broker (`0.peerjs.com`, wss) and public STUN. Strict NATs/corporate networks may need a TURN relay:
   fill in TURN server / user / password in Settings → Online.
+- **Reconnect grace:** a pilot whose connection drops mid-match (phone backgrounded, network switch) keeps the seat for 60 s and
+  gets every missed terrain change on return; the host *holds* that pilot's turn instead of timing it out. Heartbeats every 2 s,
+  20 s of total silence = presumed dropped (that only starts the grace, it never skips a connected pilot's turn).
+- **Turn ack:** the host starts a turn's 20 s timer only after the active pilot's client acknowledges the turn, so a laggy link no
+  longer loses half its turn (or the whole turn) before it even sees it. Inputs carry the turn number; stale ones are ignored.
+- **Backpressure:** snapshots are full state, so the host skips stale ones on a slow link instead of building a multi-second queue;
+  deltas (terrain carves, effects, sounds) always ride on the next snapshot.
+- **Terrain self-healing:** at every turn start the host sends a checksum of the ground; a client whose ground differs (a lost
+  or mis-applied carve) asks for the whole ground (run-length coded, ~10 KB) and replaces its copy, so a desync cannot outlive one
+  turn. Non-finite carve values are never sent (they would decode as 0 on the clients).
+- **Fairness:** only the active pilot's rig moves; other clients never receive the shooter's power while it charges (they see
+  "X is aiming…"), only the shot once fired.
+- **Force Start (host):** start without waiting for every READY (team rule still applies), with a confirm dialog. Unready pilots are
+  pulled in with the rig they have selected.
+- **Sudden Death setting (host, waiting room):** Off / 20 / 30 / 40 turns. From that turn on a *SUDDEN DEATH* banner shows and every
+  pilot's Overdrive gauge is kept full.
+- **Live ranks:** XP changes of pilots in the waiting room update their rank icons live.
+- **Chat:** in the waiting room (inline) and in the match (under the minimap, **Enter** to open, **Esc** closes). All / Team toggle,
+  quick-chat presets, name + rank icon per line, 120-char limit, no HTML, host-side rate limit (burst 4 / 8 s). Typing never triggers
+  game shortcuts.
+- **Vote kick (3+ pilots):** from the room slot or the in-match players menu. Host-tallied; passes only with a *strict* majority of
+  eligible voters (everyone but the target, starter counts Yes) **and** at least 2 Yes, so ties fail; 30 s timeout (no vote = No),
+  one vote at a time, 60 s cooldown per starter. The kicked pilot forfeits (turns skipped), sees "You were voted out" and can't rejoin
+  that room this session. If the host is voted out the match ends for everyone with a notice (no host migration).
+- **Bot matches** (any pilot flagged `bot`) pay only **1 XP + 1 gold for a win** and nothing otherwise. The current build has no bots,
+  so this only matters once they exist.
+
+## Friends and presence
+The **Friends** button (lobby and waiting room header, with an online-count badge) opens a corner panel (a bottom sheet on phones).
+Each device has an 8-character friend code. Add by code → the other side gets a request → accept. Presence runs through a small
+PeerJS peer per player on the public broker (no servers, no logins): green dot = online, *in room XYZ* with a **Join** button when
+the room is open, **Invite** while you're in a room. Online friends are listed first. Friends are stored in the profile.
+
+## Gifts and admin mode
+- **Gift** button on every shop item: pick a friend, optional message (filtered). The sender pays the normal price. The gift goes
+  P2P to the friend's presence peer and is retried until the recipient **acks** it; offline friends get it the next time both are
+  online. Gift ids make delivery idempotent (never lost, never duplicated, even across reloads). The recipient sees a toast and an
+  unwrap animation in the gift inbox, then **Accept** puts the item in their inventory.
+- **Admin mode** is defined only by public keys in `js/admin_keys.js` (`AG.ADMIN_PUBLIC_KEYS`, empty = nobody is admin).
+  The admin device holds an ECDSA P-256 private key (WebCrypto, never leaves the device except in your own backup). Admin powers:
+  every shop item free, free gifts, gold/XP grants to friends, a ★ Admin badge. Admin gifts and grants are **signed**, and every
+  recipient verifies the signature against `ADMIN_PUBLIC_KEYS`; unsigned/forged "admin" gifts are rejected.
+
+### Admin key setup (owner, once)
+1. Open the deployed game (https) or `dist/gearbound.html` on **your own** device.
+2. Click **⚙** (top right) → scroll down → open **Admin (owner only)** → **🔑 Set up admin key**.
+3. The panel shows *"Not active yet…"* and **Public key (safe to share)** with a code starting `GBPK1.`. Press **⧉ Copy public key**.
+4. Paste it into `js/admin_keys.js` inside the list, as a quoted string:
+   `AG.ADMIN_PUBLIC_KEYS = Object.freeze([ 'GBPK1.…your code…' ]);`
+5. `node build.js`, commit, and redeploy `dist/web/` (GitHub Pages).
+6. Reload the game on that device: Settings → Admin shows **★ Admin active on this device** and the lobby shows the ★ Admin badge.
+7. **Backup (important):** Admin → **Export admin backup** → **Show backup** → **⧉ Copy backup** (`GBADMIN1.…`). Keep it somewhere
+   private (password manager). It *is* your private key: anyone with it is admin. Clearing site data without a backup loses the key
+   (then repeat from step 2 and replace the public key).
+8. Other devices of yours: Settings → Admin → **Import admin backup** → paste → **Import**.
+
 - Tested: desktop↔desktop and desktop↔emulated-iPhone, 6 turns each, host and client terrain/HP/positions identical every turn
   (`node tools/onlinetest.js`, `MOBILE_CLIENT=1` for the phone variant).
 
@@ -307,6 +376,13 @@ tools/shoplooks.js  screenshots of the shop Face / Skin tone / Hair tabs
 tools/snap.js       quick title/map/explosion snapshots to /tmp
 tools/build_assets.py  art pipeline (assets/src → assets/web + js/assets.js)
 tools/audiocheck.js  confirms every music track and sting produces sound (measured with an AnalyserNode)
+js/namefilter.js    family-friendly filter;  js/chat.js room/match chat;  js/votekick.js vote kick
+js/friends.js, js/friendsui.js  friend codes, presence peers, Friends panel;  js/gifts.js, js/giftsui.js gifting + inbox
+js/admin.js, js/admin_keys.js   signed admin mode (ECDSA P-256) and the list of admin public keys
+tools/filtertest.js unit test of the filter;  tools/nettest.js online match under latency/jitter/spikes/bandwidth/background
+tools/socialtest.js 5 browsers: chat, team chat, vote kick (fail/pass/kicked/host out), fairness, Sudden Death, live ranks
+tools/lobbytest.js  sticky name, bot reward, Sudden Death banner, friends presence (desktop + iPhone), filter, Force Start
+tools/gifttest.js   gifting + admin signatures + offline queue;  tools/spindleshots.js Spindle rear-cannon close-ups + muzzle check
 ```
 Teams are part of the data model. The Room supports up to 4v4 (Teams A and B), and `TurnSystem` and `Player` already handle more teams (A–D).
 
@@ -316,19 +392,41 @@ cd tools && npm i playwright-core && cd ..
 python3 tools/build_assets.py      # only after changing assets/src
 node build.js && node tools/playtest.js && node tools/shotstest.js && node tools/mobiletest.js && node tools/onlinetest.js && node tools/shottest.js && node tools/showcase.js && node tools/closeup.js && node tools/spawntest.js && node tools/shoplooks.js
 node tools/boomtest.js && node tools/riggallery.js && node tools/shoticons.js && node tools/rankshots.js   # boomerang hits, 14-rig gallery, 42 shot icons, rank art
+node tools/filtertest.js && node tools/spindleshots.js
+# online tests (need a TURN relay reachable from headless Chrome; TURN='url,user,password')
+TURN=... node tools/onlinetest.js && TURNS=9 TURN=... node tools/nettest.js && TURN=... node tools/socialtest.js && TURN=... node tools/lobbytest.js && TURN=... node tools/gifttest.js
+# or everything, sequentially (about 50 min headless); resumable: a test that already passed with the same
+# app code + same test script is skipped. Results are appended to tools/last-test-run.txt
+TURN_URL='turn:host:3478?transport=tcp,user,pass' tools/runall.sh
 ```
 (These scripts use `/usr/bin/google-chrome` with SwiftShader WebGL, so headless frame rates don't reflect real GPUs. Set `CHROME=/path/to/chrome` to use a different browser for `playtest.js`.)
 
 ## Known issues
 - Painted art is AI-assisted and then keyed on magenta. The edges are now colour-bled, so the magenta halo is gone at normal zoom. At very high zoom a faint seam can still show, for example a small patched block on the top of Gyro's wheel. Some purple-themed items (Orrery, Volt and a few premium cosmetics) are purple by design.
-- Spindle's *Deep Eruption* commits to its dive. Once it burrows, it keeps drilling through caves and air gaps at a fixed speed until it erupts. That keeps it deterministic online, but it can look odd crossing a gap. Its eruption can land slightly off-centre on a target that is moving or on a slope, so it often does less than its full 330 damage. In the test it did 157.
+- Spindle's eruptions are steered but not guaranteed: on a target that is moving or on a slope the shell can come up slightly off-centre, so Deep Eruption often does less than its full 330 damage.
 - Spindle has no walking-leg animation. It skitters with a bob and squash instead.
 - Online play needs a TURN relay on strict networks (see Online). The automated online test runs on a local TURN server only.
+- Progress is stored on each player's device so a determined player could edit their own save; signatures prevent impersonating the admin or forging admin gifts.
+- Normal (non-admin) gifts are not provably paid for: a player who edits their own save could send gifts without really spending gold.
+  Admin "free" purchases are local to the admin device.
+- There are no bots yet, so the 1 XP + 1 gold bot rule is keyed on a `bot` flag and only tested with a synthetic bot pilot.
+- If the host is voted out (or quits), the match ends for everyone: there is no host migration.
+- Presence/friends and room directory rely on the public PeerJS broker (`0.peerjs.com`); if it's down or rate-limits, friends show
+  offline and rooms can only be joined by code. Presence updates take a few seconds.
+- The online/lag tests use simulated latency, jitter, spikes and bandwidth limits plus a hidden (backgrounded) host on a local TURN
+  relay, not real mobile networks. A backgrounded *host* tab is throttled by the browser; the match keeps running (the host
+  simulates on a timer when hidden) but can feel slower to the others.
+- In about 1 of 4 nettest runs (before the checksum fix) both joiners ended up with identical ground that differed from the host's,
+  starting the turn after Joiner1's forced reconnect. The exact lost carve was never pinned down; the per-turn terrain checksum and
+  full-ground resync now repair it within a turn (nettest also corrupts a joiner's ground on purpose and checks it heals), but the
+  ground can look wrong on a client for up to one shot before it is corrected.
+- Headless test Chrome (SwiftShader) stalls frames with several pages open, so the online tests use generous timeouts; that
+  says nothing about real devices, but it is why the tests take minutes.
 - Touch controls were checked in an emulated iPhone 14 and iPad (landscape and portrait) with real CDP touch events, not on physical devices.
 
 ## Roadmap
-1. **Gameplay:** sudden death (rising void / forced Overdrive), fall damage, more handcrafted maps, caves and moving islands.
-2. **Online:** reconnect to a match in progress, spectators, a small relay/server for strict networks, server-checked XP and gold.
+1. **Gameplay:** bots, fall damage, more handcrafted maps, caves and moving islands.
+2. **Online:** host migration, spectators, a small relay/server for strict networks, server-checked XP and gold.
 3. **Accounts (own, no Big Tech):** optional username + PIN or transfer-code sync for cross-device progress.
 4. **Art:** animated rider poses, per-rig firing/recoil frames, more hand-painted terrain sets.
 5. **Tech:** ES modules plus a tiny bundler, unit tests for physics and turns, fixed-point math for cross-browser determinism.
