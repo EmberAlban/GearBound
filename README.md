@@ -9,7 +9,7 @@ destructible terrain, and delay-based turn order. All names, art and text are or
 **Play:** open `index.html`, or the single-file build **`dist/gearbound.html`** (works offline from file://; `dist/game.html` is a legacy copy).
 For phones, tablets and online play over the internet, host the folder **`dist/web/`** on any static https host (see *Deploying*).
 
-**Flow:** Title (type a pilot name once — it sticks — and pick an avatar; no sign-in of any kind) → **Main lobby** (room list, create / join-by-code / recent rooms,
+**Flow:** Title (type a pilot name once — it sticks — and pick an avatar; no sign-in needed for offline play; online play needs a free pilot account, see below) → **Main lobby** (room list, create / join-by-code / recent rooms,
 scrolling **rankings panel**, shop icon) → **Waiting room** (Team A vs Team B up to 4v4, rigs, items, map, chat, ready toggles, **10→0 countdown**)
 → painted **loading screen** → **Battle** → **Results** (stats, gold, XP and rank-up) → back to the room.
 Your profile (pilots, gold, XP, owned items, loadout) and settings are saved on the device in `localStorage`.
@@ -121,14 +121,61 @@ simulation applies (`js/perks.js`, used in `main.js` and `physics.js`). The tool
 explosion skins (Confetti Burst, Clockwork Sparks), emotes (Tip of the Hat, Victory Jig), name colors (Gilded, Aurora), and
 Gold/XP gain boosts (+20%). They appear under the shop's **Premium ✦** tab priced "Coming soon" and can't be bought yet.
 
-## No sign-in: pilot name + avatar
-There are **no third-party logins** (no Google/Apple/Microsoft/Yahoo buttons). You type a pilot name, pick an avatar, and the
-profile lives on that device. `js/auth.js` is still loaded as an internal abstraction, but no screen calls it.
+## Pilot accounts and cloud saves
+There are **no Google/Apple/Facebook/Microsoft logins**. Offline and practice play need no account at all: you type a pilot
+name, pick an avatar and play, and the profile lives on that device. A free **pilot account** is just a **pilot name + a secret
+password** (6–72 characters, with a 👁 Show / 🙈 Hide toggle). It is needed for **online play** and keeps your progress in
+the cloud. The title screen has **🔑 Log in / ✨ New pilot account**. ⚙ Settings has **Log out**, **Change password** and
+renaming (the same name filter and uniqueness rules apply).
+
+How it works (js/cloud.js, a tiny `fetch` client, no SDK):
+- Backend: Supabase project `msvjemuwhkroqbkmsptc`. The publishable key in js/cloud.js is public by design; all protection is RLS + grants.
+- **Sign-up** goes through the Edge Function `supabase/functions/signup` (`verify_jwt` off; CORS: emberalban.github.io,
+  localhost/127.0.0.1 on any port, and `Origin: null` for the single-file `dist/gearbound.html` opened from disk). It applies
+  the family-friendly filter (`namefilter.js` is generated from `js/namefilter.js` by `node tools/gen-edge-filter.js` — rerun
+  it and redeploy the function after changing the word lists) plus reserved words, checks the name is free
+  (case/space/`_.-`-insensitive: "Ace Pilot" = "ace_pilot"), and creates the user with the service-role key using the hidden
+  address `<name_key>@pilots.gearbound.invalid` (`email_confirm: true`). That way, e-mail confirmation can stay ON in the
+  project and the client never calls `signUp`. The same function handles **rename** (`{action:'rename'}`, requires the user's token).
+- **Rate limits** (signup_attempts table): 30 attempts and 5 new accounts per IP per hour/day, 10 renames per pilot per hour,
+  300 new accounts per hour overall.
+- **Login** uses the password grant; the session (with refresh token) is kept in localStorage, so you stay logged in.
+- **Cloud saves**: loaded on login. The first login on a device that already has progress **merges** (max XP and gold, union of
+  owned cosmetics and item counts, friends kept; the cloud's friend code wins). After that every save (match end, shop,
+  gifts, settings) uploads after 2.5 s (debounced). Offline changes are flagged and uploaded when the network returns; on a
+  conflict both sides are merged. Logging into a different pilot on the same device **stashes** the previous pilot's save
+  (`gearbound.acct.<id>`) instead of mixing them.
+- **XP never goes down by accident**: the client refuses to upload a save with less XP than the cloud has, and the database
+  trigger (`supabase/accounts.sql`) keeps the old save if XP drops, if the save is not a profile, or if it exceeds 300 KB.
+  It logs each case to `save_anomalies` (client-side anomalies go to `gearbound.cloud.log`). The previous save is always kept in `prev_save`.
+- **Cloud gift mailbox** (`supabase/gifts_by_code.sql`): if a friend can't be reached P2P, a gift is also dropped in the
+  `gifts` table, addressed by friend code. The recipient picks it up after logging in (and every minute) with the same checks
+  as P2P gifts; duplicates are ignored by gift id. RLS: you can only send gifts "from" your own friend code and only read or
+  delete gifts addressed to yours.
+- Database setup, in order: `supabase/setup.sql`, `supabase/accounts.sql`, `supabase/gifts_by_code.sql`. Deploy the function
+  with `supabase functions deploy signup --no-verify-jwt`; it reads `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` from its env.
+
+Limits (honest list):
+- **No password reset by the player**: there is no e-mail. An admin can set a new password in the Supabase dashboard
+  (Authentication → Users), where the login address is `<name_key>@pilots.gearbound.invalid`.
+- The "account needed for online play" rule is enforced **in the client**. Matches are peer-to-peer, so a modified client could
+  still join rooms without an account.
+- A save is still written by the player's own device, so a determined player could raise their own XP/gold; the server only
+  stops decreases and junk.
 
 **Moving progress between devices:** the title screen's **⇄ Move my progress to another device** button shows an **export code** (`GB1-…`, a checksummed copy of the
-profile) that you can paste into *Import* on another device. Real cross-device sync would later need a small account system of our
-own (e.g. a username + PIN or a one-time transfer code backed by a tiny database); no Big-Tech sign-in is planned.
+profile) that you can paste into *Import* on another device. With a pilot account (below) this happens automatically.
 Because profiles are local, gold/XP can be edited by a determined player; online, XP and gold are self-reported.
+
+**Saves never wipe (and the old `/gearbound/` path):** the profile is migrated forward instead of being reset, the last 3 good
+saves are kept as rolling backups (`gearbound.profile.bak`), an unreadable save is kept raw (`gearbound.profile.raw`) and the best
+recoverable value wins, imports merge (max XP/gold, union of items) and the browser is asked for persistent storage.
+The "wipe" players saw came from the repo rename: the old site `emberalban.github.io/gearbound/` now 404s, and iPhone/iPad
+home-screen apps keep their own storage, separate from Safari, so the new site can't read a save made in an icon added from the
+old path. Saves made in a normal browser tab share the same origin (`emberalban.github.io`) and are picked up automatically.
+For home-screen apps, `rescue/gearbound/index.html` must be served at the **old** `/gearbound/` path (for example a `gearbound/` folder in an `emberalban.github.io` user-site repo; not yet tested): opening the old icon then
+reads that app's save and sends it to the new site as `#gb1=<transfer code>`, which the new build merges in automatically
+(or the player copies the code into *Move my progress → Import*).
 
 **Sticky pilot name:** the name is asked for once. Returning pilots see *Welcome back, <name>* and go straight in; the name is also
 kept in its own key (`gearbound.pilotName`) so it survives a lost/reset profile. Rename only in ⚙ Settings → Pilot name.
@@ -345,7 +392,7 @@ js/art.js           image/font loader, tinted/pixel caches, soft particle sprite
 js/terrain.js       bitmap terrain: generation, carving, 2.5D render (lit front face + extruded thickness), map themes
 js/avatar.js        rider avatar drawing, clothing/hat/skin/pet catalogs, Pet entity
 js/perks.js         gold-item combat perks + caps, premium (cosmetic/economy) catalog
-js/auth.js          (unused) old sign-in abstraction, kept for reference; the game has no third-party login
+js/cloud.js         pilot accounts (name + password) and cloud saves on Supabase; see supabase/ for SQL + the signup Edge Function
 js/items.js         power-up catalog, one-per-turn rule, delay costs, effects (host-validated online)
 js/weather.js       360° wind and weather columns (lightning / sunbeam / laser / tornado)
 js/ranks.js         40 ranks + match XP;  js/rank_art.js generated rank icons
@@ -393,6 +440,8 @@ python3 tools/build_assets.py      # only after changing assets/src
 node build.js && node tools/playtest.js && node tools/shotstest.js && node tools/mobiletest.js && node tools/onlinetest.js && node tools/shottest.js && node tools/showcase.js && node tools/closeup.js && node tools/spawntest.js && node tools/shoplooks.js
 node tools/boomtest.js && node tools/riggallery.js && node tools/shoticons.js && node tools/rankshots.js   # boomerang hits, 14-rig gallery, 42 shot icons, rank art
 node tools/filtertest.js && node tools/spindleshots.js
+node tools/accounttest.js && node tools/accountshots.js   # accounts against a mock Supabase; screenshots → screenshots/accounts/
+# node tools/livee2e.js  — ONE real run against the live project with a throwaway pilot; delete it afterwards (see tools/livee2e-result.txt)
 # online tests (need a TURN relay reachable from headless Chrome; TURN='url,user,password')
 TURN=... node tools/onlinetest.js && TURNS=9 TURN=... node tools/nettest.js && TURN=... node tools/socialtest.js && TURN=... node tools/lobbytest.js && TURN=... node tools/gifttest.js
 # or everything, sequentially (about 50 min headless); resumable: a test that already passed with the same
@@ -406,7 +455,10 @@ TURN_URL='turn:host:3478?transport=tcp,user,pass' tools/runall.sh
 - Spindle's eruptions are steered but not guaranteed: on a target that is moving or on a slope the shell can come up slightly off-centre, so Deep Eruption often does less than its full 330 damage.
 - Spindle has no walking-leg animation. It skitters with a bob and squash instead.
 - Online play needs a TURN relay on strict networks (see Online). The automated online test runs on a local TURN server only.
-- Progress is stored on each player's device so a determined player could edit their own save; signatures prevent impersonating the admin or forging admin gifts.
+- Pilot accounts: no self-service password reset (no e-mail), the online-needs-an-account rule is client-side only (P2P), and
+  merging two devices takes the higher gold of the two (so it can't lose gold, but it can't subtract gold spent on the other
+  device either). When two devices merge, the cloud's friend code wins; friends who only knew the other device's code need to re-add.
+- Progress is stored on each player's device (and copied to the cloud with an account), so a determined player could edit their own save; signatures prevent impersonating the admin or forging admin gifts.
 - Normal (non-admin) gifts are not provably paid for: a player who edits their own save could send gifts without really spending gold.
   Admin "free" purchases are local to the admin device.
 - There are no bots yet, so the 1 XP + 1 gold bot rule is keyed on a `bot` flag and only tested with a synthetic bot pilot.

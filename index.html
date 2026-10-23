@@ -541,7 +541,7 @@ body { touch-action: manipulation; -webkit-tap-highlight-color: transparent; ove
   background: radial-gradient(circle at 35% 30%, rgba(80,92,150,.78), rgba(16,20,44,.82)); color: #fff; font: 700 22px var(--display); border-radius: 50%;
   width: 64px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.25); }
 .touchui .tbtn small { font-size: 9px; letter-spacing: 1px; opacity: .7; margin-top: -2px; }
-.touchui .tbtn.down { transform: scale(.92); background: radial-gradient(circle at 35% 30%, #ffd36b, #b9782a); color: #2a1606; }
+.touchui .tbtn.held { transform: scale(.92); background: radial-gradient(circle at 35% 30%, #ffd36b, #b9782a); color: #2a1606; }
 .touchui .mv.left { left: calc(16px + env(safe-area-inset-left)); bottom: calc(22px + env(safe-area-inset-bottom)); width: 76px; height: 76px; }
 .touchui .mv.right { left: calc(102px + env(safe-area-inset-left)); bottom: calc(22px + env(safe-area-inset-bottom)); width: 76px; height: 76px; }
 .touchui .ang.up { left: calc(196px + env(safe-area-inset-left)); bottom: calc(78px + env(safe-area-inset-bottom)); width: 58px; height: 58px; }
@@ -554,25 +554,25 @@ body { touch-action: manipulation; -webkit-tap-highlight-color: transparent; ove
 .touchui .fire .trk { fill: none; stroke: rgba(0,0,0,.35); stroke-width: 6; } .touchui .fire .arc { fill: none; stroke: #ffe066; stroke-width: 6; stroke-linecap: round; stroke-dasharray: 276.5; stroke-dashoffset: 276.5; }
 .touchui .fire b { font-size: 24px; letter-spacing: 1px; } .touchui .fire em { font-style: normal; font-size: 10px; opacity: .8; }
 .touchui .tinfo.pw { position: absolute; right: calc(18px + env(safe-area-inset-right)); bottom: calc(142px + env(safe-area-inset-bottom)); width: 116px; text-align: center; font: 700 12px var(--display); color: #fff; text-shadow: 0 2px 4px #000; }
-.touchui .shot { width: 48px; height: 48px; font-size: 17px; }
+.touchui .shot { width: 52px; height: 52px; font-size: 17px; }
 .touchui .shot.s1 { right: calc(150px + env(safe-area-inset-right)); bottom: calc(86px + env(safe-area-inset-bottom)); }
 .touchui .shot.s2 { right: calc(144px + env(safe-area-inset-right)); bottom: calc(30px + env(safe-area-inset-bottom)); }
-.touchui .shot.s3 { right: calc(132px + env(safe-area-inset-right)); bottom: calc(142px + env(safe-area-inset-bottom)); font-size: 14px; background: radial-gradient(circle at 35% 30%, #b98cff, #4b2a8a); }
-.touchui .shot.sel { border: 2px solid #ffe066; box-shadow: 0 0 12px rgba(255,224,102,.7); }
+.touchui .shot.s3 { right: calc(140px + env(safe-area-inset-right)); bottom: calc(146px + env(safe-area-inset-bottom)); font-size: 14px; background: radial-gradient(circle at 35% 30%, #b98cff, #4b2a8a); }
+.touchui .shot.sel { transform: none; border: 2px solid #ffe066; box-shadow: 0 0 12px rgba(255,224,102,.7); }
 .touchui .shot.locked { opacity: .45; }
-.touchui .small { width: 50px; height: 34px; min-height: 0; padding: 0; border-radius: 17px; font-size: 13px; }
+.touchui .small { width: 54px; height: 50px; min-height: 0; padding: 0; border-radius: 25px; font-size: 13px; }
 .touchui .small svg { width: 20px; height: 20px; }
 .touchui .small.pass { right: calc(18px + env(safe-area-inset-right)); bottom: calc(166px + env(safe-area-inset-bottom)); }
-.touchui .small.cen { right: calc(74px + env(safe-area-inset-right)); bottom: calc(166px + env(safe-area-inset-bottom)); font-size: 18px; }
+.touchui .small.cen { right: calc(76px + env(safe-area-inset-right)); bottom: calc(166px + env(safe-area-inset-bottom)); font-size: 18px; }
 .touchui.idle .tbtn { opacity: .35; }
 /* touch: hide the desktop dock (the on-screen controls carry power/angle/shots) and tighten the HUD */
 body.touch .hud .hud-dock { display: none; }
 body.touch .hud .hud-help, body.touch .hud .help { display: none; }
-body.touch .hud .hud-items { bottom: calc(212px + env(safe-area-inset-bottom)); right: calc(14px + env(safe-area-inset-right)); left: auto; transform: scale(.85); transform-origin: right bottom; }
-body.touch.inbattle .gearbtn { bottom: auto; top: calc(10px + env(safe-area-inset-top)); right: calc(250px + env(safe-area-inset-right)); }
+body.touch .hud .hud-items { bottom: calc(226px + env(safe-area-inset-bottom)); right: calc(14px + env(safe-area-inset-right)); left: auto; transform: scale(.85); transform-origin: right bottom; }
+body.touch.inbattle .gearbtn { bottom: auto; top: calc(10px + env(safe-area-inset-top)); right: calc(310px + env(safe-area-inset-right)); }
 body.touch.inbattle .settings { top: 60px; bottom: auto; }
 /* narrow portrait (phones): the pilot card + wind dial fill the top-left/centre, so the gear goes to the free top-right corner */
-@media (max-width: 760px) { body.touch.inbattle .gearbtn { right: calc(12px + env(safe-area-inset-right)); left: auto; } }
+@media (max-width: 1150px) { body.touch.inbattle .gearbtn { right: calc(12px + env(safe-area-inset-right)); left: auto; } }
 .rotatehint { display: none; }
 @media (orientation: portrait) and (max-width: 600px) {
   body.touch.inbattle .rotatehint { display: flex; position: fixed; inset: 0; z-index: 80; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
@@ -585,41 +585,43 @@ body.touch.inbattle .settings { top: 60px; bottom: auto; }
   /* compact portrait controls (after "Play in portrait") */
   .touchui .mv.left { left: calc(10px + env(safe-area-inset-left)); bottom: calc(18px + env(safe-area-inset-bottom)); width: 56px; height: 56px; }
   .touchui .mv.right { left: calc(72px + env(safe-area-inset-left)); bottom: calc(18px + env(safe-area-inset-bottom)); width: 56px; height: 56px; }
-  .touchui .ang.up { left: calc(136px + env(safe-area-inset-left)); bottom: calc(66px + env(safe-area-inset-bottom)); width: 46px; height: 46px; }
-  .touchui .ang.down { left: calc(136px + env(safe-area-inset-left)); bottom: calc(14px + env(safe-area-inset-bottom)); width: 46px; height: 46px; }
-  .touchui .tinfo.ang { left: calc(188px + env(safe-area-inset-left)); bottom: calc(50px + env(safe-area-inset-bottom)); font-size: 16px; }
+  .touchui .ang.up { left: calc(136px + env(safe-area-inset-left)); bottom: calc(72px + env(safe-area-inset-bottom)); width: 52px; height: 52px; }
+  .touchui .ang.down { left: calc(136px + env(safe-area-inset-left)); bottom: calc(14px + env(safe-area-inset-bottom)); width: 52px; height: 52px; }
+  .touchui .tinfo.ang { left: calc(136px + env(safe-area-inset-left)); bottom: calc(130px + env(safe-area-inset-bottom)); width: 52px; text-align: center; font-size: 16px; }
   .touchui .tfuel { left: calc(10px + env(safe-area-inset-left)); bottom: calc(82px + env(safe-area-inset-bottom)); width: 118px; }
   .touchui .fire { right: calc(12px + env(safe-area-inset-right)); bottom: calc(16px + env(safe-area-inset-bottom)); width: 88px; height: 88px; }
   .touchui .fire b { font-size: 19px; }
   .touchui .tinfo.pw { right: calc(12px + env(safe-area-inset-right)); bottom: calc(110px + env(safe-area-inset-bottom)); width: 88px; font-size: 11px; }
-  .touchui .shot.s1 { right: calc(108px + env(safe-area-inset-right)); bottom: calc(64px + env(safe-area-inset-bottom)); width: 42px; height: 42px; }
-  .touchui .shot.s2 { right: calc(108px + env(safe-area-inset-right)); bottom: calc(14px + env(safe-area-inset-bottom)); width: 42px; height: 42px; }
-  .touchui .shot.s3 { right: calc(108px + env(safe-area-inset-right)); bottom: calc(114px + env(safe-area-inset-bottom)); width: 42px; height: 42px; }
+  .touchui .shot.s1 { right: calc(108px + env(safe-area-inset-right)); bottom: calc(72px + env(safe-area-inset-bottom)); width: 52px; height: 52px; }
+  .touchui .shot.s2 { right: calc(108px + env(safe-area-inset-right)); bottom: calc(14px + env(safe-area-inset-bottom)); width: 52px; height: 52px; }
+  .touchui .shot.s3 { right: calc(108px + env(safe-area-inset-right)); bottom: calc(130px + env(safe-area-inset-bottom)); width: 52px; height: 52px; }
   .touchui .small.pass { right: calc(12px + env(safe-area-inset-right)); bottom: calc(132px + env(safe-area-inset-bottom)); }
-  .touchui .small.cen { right: calc(12px + env(safe-area-inset-right)); bottom: calc(172px + env(safe-area-inset-bottom)); }
-  body.touch .hud .hud-items { bottom: calc(214px + env(safe-area-inset-bottom)); }
+  .touchui .small.cen { right: calc(12px + env(safe-area-inset-right)); bottom: calc(190px + env(safe-area-inset-bottom)); }
+  body.touch .hud .hud-items { bottom: calc(250px + env(safe-area-inset-bottom)); }
+  /* narrow portrait: the centred wind dial collided with the pilot card — dock it top-right under the gear */
+  body.touch .hud .hud-wind { left: auto; right: calc(10px + env(safe-area-inset-right)); top: calc(62px + env(safe-area-inset-top)); transform: none; }
 }
 @keyframes rot90 { 0%, 20% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }
 
 /* phone landscape: short screens */
 @media (max-height: 520px) {
-  body.touch .hud .hud-mini { transform: scale(.72); transform-origin: left top; top: 70px; }
-  body.touch .hud .hud-card { transform: scale(.8); transform-origin: left top; }
-  body.touch .hud .hud-wind { transform: translateX(-50%) scale(.75); transform-origin: center top; }
+  body.touch .hud .hud-mini { transform: scale(.88); transform-origin: left top; top: 82px; }
+  body.touch .hud .hud-card { transform: scale(.95); transform-origin: left top; }
+  body.touch .hud .hud-wind { transform: translateX(-50%) scale(.92); transform-origin: center top; }
   body.touch .hud .hud-order { transform: scale(.75); transform-origin: right top; }
-  body.touch .hud .hud-items { top: calc(6px + env(safe-area-inset-top)); bottom: auto; right: calc(6px + env(safe-area-inset-right)); transform: scale(.62); transform-origin: right top; }
+  body.touch .hud .hud-items { top: calc(6px + env(safe-area-inset-top)); bottom: auto; right: calc(6px + env(safe-area-inset-right)); transform: scale(.78); transform-origin: right top; }
   body.touch .hud .hud-order { display: none; }
   body.touch.inbattle .gearbtn { top: auto; right: auto; left: 50%; margin-left: -20px; bottom: calc(8px + env(safe-area-inset-bottom)); }
   .touchui .mv.left, .touchui .mv.right { width: 64px; height: 64px; } .touchui .mv.right { left: calc(90px + env(safe-area-inset-left)); }
-  .touchui .ang.up, .touchui .ang.down { left: calc(170px + env(safe-area-inset-left)); width: 50px; height: 50px; } .touchui .ang.up { bottom: calc(70px + env(safe-area-inset-bottom)); }
+  .touchui .ang.up, .touchui .ang.down { left: calc(170px + env(safe-area-inset-left)); width: 52px; height: 52px; } .touchui .ang.up { bottom: calc(76px + env(safe-area-inset-bottom)); }
   .touchui .tinfo.ang { left: calc(228px + env(safe-area-inset-left)); bottom: calc(52px + env(safe-area-inset-bottom)); }
   .touchui .tfuel { bottom: calc(94px + env(safe-area-inset-bottom)); width: 138px; }
   .touchui .fire { width: 98px; height: 98px; }
   .touchui .tinfo.pw { width: 98px; bottom: calc(124px + env(safe-area-inset-bottom)); }
-  .touchui .shot.s1 { right: calc(130px + env(safe-area-inset-right)); bottom: calc(72px + env(safe-area-inset-bottom)); width: 44px; height: 44px; }
-  .touchui .shot.s2 { right: calc(124px + env(safe-area-inset-right)); bottom: calc(20px + env(safe-area-inset-bottom)); width: 44px; height: 44px; }
-  .touchui .shot.s3 { right: calc(122px + env(safe-area-inset-right)); bottom: calc(124px + env(safe-area-inset-bottom)); width: 44px; height: 44px; }
-  .touchui .small.pass, .touchui .small.cen { bottom: calc(176px + env(safe-area-inset-bottom)); }
+  .touchui .shot.s1 { right: calc(132px + env(safe-area-inset-right)); bottom: calc(76px + env(safe-area-inset-bottom)); width: 52px; height: 52px; }
+  .touchui .shot.s2 { right: calc(126px + env(safe-area-inset-right)); bottom: calc(18px + env(safe-area-inset-bottom)); width: 52px; height: 52px; }
+  .touchui .shot.s3 { right: calc(126px + env(safe-area-inset-right)); bottom: calc(134px + env(safe-area-inset-bottom)); width: 52px; height: 52px; }
+  .touchui .small.pass, .touchui .small.cen { bottom: calc(190px + env(safe-area-inset-bottom)); } .touchui .small.cen { right: calc(78px + env(safe-area-inset-right)); }
   .menu { padding: 8px 10px; }
   .title { font-size: 44px !important; }
   .entryprev .preview, .mlleft .preview { max-height: 34vh; width: auto; }
@@ -861,6 +863,53 @@ p.botnote { max-width: 560px; margin: 8px auto 0; }
 .admingrant { margin-top: 8px; padding: 6px; border-radius: 8px; background: rgba(255,215,106,.08); }
 .giftcard.still .giftbox, .giftcard.still .giftbox::after { animation: none; } .giftcard.still .giftbox::after { opacity: 0; }
 .gifthead > button { flex: 0 0 auto; width: auto; min-width: 0; padding: 6px 12px; }
+
+/* ================= UI size: compact phone UI =================
+   --ui is set by AG.Touch.applyUi (Settings → UI size; Auto = Small 0.82 on phones, Medium 1 elsewhere, Large 1.15).
+   Zoom is applied per element so positions shrink towards their own screen corner; base sizes are chosen so every
+   touch target stays >= 40 CSS px at Small (52 * .82 = 42.6). */
+:root { --ui: 1; }
+.touchui .tbtn, .touchui .tinfo, .touchui .tfuel { zoom: var(--ui); }
+body.touch .hud > .hud-card, body.touch .hud > .hud-mini, body.touch .hud > .hud-wind, body.touch .hud > .hud-order,
+body.touch .hud > .hud-items, body.touch .hud > .hud-net, body.touch .hud > .hud-chat, body.touch .hud > .hud-chatin { zoom: var(--ui); }
+/* menus on small screens: tighter type and padding, buttons keep >= 40px */
+body.ui-s .menu { padding: 8px 8px calc(12px + env(safe-area-inset-bottom)); }
+body.ui-s .menu h1, body.ui-s .roomhead h1 { font-size: 26px; letter-spacing: 2px; margin: 0 0 4px; }
+body.ui-s .mlleft, body.ui-s .mlright { padding: 8px; border-radius: 14px; }
+body.ui-s .mlleft { gap: 7px; }
+body.ui-s .mainlobby .mlleft .preview { max-height: 150px; }
+body.ui-s .shopbig { padding: 6px 12px; gap: 10px; }
+body.ui-s .shopbig img { width: 48px; height: 48px; }
+body.ui-s .shopbig b { font-size: 22px; letter-spacing: 3px; }
+body.ui-s .shopbig em { font-size: 11px; }
+body.ui-s .slot { margin-bottom: 5px; } body.ui-s .slot.empty { min-height: 0; padding: 4px; }
+body.ui-s .slot .join { height: 42px; min-height: 40px; }
+body.ui-s .vs { font-size: 36px; }
+body.ui-s .btn { padding-left: 12px; padding-right: 12px; }
+body.ui-s .teamcol h2 { font-size: 15px; margin: 0 0 6px; }
+body.ui-l .menu { font-size: 1.08em; }
+
+/* ---------------------------------------------------------------- pilot accounts (js/cloud.js) */
+.acctline { display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 18px; }
+.acctline .acctbtns { justify-content: center; gap: 8px; flex-wrap: wrap; }
+.acctline .acctbtns .btn { min-height: 40px; }
+.acctin { font-size: 14px; color: #cfe3ff; text-align: center; } .acctin b { color: #ffd98a; } .acctin .cst { color: var(--brass2); font-weight: 700; }
+.rigpicker .rpanel.account { width: min(460px, 94vw); height: auto; max-height: 96vh; max-height: 96dvh; overflow-y: auto; gap: 8px; padding: 16px 18px; }
+.rpanel.account h2 { margin: 2px 0 0; color: #ffd36b; font: 700 24px var(--display); text-align: center; }
+.rpanel.account .note { margin: 0; font-size: 13.5px; line-height: 1.35; color: #c9d6f2; }
+.rpanel.account .note.reason { color: #ffe1a0; font-weight: 700; } .rpanel.account .note.reason:empty { display: none; }
+.rpanel.account label.txt { display: flex; flex-direction: column; gap: 4px; font-weight: 700; color: #e9eefc; }
+.rpanel.account input { font-size: 17px; padding: 10px 12px; min-height: 44px; border-radius: 12px; }
+.rpanel.account .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center; }
+.rpanel.account .authmsg { min-height: 20px; }
+.acctabs { display: flex; gap: 6px; justify-content: center; }
+.acctabs .btn { flex: 1; min-height: 42px; opacity: .65; } .acctabs .btn.on { opacity: 1; box-shadow: 0 0 0 2px #ffd36b inset; }
+.pwrow { display: flex; gap: 6px; align-items: stretch; } .pwrow input { flex: 1; min-width: 0; }
+.pweye { min-width: 84px; min-height: 44px; white-space: nowrap; }
+.acctbox { margin: 4px 0 6px; } .acctbox .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.acctbox .np b { color: #ffd98a; }
+.chpw { display: none; flex-direction: column; gap: 6px; margin-top: 6px; } .chpw.open { display: flex; }
+.chpw .pwrow input { min-height: 38px; }
 
 </style>
 </head>
@@ -1145,7 +1194,7 @@ window.AG = window.AG || {};
   var SETTINGS_KEY = 'gearbound.settings.v1';
   AG.settings = { music: 0.55, sfx: 0.8, muted: false };
   try { var saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null'); if (saved) for (var k in saved) AG.settings[k] = saved[k]; } catch (e) {}
-  AG.saveSettings = function () { try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(AG.settings)); } catch (e) {} };
+  AG.saveSettings = function () { try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(AG.settings)); } catch (e) {} if (AG.Cloud) AG.Cloud.changed(); };
 
   // ---------------- Audio graph: master -> {musicBus, sfxBus} ----------------
   var ctx = null, master = null, sfxBus = null, musicBus = null, noiseBuf = null;
@@ -2558,10 +2607,13 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   // overlay announcement (screen space, under the turn banner)
   W.drawAnnounce = function (c, g, Wd, H) {
     var a = g.announce; if (!a || a.t <= 0) return;
-    var life = a.max - a.t, k = Math.min(1, life / 12, a.t / 20), y = H * 0.27 + 70;
+    // reuse this frame's layout from the banner (stacked below it), or lay out alone below the HUD
+    var L = (g._overlayFrame === g.frame && g._overlay && g._overlay.announce) || AG.Render.layoutOverlay(c, g, Wd, H).announce; if (!L) return;
+    var life = a.max - a.t, k = Math.min(1, life / 12, a.t / 20), y = L.y + L.ts * 0.65 + 3;
     c.save(); c.globalAlpha = k; c.textAlign = 'center'; c.textBaseline = 'middle';
-    c.font = '700 26px ' + AG.Render.FONT; c.shadowColor = a.color; c.shadowBlur = 18; c.fillStyle = '#fff'; c.fillText(a.text, Wd / 2, y);
-    c.shadowBlur = 0; c.font = '600 14px ' + AG.Render.FONT; c.fillStyle = a.color; c.fillText(a.sub, Wd / 2, y + 26);
+    c.font = '700 ' + L.ts + 'px ' + AG.Render.FONT; c.shadowColor = a.color; c.shadowBlur = 18; c.fillStyle = '#fff'; c.fillText(a.text, Wd / 2, y);
+    c.shadowBlur = 0; c.font = '600 ' + L.ss + 'px ' + AG.Render.FONT; c.fillStyle = a.color;
+    L.sub.forEach(function (l, i) { c.fillText(l, Wd / 2, y + L.ts * 0.65 + 3 + L.ss / 2 + i * (L.ss + 6)); });
     c.restore();
   };
   AG.Weather = W;
@@ -2569,41 +2621,343 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
 
 </script>
 <script>
-/* js/auth.js */
-// auth.js — sign-in provider abstraction.
-// Today every provider resolves to { ok:false, reason:'coming_soon' } and the
-// game continues as a GUEST (local profile in localStorage). To go live, register
-// a real adapter per provider (e.g. Firebase Auth or Supabase Auth) with
-// AG.Auth.registerAdapter('google', function () { return firebaseSignInWithGoogle(); })
-// which must resolve to { ok:true, user:{ id, name, provider } }.
+/* js/cloud.js */
+// cloud.js — pilot accounts (pilot name + password) and cloud saves on Supabase.
+// * No third-party sign-in and no e-mail: a pilot name maps to a hidden login address <key>@pilots.gearbound.invalid
+//   (key = lower-case name, spaces/_/./- folded to '_'). Accounts are created by the 'signup' Edge Function
+//   (supabase/functions/signup), which applies the same family-friendly name filter and uniqueness check.
+// * Tiny fetch client (no SDK, works in the single-file build). Everything degrades gracefully offline: the local
+//   save keeps working, unsynced changes are flagged and pushed when the network is back.
+// * Safety: a cloud save is never replaced by an empty profile or one with less XP (refused + logged here, and the
+//   database refuses it too — see supabase/accounts.sql). First login on a device that already has progress MERGES
+//   (max XP/gold, union of owned items/outfits/pets, friends kept).
 (function (AG) {
   'use strict';
-  var adapters = {};
-  var Auth = {
-    PROVIDERS: [
-      { id: 'google', label: 'Sign in with Google', glyph: 'G', bg: '#ffffff', fg: '#3c4043' },
-      { id: 'apple', label: 'Sign in with Apple', glyph: '', bg: '#000000', fg: '#ffffff' },
-      { id: 'yahoo', label: 'Sign in with Yahoo', glyph: 'Y!', bg: '#5f01d1', fg: '#ffffff' },
-      { id: 'microsoft', label: 'Sign in with Microsoft', glyph: '▦', bg: '#2f2f2f', fg: '#ffffff' }
-    ],
-    session: null,
-    registerAdapter: function (id, fn) { adapters[id] = fn; },
-    isAvailable: function (id) { return !!adapters[id]; },
-    signIn: function (id) {
-      var p = Auth.PROVIDERS.filter(function (x) { return x.id === id; })[0];
-      if (!p) return Promise.resolve({ ok: false, reason: 'unknown_provider' });
-      if (!adapters[id]) return Promise.resolve({ ok: false, reason: 'coming_soon', provider: p });
-      return Promise.resolve(adapters[id]()).then(function (res) {
-        if (res && res.ok) Auth.session = { provider: id, user: res.user };
-        return res;
-      });
-    },
-    playAsGuest: function (name) {
-      Auth.session = { provider: 'guest', user: { id: 'guest', name: name || 'Pilot 1' } };
-      return Auth.session;
-    }
+  var C = {
+    URL: 'https://msvjemuwhkroqbkmsptc.supabase.co',
+    KEY: 'sb_publishable_iiovpvwUxeD_M7AXiyIXqw_CqRI2vll',
+    DOMAIN: 'pilots.gearbound.invalid',
+    DEBOUNCE: 2500, RETRY_MS: 30000,
+    session: null, status: 'off', // off | syncing | ok | offline | error
+    lastError: '', listeners: []
   };
-  AG.Auth = Auth;
+  var SK = 'gearbound.cloud.session', STK = 'gearbound.cloud.state', LK = 'gearbound.cloud.log', STASH = 'gearbound.acct.';
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+  function jget(k, d) { try { var v = JSON.parse(lsGet(k)); return v == null ? d : v; } catch (e) { return d; } }
+  var S = function () { return AG.Screens; };
+  function emit() { C.listeners.forEach(function (f) { try { f(C); } catch (e) {} }); }
+  C.on = function (f) { C.listeners.push(f); return function () { var i = C.listeners.indexOf(f); if (i >= 0) C.listeners.splice(i, 1); }; };
+  function setStatus(s, err) { C.status = s; if (err != null) C.lastError = err; emit(); }
+
+  // ---------------------------------------------------------------- names (mirror of supabase/functions/signup/rules.js)
+  var RESERVED = ['admin', 'administrator', 'moderator', 'mod', 'gearbound', 'system', 'support', 'staff', 'official', 'owner', 'server'];
+  C.pilotKey = function (name) { return String(name || '').trim().toLowerCase().replace(/[\s_.\-]+/g, '_').replace(/^_+|_+$/g, ''); };
+  C.pilotEmail = function (name) { return C.pilotKey(name) + '@' + C.DOMAIN; };
+  C.checkName = function (raw) {
+    var n = String(raw == null ? '' : raw).replace(/\s+/g, ' ').trim();
+    if (!n) return 'Please enter a pilot name.';
+    if (n.length > 14) return 'Pilot names can be up to 14 characters.';
+    if (!/^[A-Za-z0-9 _.\-]+$/.test(n)) return 'Use letters, numbers, spaces, _ . or - only.';
+    if ((n.match(/[A-Za-z0-9]/g) || []).length < 3) return 'Pilot names need at least 3 letters or numbers.';
+    var c = AG.NameFilter.checkName(n); if (!c.ok) return c.reason;
+    if (RESERVED.indexOf(C.pilotKey(n).replace(/_/g, '')) >= 0) return 'That name is reserved. Please pick another.';
+    return '';
+  };
+  C.checkPassword = function (p) {
+    if (typeof p !== 'string' || p.length < 6) return 'Passwords need at least 6 characters.';
+    if (p.length > 72) return 'That password is too long (72 characters max).';
+    return '';
+  };
+
+  // ---------------------------------------------------------------- anomaly log (kept on this device, newest last)
+  C.log = function (kind, detail) {
+    var a = jget(LK, []); if (!Array.isArray(a)) a = [];
+    a.push({ t: Date.now(), kind: kind, detail: detail || null }); while (a.length > 50) a.shift();
+    lsSet(LK, JSON.stringify(a));
+    try { console.warn('[cloud]', kind, detail || ''); } catch (e) {}
+  };
+  C.anomalies = function () { return jget(LK, []); };
+
+  // ---------------------------------------------------------------- HTTP
+  var OFFLINE = { ok: false, status: 0, offline: true, data: null };
+  function req(method, path, body, token, extra) {
+    if (typeof fetch !== 'function') return Promise.resolve(OFFLINE);
+    var h = { apikey: C.KEY, 'Content-Type': 'application/json' };
+    if (token) h.Authorization = 'Bearer ' + token;
+    if (extra) for (var k in extra) h[k] = extra[k];
+    var ctl = typeof AbortController === 'function' ? new AbortController() : null;
+    var to = setTimeout(function () { if (ctl) ctl.abort(); }, 15000);
+    return fetch(C.URL + path, { method: method, headers: h, body: body == null ? undefined : JSON.stringify(body), signal: ctl ? ctl.signal : undefined })
+      .then(function (r) {
+        clearTimeout(to);
+        return r.text().then(function (t) { var d = null; try { d = t ? JSON.parse(t) : null; } catch (e) { d = { message: t }; } return { ok: r.ok, status: r.status, data: d }; });
+      }, function () { clearTimeout(to); return OFFLINE; });
+  }
+  C._req = req;
+  function msgOf(r, fallback) {
+    if (r.offline) return 'Can\'t reach the GearBound server. Check your internet, or play offline for now.';
+    var d = r.data || {};
+    return d.message || d.msg || d.error_description || fallback || 'Something went wrong. Please try again.';
+  }
+
+  // ---------------------------------------------------------------- session
+  function saveSession(s) { C.session = s; if (s) lsSet(SK, JSON.stringify(s)); else lsDel(SK); emit(); }
+  function fromToken(d, name) {
+    return { access_token: d.access_token, refresh_token: d.refresh_token, expires_at: d.expires_at || Math.floor(Date.now() / 1000) + (d.expires_in || 3600),
+      uid: d.user && d.user.id, email: d.user && d.user.email, name: name || (d.user && d.user.user_metadata && d.user.user_metadata.pilot_name) || '' };
+  }
+  C.user = function () { return C.session ? { id: C.session.uid, name: C.session.name } : null; };
+  C.loggedIn = function () { return !!(C.session && C.session.uid); };
+  var refreshing = null;
+  function token() {
+    var s = C.session; if (!s) return Promise.resolve(null);
+    if (s.expires_at - 60 > Date.now() / 1000) return Promise.resolve(s.access_token);
+    if (refreshing) return refreshing;
+    refreshing = req('POST', '/auth/v1/token?grant_type=refresh_token', { refresh_token: s.refresh_token }).then(function (r) {
+      refreshing = null;
+      if (r.ok && r.data && r.data.access_token) { saveSession(fromToken(r.data, s.name)); return C.session.access_token; }
+      if (r.offline || r.status >= 500) { setStatus('offline'); return null; }
+      // refresh token revoked/expired → logged out (the local save stays)
+      C.log('session_ended', { status: r.status });
+      saveSession(null); setStatus('off', 'Your login ran out. Please log in again.');
+      return null;
+    });
+    return refreshing;
+  }
+  C.token = token;
+
+  // ---------------------------------------------------------------- sync state
+  // { uid, name, rev (cloud updated_at we last matched), xp (cloud xp we last saw), dirty (local changes not yet in the cloud) }
+  function st() { var s = jget(STK, {}); return s && typeof s === 'object' ? s : {}; }
+  function setSt(s) { lsSet(STK, JSON.stringify(s)); }
+  C.state = st;
+  function xpOf(p) { return p && p.players && p.players[0] ? +p.players[0].xp || 0 : 0; }
+  function isProfile(p) { return !!(p && Array.isArray(p.players) && p.players[0] && typeof p.players[0] === 'object'); }
+  // what goes to the cloud: the profile (+ a few settings), never transient/secret bits
+  function cloudCopy() {
+    var p = JSON.parse(JSON.stringify(S().profile));
+    (p.players || []).forEach(function (pl) { if (pl) delete pl.ready; });
+    var set = AG.settings || {}, keep = {};
+    ['music', 'sfx', 'muted', 'quality', 'shake', 'aimGuide'].forEach(function (k) { if (set[k] != null) keep[k] = set[k]; });
+    p.settings = keep;
+    return p;
+  }
+  function applyName(p, name) { if (name && isProfile(p)) { p.players[0].name = name; p.players[0].nameSet = true; } return p; }
+
+  // ---------------------------------------------------------------- pull + reconcile
+  C.pull = function () {
+    if (!C.loggedIn()) return Promise.resolve(false);
+    setStatus('syncing');
+    return token().then(function (t) {
+      if (!t) { if (C.loggedIn()) setStatus('offline'); return false; }
+      var uid = C.session.uid;
+      return req('GET', '/rest/v1/pilots?id=eq.' + uid + '&select=pilot_name,save,updated_at', null, t).then(function (r) {
+        if (!r.ok || !Array.isArray(r.data)) { setStatus(r.offline ? 'offline' : 'error', msgOf(r)); return false; }
+        if (!r.data.length) { C.log('no_cloud_row', { uid: uid }); setStatus('error', 'Your pilot was not found in the cloud.'); return false; }
+        reconcile(uid, r.data[0]);
+        return true;
+      });
+    });
+  };
+  function reconcile(uid, row) {
+    var Sc = S(), s = st(), local = Sc.profile, name = row.pilot_name;
+    var cloud = isProfile(row.save) ? Sc.migrate(JSON.parse(JSON.stringify(row.save))) : null;
+    C.session.name = name; saveSession(C.session);
+    var push = false, result;
+    if (s.uid && s.uid !== uid) {
+      // this device's save belongs to ANOTHER pilot: put it aside (with its backups) and use this pilot's cloud save
+      Sc.stashProfile(STASH + s.uid, { dirty: !!s.dirty, name: s.name });
+      result = cloud || Sc.migrate({ players: [null, null] }); push = !cloud;
+      var mine = jget(STASH + uid, null);
+      if (mine && mine.dirty && isProfile(mine.profile)) { Sc.best(result, Sc.migrate(mine.profile)); push = true; C.log('merged_stash', { uid: uid }); }
+      if (mine) lsDel(STASH + uid);
+    } else if (!s.uid) {
+      // first login on this device: keep any progress made here
+      if (!cloud) { result = local; push = true; }
+      else if (Sc.pristine(local)) result = cloud;
+      else { result = Sc.best(cloud, local); push = true; C.log('first_login_merge', { cloudXp: xpOf(cloud), localXp: xpOf(local) }); }
+    } else if (!cloud) {
+      result = local; push = true; // empty cloud save: never adopt it, re-upload ours
+      C.log('empty_cloud_save', {});
+    } else if (s.dirty) {
+      // offline changes waiting: if the cloud didn't move meanwhile just upload, otherwise merge both
+      if (row.updated_at === s.rev) result = local;
+      else { result = Sc.best(cloud, local); C.log('conflict_merge', { cloudXp: xpOf(cloud), localXp: xpOf(local) }); }
+      push = true;
+    } else {
+      result = cloud;
+      if (xpOf(cloud) < xpOf(local)) { result = Sc.best(cloud, local); push = true; C.log('cloud_lower_than_local', { cloudXp: xpOf(cloud), localXp: xpOf(local) }); }
+    }
+    applyName(result, name);
+    if (cloud && cloud.settings && !s.uid) applySettings(cloud.settings);
+    setSt({ uid: uid, name: name, rev: row.updated_at, xp: Math.max(xpOf(cloud), s.uid === uid ? +s.xp || 0 : 0), dirty: push });
+    if (result !== local) Sc.adoptProfile(result); else Sc.save(true);
+    Sc.setStickyName(name);
+    if (push) C.pushNow(); else setStatus('ok', '');
+    if (AG.Friends && AG.Friends.refreshMe) try { AG.Friends.refreshMe(); } catch (e) {}
+    if (C.onAdopt) C.onAdopt();
+  }
+  function applySettings(cs) {
+    var set = AG.settings; if (!set || !cs) return;
+    for (var k in cs) set[k] = cs[k];
+    try { AG.saveSettings(); if (AG.audio && AG.audio.applySettings) AG.audio.applySettings(); } catch (e) {}
+  }
+
+  // ---------------------------------------------------------------- push (debounced, offline queue)
+  var timer = null, pushing = null, retryT = null;
+  // called by Screens.save() (match end, shop, gifts, settings, …)
+  C.changed = function () {
+    var s = st();
+    // logged out: this device's save still belongs to the last pilot — remember it changed, sync on next login
+    if (!C.loggedIn()) { if (s.uid && !s.dirty) { s.dirty = true; setSt(s); } return; }
+    if (s.uid !== C.session.uid) return; // not reconciled yet (pull will take care of it)
+    if (!s.dirty) { s.dirty = true; setSt(s); }
+    clearTimeout(timer); timer = setTimeout(C.pushNow, C.DEBOUNCE);
+  };
+  C.pushNow = function () {
+    clearTimeout(timer); timer = null;
+    if (!C.loggedIn()) return Promise.resolve(false);
+    if (pushing) { pushing.then(function () { if (st().dirty) C.changed(); }); return pushing; }
+    var s = st(); if (s.uid !== C.session.uid) return Promise.resolve(false);
+    var p = cloudCopy(), x = xpOf(p);
+    if (!isProfile(p)) { C.log('refused_empty_push', {}); return Promise.resolve(false); }
+    if (x < (+s.xp || 0)) {
+      // never lower the cloud's XP: something reset this device; reload and merge instead
+      C.log('refused_lower_xp', { localXp: x, cloudXp: s.xp });
+      s.dirty = false; setSt(s);
+      return C.pull();
+    }
+    setStatus('syncing');
+    pushing = token().then(function (t) {
+      if (!t) { queueRetry(); return false; }
+      return req('PATCH', '/rest/v1/pilots?id=eq.' + s.uid + '&select=save,updated_at', { save: p }, t, { Prefer: 'return=representation' }).then(function (r) {
+        if (r.ok && Array.isArray(r.data) && r.data[0]) {
+          var back = r.data[0], bx = xpOf(back.save), now = st();
+          if (bx < x) { C.log('server_refused_save', { sentXp: x, cloudXp: bx }); now.dirty = false; setSt(now); return C.pull(); }
+          now.rev = back.updated_at; now.xp = Math.max(+now.xp || 0, bx);
+          if (now.dirty && JSON.stringify(cloudCopy()) === JSON.stringify(p)) now.dirty = false;
+          setSt(now); setStatus('ok', ''); C.lastSync = Date.now();
+          if (now.dirty) C.changed();
+          return true;
+        }
+        if (r.status === 401) { C.session.expires_at = 0; saveSession(C.session); }
+        C.log('push_failed', { status: r.status });
+        setStatus(r.offline ? 'offline' : 'error', msgOf(r)); queueRetry();
+        return false;
+      });
+    });
+    return pushing.then(function (v) { pushing = null; return v; }, function () { pushing = null; return false; });
+  };
+  function queueRetry() { clearTimeout(retryT); retryT = setTimeout(function () { if (st().dirty) C.pushNow(); }, C.RETRY_MS); }
+  // last-chance upload when the tab is hidden/closed (keepalive fetch, fire and forget)
+  function flushKeepalive() {
+    if (!C.loggedIn() || !st().dirty || typeof fetch !== 'function') return;
+    var s = st(), ses = C.session; if (s.uid !== ses.uid || ses.expires_at - 30 < Date.now() / 1000) return;
+    var p = cloudCopy(); if (!isProfile(p) || xpOf(p) < (+s.xp || 0)) return;
+    var body = JSON.stringify({ save: p }); if (body.length > 60000) return; // keepalive bodies are capped at 64 KB
+    try { fetch(C.URL + '/rest/v1/pilots?id=eq.' + s.uid, { method: 'PATCH', keepalive: true, headers: { apikey: C.KEY, Authorization: 'Bearer ' + ses.access_token, 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: body }); } catch (e) {}
+  }
+
+  // ---------------------------------------------------------------- account actions (all resolve { ok, message })
+  C.login = function (name, password) {
+    var n = String(name || '').replace(/\s+/g, ' ').trim();
+    if (!n) return Promise.resolve({ ok: false, message: 'Please enter your pilot name.' });
+    if (!password) return Promise.resolve({ ok: false, message: 'Please enter your password.' });
+    return req('POST', '/auth/v1/token?grant_type=password', { email: C.pilotEmail(n), password: password }).then(function (r) {
+      if (!r.ok || !r.data || !r.data.access_token) {
+        if (r.status === 400 || r.status === 401) return { ok: false, message: 'That pilot name and password don\'t match. Check the spelling and try again!' };
+        if (r.status === 429) return { ok: false, message: 'Too many tries. Please wait a minute and try again.' };
+        return { ok: false, message: msgOf(r) };
+      }
+      saveSession(fromToken(r.data, n));
+      return C.pull().then(function () { return { ok: true, name: C.session && C.session.name }; });
+    });
+  };
+  C.signup = function (name, password) {
+    var why = C.checkName(name) || C.checkPassword(password);
+    if (why) return Promise.resolve({ ok: false, message: why });
+    var n = String(name).replace(/\s+/g, ' ').trim(), s = st(), Sc = S();
+    // a brand-new pilot starts from this device's progress — unless that progress belongs to another pilot
+    var start = s.uid ? null : cloudCopy();
+    return req('POST', '/functions/v1/signup', { action: 'signup', name: n, password: password, save: start }).then(function (r) {
+      if (!r.ok || !r.data || !r.data.ok) return { ok: false, message: msgOf(r), code: r.data && r.data.error };
+      return C.login(r.data.name || n, password).then(function (lr) {
+        if (lr.ok) C.log('signed_up', { name: r.data.name || n });
+        return lr.ok ? { ok: true, name: r.data.name || n, created: true } : lr;
+      });
+    });
+  };
+  C.logout = function () {
+    var ses = C.session;
+    return (st().dirty ? C.pushNow() : Promise.resolve()).then(function () {
+      if (ses) req('POST', '/auth/v1/logout', {}, ses.access_token);
+      saveSession(null); setStatus('off', '');
+      // the device keeps this pilot's save (state.uid stays) so another pilot logging in here won't merge into it
+      return { ok: true };
+    });
+  };
+  C.changePassword = function (oldPw, newPw) {
+    if (!C.loggedIn()) return Promise.resolve({ ok: false, message: 'Please log in first.' });
+    var why = C.checkPassword(newPw); if (why) return Promise.resolve({ ok: false, message: why });
+    // check the current password first (also gives a fresh token)
+    return req('POST', '/auth/v1/token?grant_type=password', { email: C.session.email || C.pilotEmail(C.session.name), password: oldPw || '' }).then(function (r) {
+      if (!r.ok || !r.data || !r.data.access_token) return { ok: false, message: r.offline ? msgOf(r) : 'Your current password isn\'t right.' };
+      saveSession(fromToken(r.data, C.session.name));
+      return req('PUT', '/auth/v1/user', { password: newPw }, C.session.access_token).then(function (u) {
+        if (!u.ok) return { ok: false, message: msgOf(u, 'Could not change the password.') };
+        return { ok: true, message: 'Password changed ✔' };
+      });
+    });
+  };
+  C.rename = function (name) {
+    if (!C.loggedIn()) return Promise.resolve({ ok: false, message: 'Please log in first.' });
+    var why = C.checkName(name); if (why) return Promise.resolve({ ok: false, message: why });
+    return token().then(function (t) {
+      if (!t) return { ok: false, message: 'You need to be online to change your pilot name.' };
+      return req('POST', '/functions/v1/signup', { action: 'rename', name: name }, t).then(function (r) {
+        if (!r.ok || !r.data || !r.data.ok) return { ok: false, message: msgOf(r) };
+        var nn = r.data.name;
+        C.session.name = nn; C.session.email = C.pilotEmail(nn); saveSession(C.session);
+        var s = st(); s.name = nn; setSt(s);
+        return { ok: true, name: nn };
+      });
+    });
+  };
+
+  // ---------------------------------------------------------------- cloud gift delivery (backup for the P2P path)
+  C.sendGift = function (g) {
+    if (!C.loggedIn()) return Promise.resolve(false);
+    return token().then(function (t) {
+      if (!t) return false;
+      return req('POST', '/rest/v1/gifts', { recipient_code: g.to, gift: g }, t, { Prefer: 'return=minimal' }).then(function (r) { if (!r.ok) C.log('gift_send_failed', { status: r.status }); return r.ok; });
+    });
+  };
+  C.fetchGifts = function () {
+    if (!C.loggedIn()) return Promise.resolve([]);
+    return token().then(function (t) {
+      if (!t) return [];
+      return req('GET', '/rest/v1/gifts?select=id,gift,created_at&order=created_at.asc&limit=50', null, t).then(function (r) { return r.ok && Array.isArray(r.data) ? r.data : []; });
+    });
+  };
+  C.deleteGift = function (id) {
+    return token().then(function (t) { return t ? req('DELETE', '/rest/v1/gifts?id=eq.' + encodeURIComponent(id), null, t) : null; });
+  };
+
+  // ---------------------------------------------------------------- boot
+  C.init = function () {
+    C.session = jget(SK, null);
+    if (C.session && !C.session.uid) C.session = null;
+    if (C.session) { setStatus('syncing'); C.pull(); }
+    window.addEventListener('online', function () { if (C.loggedIn()) { if (st().uid === C.session.uid && st().dirty) C.pushNow(); else C.pull(); } });
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') flushKeepalive(); });
+    window.addEventListener('pagehide', flushKeepalive);
+  };
+  // online play needs an account; tests set window.__GB_NO_ACCOUNT_GATE (this is a client-side rule: online play is P2P)
+  C.required = function () { return !window.__GB_NO_ACCOUNT_GATE; };
+  C.canPlayOnline = function () { return !C.required() || C.loggedIn(); };
+  AG.Cloud = C;
 })(window.AG);
 
 </script>
@@ -4484,12 +4838,68 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     });
   };
 
+  // Screen-space overlay layout: the turn banner and the weather announcement are placed below the top HUD
+  // (pilot card, minimap, wind dial, turn order, items, gear) so on phones they never cover it, and stacked so
+  // they never cover each other. HUD rects are read from the DOM at most every 500ms.
+  var hudCache = { t: -1e9, rects: [] };
+  var HUD_SEL = ['.hud-card', '.hud-mini', '.hud-wind', '.hud-order', '.hud-items', '#gearBtn'];
+  R.hudRects = function () {
+    var now = (window.performance && performance.now()) || Date.now();
+    if (now - hudCache.t < 500) return hudCache.rects;
+    var out = [];
+    HUD_SEL.forEach(function (s) { var e = document.querySelector(s); if (!e || !e.offsetParent && getComputedStyle(e).position !== 'fixed') return;
+      var cs = getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden') return;
+      var r = e.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return; out.push({ n: s, r: [r.left, r.top, r.right, r.bottom] }); });
+    hudCache = { t: now, rects: out }; return out;
+  };
+  // lowest bottom edge of the HUD pieces that sit in the top part of the screen
+  R.hudBottom = function (H) { var b = 0; R.hudRects().forEach(function (h) { if (h.r[1] < H * 0.4 && h.r[3] < H * 0.6) b = Math.max(b, h.r[3]); }); return b; };
+  R.overlayTop = function (H) { return Math.max(H * 0.27 - 38, R.hudBottom(H) + 6); };
+  // fit a single line to maxW by shrinking the font (min 60% of the size)
+  function fitFont(c, text, weight, size, maxW) { var s = size; c.font = weight + ' ' + s + 'px ' + FONT; var w = c.measureText(text).width;
+    if (w > maxW) { s = Math.max(Math.floor(size * 0.6), Math.floor(size * maxW / w)); c.font = weight + ' ' + s + 'px ' + FONT; } return s; }
+  // split a "a · b · c" sub line into as few lines as fit maxW
+  function wrapSub(c, text, maxW) { if (c.measureText(text).width <= maxW) return [text];
+    var parts = text.split(' · '), lines = [], cur = '';
+    parts.forEach(function (p) { var t = cur ? cur + ' · ' + p : p; if (cur && c.measureText(t).width > maxW) { lines.push(cur); cur = p; } else cur = t; });
+    if (cur) lines.push(cur); return lines; }
+  function boxHit(a, b) { return Math.min(a[2], b[2]) - Math.max(a[0], b[0]) > 2 && Math.min(a[3], b[3]) - Math.max(a[1], b[1]) > 2; }
+  R.layoutOverlay = function (c, g, W, H) {
+    var L = { banner: null, announce: null, overlap: '' }, y = R.overlayTop(H), maxW = W * 0.92;
+    var b = g.banner && g.banner.t > 0 ? g.banner : null, a = g.announce && g.announce.t > 0 ? g.announce : null;
+    c.save();
+    if (b) {
+      var ts = fitFont(c, b.text, '700', W < 500 ? 30 : 36, maxW), tw = c.measureText(b.text).width, sub = [], ss = 14, sw = 0;
+      if (b.sub) { ss = W < 500 ? 12 : 14; c.font = '600 ' + ss + 'px ' + FONT; sub = wrapSub(c, b.sub.toUpperCase(), maxW); sub.forEach(function (l) { sw = Math.max(sw, c.measureText(l).width); }); }
+      var bh = Math.round(ts * 1.25 + 18 + sub.length * (ss + 6));
+      L.banner = { y: y, h: bh, ts: ts, ss: ss, sub: sub, box: [W / 2 - Math.max(tw, sw) / 2 - 8, y, W / 2 + Math.max(tw, sw) / 2 + 8, y + bh] };
+      y += bh + 6;
+    }
+    if (a) {
+      var as = fitFont(c, a.text, '700', W < 500 ? 22 : 26, maxW), aw = c.measureText(a.text).width, ss2 = W < 500 ? 12 : 14;
+      c.font = '600 ' + ss2 + 'px ' + FONT; var asub = a.sub ? wrapSub(c, a.sub, maxW) : [], asw = 0; asub.forEach(function (l) { asw = Math.max(asw, c.measureText(l).width); });
+      var ah = Math.round(as * 1.3 + 6 + asub.length * (ss2 + 6));
+      L.announce = { y: y, h: ah, ts: as, ss: ss2, sub: asub, box: [W / 2 - Math.max(aw, asw) / 2 - 8, y, W / 2 + Math.max(aw, asw) / 2 + 8, y + ah] };
+    }
+    c.restore();
+    var hits = [];
+    [['banner', L.banner], ['announce', L.announce]].forEach(function (p) { if (!p[1]) return;
+      R.hudRects().forEach(function (h) { if (boxHit(p[1].box, h.r)) hits.push(p[0] + ' x ' + h.n); });
+      if (p[1].box[0] < -1 || p[1].box[2] > W + 1 || p[1].box[3] > H) hits.push(p[0] + ' off-screen'); });
+    if (L.banner && L.announce && boxHit(L.banner.box, L.announce.box)) hits.push('banner x announce');
+    L.overlap = hits.join('; ');
+    g._overlay = L; g._overlayFrame = g.frame;
+    R.lastBanner = { banner: L.banner && L.banner.box.map(Math.round), announce: L.announce && L.announce.box.map(Math.round), overlap: L.overlap, W: W, H: H };
+    return L;
+  };
+
   // Animated banner announcing whose turn it is (slides + scales in, glassy strip).
   R.drawBanner = function (c, g, W, H) {
     var b = g.banner; if (!b || b.t <= 0) return;
+    var L = R.layoutOverlay(c, g, W, H).banner;
     var life = b.max - b.t, inT = Math.min(1, life / 14), outT = Math.min(1, b.t / 16), k = Math.min(inT, outT);
     var ease = 1 - Math.pow(1 - inT, 3);
-    var y = H * 0.27, bh = 76;
+    var bh = L.h, y = L.y + bh / 2;
     c.save();
     c.globalAlpha = k;
     var gr = c.createLinearGradient(0, 0, W, 0);
@@ -4498,13 +4908,14 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var lg = c.createLinearGradient(W * 0.2, 0, W * 0.8, 0);
     lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(0.5, b.color); lg.addColorStop(1, 'rgba(255,255,255,0)');
     c.fillStyle = lg; c.fillRect(W * 0.2 + (1 - ease) * W * 0.3, y - bh / 2, W * 0.6 * ease, 2); c.fillRect(W * 0.2, y + bh / 2 - 2, W * 0.6 * ease, 2);
-    var slide = (1 - ease) * 140;
+    var slide = (1 - ease) * 140, ty = L.y + 9 + L.ts * 0.62;
     c.textAlign = 'center'; c.textBaseline = 'middle';
-    c.font = '700 36px ' + FONT;
+    c.font = '700 ' + L.ts + 'px ' + FONT;
     c.shadowColor = 'rgba(0,0,0,0.6)'; c.shadowBlur = 12; c.shadowOffsetY = 3;
-    c.fillStyle = '#fff'; c.fillText(b.text, W / 2 - slide, y - 8);
+    c.fillStyle = '#fff'; c.fillText(b.text, W / 2 - slide, ty);
     c.shadowBlur = 0; c.shadowOffsetY = 0;
-    if (b.sub) { c.font = '600 14px ' + FONT; c.fillStyle = b.color; c.fillText(b.sub.toUpperCase(), W / 2 + slide, y + 22); }
+    if (L.sub.length) { c.font = '600 ' + L.ss + 'px ' + FONT; c.fillStyle = b.color;
+      L.sub.forEach(function (l, i) { c.fillText(l, W / 2 + slide, ty + L.ts * 0.63 + 4 + L.ss / 2 + i * (L.ss + 6)); }); }
     c.restore();
   };
 
@@ -6312,25 +6723,78 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       gold: START_GOLD, xp: 0, owned: ['hat:none', 'outfit:scout', 'pet:none'], items: { heal: 1, calm: 1 }, loadout: ['heal', 'calm'] };
   }
   S.defaultPlayer = defaultPlayer;
+  // ---- save robustness: a save is NEVER deleted or replaced by a fresh one. Unreadable / odd-shaped saves are kept
+  // (raw) under gearbound.profile.raw, the last 3 good snapshots live in gearbound.profile.bak, everything is
+  // migrated forward (missing fields filled, unknown fields kept) and if the live save ever has LESS xp than a
+  // snapshot (xp never goes down in play, so that means a reset or a stale tab overwrote it) the best values of all
+  // copies are merged back: max xp / gold, union of owned cosmetics, max item counts, union of friends.
+  var BAK_KEY = 'gearbound.profile.bak', RAW_KEY = 'gearbound.profile.raw', SCHEMA = 2, lastBak = 0, lastXp = -1;
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
+  function ring(key, item, max) { var a = []; try { a = JSON.parse(lsGet(key) || '[]'); } catch (e) {} if (!Array.isArray(a)) a = []; a.push(item); while (a.length > max) a.shift(); lsSet(key, JSON.stringify(a)); }
+  function fixPlayer(pl, i) {
+    var d = defaultPlayer(i + 1, i % 2 ? 'B' : 'A');
+    if (!pl || typeof pl !== 'object') return d;
+    Object.keys(d).forEach(function (k) { if (pl[k] == null) pl[k] = d[k]; });
+    if (typeof pl.avatar !== 'object') pl.avatar = d.avatar;
+    Object.keys(d.avatar).forEach(function (k) { if (!pl.avatar[k]) pl.avatar[k] = k === 'hair' ? 'natural' : d.avatar[k]; });
+    if (!Array.isArray(pl.owned)) pl.owned = d.owned.slice();
+    d.owned.forEach(function (o) { if (pl.owned.indexOf(o) < 0) pl.owned.push(o); });
+    if (typeof pl.items !== 'object' || Array.isArray(pl.items)) pl.items = { heal: 1, calm: 1 };
+    if (!Array.isArray(pl.loadout)) pl.loadout = [];
+    pl.gold = Math.max(0, +pl.gold || 0); pl.xp = AG.Ranks.clamp(pl.xp); pl.ready = false;
+    return pl;
+  }
+  // parse + migrate forward; returns null only for data that is not a profile at all
+  function migrate(raw) {
+    var p = null; try { p = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch (e) { return null; }
+    if (!p || typeof p !== 'object') return null;
+    if (!Array.isArray(p.players) && p.players && typeof p.players === 'object') p.players = Object.keys(p.players).map(function (k) { return p.players[k]; });
+    if (!Array.isArray(p.players) || !p.players.length || typeof p.players[0] !== 'object') return null;
+    if (p.players.length < 2) p.players.push(null);
+    p.players = p.players.map(fixPlayer);
+    if (p.theme == null) p.theme = 0;
+    if (p.seed == null) p.seed = Math.floor(Math.random() * 1e9);
+    p.schema = Math.max(SCHEMA, p.schema | 0);
+    return p;
+  }
+  function best(into, from) {
+    for (var i = 0; i < 2; i++) {
+      var a = into.players[i], b = from.players[i]; if (!a || !b) continue;
+      a.xp = Math.max(a.xp, b.xp); a.gold = Math.max(a.gold, b.gold);
+      b.owned.forEach(function (o) { if (a.owned.indexOf(o) < 0) a.owned.push(o); });
+      Object.keys(b.items).forEach(function (k) { a.items[k] = Math.max(a.items[k] | 0, b.items[k] | 0); });
+      if (!a.nameSet && b.nameSet) { a.name = b.name; a.nameSet = true; }
+      if (i === 0 && b.loadout.length && !a.loadout.length) a.loadout = b.loadout.slice();
+    }
+    if (!into.friendCode && from.friendCode) { into.friendCode = from.friendCode; into.friendCodeOk = from.friendCodeOk; }
+    if (Array.isArray(from.friends)) { var have = {}; into.friends = into.friends || []; into.friends.forEach(function (f) { have[f.code] = 1; });
+      from.friends.forEach(function (f) { if (f && f.code && !have[f.code]) { into.friends.push(f); have[f.code] = 1; } }); }
+    return into;
+  }
+  function pristine(p) { var m = p.players[0]; return !m.nameSet && !m.xp && m.gold === START_GOLD && m.owned.length <= 3; }
+  function snapshot(p) { if (pristine(p)) return; var s = JSON.stringify(p), a = []; try { a = JSON.parse(lsGet(BAK_KEY) || '[]'); } catch (e) {}
+    if (Array.isArray(a) && a.length && a[a.length - 1].d === s) return; ring(BAK_KEY, { t: Date.now(), d: s }, 3); lastBak = Date.now(); }
+  S.recovered = false;
   S.load = function () {
-    var p = null;
-    try { p = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null'); } catch (e) {}
-    if (!p || !p.players || p.players.length < 2) p = { theme: 0, seed: Math.floor(Math.random() * 1e9), players: [defaultPlayer(1, 'A'), defaultPlayer(2, 'B')] };
-    p.players.forEach(function (pl, i) {
-      pl.ready = false;
-      // profiles saved before faces/hair existed get a default look
-      if (!pl.avatar.face) pl.avatar.face = AG.Avatar.FACES[i % AG.Avatar.FACES.length].id;
-      if (!pl.avatar.hair) pl.avatar.hair = 'natural';
-      if (!pl.items) pl.items = { heal: 1, calm: 1 };
-      if (!pl.loadout) pl.loadout = [];
-      pl.xp = AG.Ranks.clamp(pl.xp);
-    });
+    var raw = lsGet(PROFILE_KEY), p = raw ? migrate(raw) : null;
+    if (raw && !p) ring(RAW_KEY, { t: Date.now(), d: raw.slice(0, 200000) }, 3); // unreadable: keep it, never just drop it
+    // every other copy on this origin: rolling snapshots + any other gearbound profile-shaped key (future/older versions)
+    var cands = [];
+    try { (JSON.parse(lsGet(BAK_KEY) || '[]') || []).forEach(function (b) { var q = b && migrate(b.d); if (q) cands.push(q); }); } catch (e) {}
+    try { for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i);
+      if (/^gearbound/i.test(k) && !/^gearbound\.(acct|cloud)\./i.test(k) && k !== PROFILE_KEY && k !== BAK_KEY && k !== RAW_KEY && /players/.test(lsGet(k) || '')) { var q = migrate(lsGet(k)); if (q) cands.push(q); } } } catch (e) {}
+    var maxXp = 0; cands.forEach(function (q) { maxXp = Math.max(maxXp, q.players[0].xp); });
+    if (!p) { p = cands.length ? cands[cands.length - 1] : migrate({ players: [null, null] }); if (cands.length) S.recovered = true; }
+    if (cands.length && (S.recovered || p.players[0].xp < maxXp)) { cands.forEach(function (q) { best(p, q); }); S.recovered = true; }
     // sticky pilot name: a chosen name is also kept under its own key, so even a lost/reset profile keeps it
-    var me = p.players[0], bk = null;
-    try { bk = localStorage.getItem(NAME_KEY); } catch (e) {}
+    var me = p.players[0], bk = lsGet(NAME_KEY);
     if (bk && AG.NameFilter.checkName(bk).ok) { me.name = bk; me.nameSet = true; }
-    else if (me.nameSet) { try { localStorage.setItem(NAME_KEY, me.name); } catch (e) {} }
+    else if (me.nameSet) lsSet(NAME_KEY, me.name);
     S.profile = p;
+    if (S.recovered || (raw && !p)) S.save();
+    lastXp = p.players[0].xp; snapshot(p);
+    try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {}); } catch (e) {}
   };
   var NAME_KEY = 'gearbound.pilotName';
   // The ONLY way the pilot name changes once chosen (title screen on first visit, then Settings → Pilot name → Save).
@@ -6344,7 +6808,26 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     if (R && R.mode !== 'local' && R.status !== 'playing') { var ms = AG.Online.myMainSlot(); if (ms) { try { AG.Online.act(ms, 'name', c.name); } catch (e) {} if (R.mode === 'client') ms.name = c.name; } }
     return null;
   };
-  S.save = function () { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(S.profile)); } catch (e) {} };
+  // quiet=true: written because of a cloud load (don't echo it back to the cloud)
+  S.save = function (quiet) {
+    var p = S.profile; if (!p || !p.players) return; // never write a non-profile over the save
+    p.schema = Math.max(SCHEMA, p.schema | 0); p.savedAt = Date.now();
+    lsSet(PROFILE_KEY, JSON.stringify(p));
+    // rolling backup: on every load, whenever xp changes (match end) and at most every 2 minutes otherwise
+    if (p.players[0].xp !== lastXp || Date.now() - lastBak > 120000) { lastXp = p.players[0].xp; snapshot(p); }
+    if (quiet !== true && AG.Cloud) AG.Cloud.changed();
+  };
+  // ---- used by js/cloud.js (accounts)
+  S.migrate = migrate; S.best = best; S.pristine = pristine;
+  // replace the whole profile with a cloud copy
+  S.adoptProfile = function (p) { S.profile = p; lastXp = -1; S.save(true); };
+  // another pilot is logging in on this device: put this save and its backups aside so they never merge into theirs
+  S.stashProfile = function (key, meta) {
+    var o = { t: Date.now(), profile: S.profile, bak: lsGet(BAK_KEY) }; for (var k in meta || {}) o[k] = meta[k];
+    lsSet(key, JSON.stringify(o)); try { localStorage.removeItem(BAK_KEY); } catch (e) {}
+  };
+  S.setStickyName = function (n) { if (n) lsSet(NAME_KEY, n); };
+  S.snapshot = function () { if (S.profile) snapshot(S.profile); };
 
   // ---------------------------------------------------------------- helpers
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
@@ -6448,8 +6931,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     logo.innerHTML = '<div class="gear g1"></div><div class="gear g2"></div><h1 class="title">GEAR<b>BOUND</b><span>STEAM &amp; THUNDER ARTILLERY</span></h1>';
     box.appendChild(logo);
     box.appendChild(el('p', 'sub', 'Ride your rig. Read the wind. Rule the sky.'));
-    // Entry card: pick a pilot name + look and play. Profile lives on this device (no third-party sign-in).
-    // js/auth.js stays as an internal abstraction for a future simple account; it is not used here.
+    // Entry card: pick a pilot name + look and play. Offline play needs no account; a pilot account (js/cloud.js) adds online play + cloud saves.
     var me = S.profile.players[0];
     var form = el('div', 'login entry');
     var pv = el('div', 'entryprev'); form.appendChild(pv);
@@ -6486,7 +6968,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     form.appendChild(nerr);
     var tr = btn('ghost small', '⇄ Move my progress to another device', function () { S.transferDialog(); }); tr.id = 'transferBtn';
     form.appendChild(tr);
-    form.appendChild(el('div', 'authmsg', 'Your pilot, rank, gold and items are saved on this device.'));
+    var al = el('div', 'acctline'); al.id = 'acctLine'; form.appendChild(al); S.titleAccount(al);
     box.appendChild(form);
     var how = el('div', 'howto');
     if (AG.Touch && AG.Touch.enabled) how.innerHTML = '<b>How to play:</b> hold ◀ ▶ to drive · ▲ ▼ to aim · hold <b>FIRE</b> to charge, let go to shoot · <b>1 2 OD</b> pick a shot · tap an item to load it · ' +
@@ -6563,7 +7045,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     list.innerHTML = '<div class="rlempty">Looking for rooms…</div>';
     right.appendChild(list);
     var acts = el('div', 'rbactions');
-    var cr = btn('primary', '＋ Create Room', function () { form.classList.toggle('open'); }); cr.id = 'createBtn';
+    var cr = btn('primary', '＋ Create Room', function () { if (needAcct(function () { form.classList.add('open'); })) return; form.classList.toggle('open'); }); cr.id = 'createBtn';
     acts.appendChild(cr);
     var qj = btn('', '⚡ Quick Join', function () { quickJoin(); }); qj.id = 'quickBtn';
     acts.appendChild(qj);
@@ -6580,6 +7062,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var fpw = el('input'); fpw.id = 'roomPw'; fpw.placeholder = 'optional password'; fpw.maxLength = 16;
     var flist = el('label', 'chk'); flist.innerHTML = '<input type="checkbox" id="roomListed" checked> List publicly';
     var fgo = btn('primary small', 'Create ▶', function () {
+      if (needAcct(function () { fgo.click(); })) return;
       setMsg('Opening room…');
       O().host({ name: fname.value, theme: +fmap.value, pw: fpw.value, listed: document.getElementById('roomListed').checked }).then(function () {
         S.go('room', S.showRoom);
@@ -6656,6 +7139,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   S._joinCode = function (c) { joinCode(c); };
   function joinCode(code, locked) {
     code = String(code || '').trim().toUpperCase();
+    if (needAcct(function () { joinCode(code, locked); })) return;
     var pw = '';
     if (locked) { pw = window.prompt('Room password:') || ''; }
     setMsg('Joining ' + code + '…');
@@ -6664,7 +7148,15 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       setMsg('Could not join ' + code + ': ' + errText(e));
     });
   }
+  // online play needs a pilot account (offline / practice never does)
+  function needAcct(retry) {
+    if (!AG.Cloud || AG.Cloud.canPlayOnline()) return false;
+    S.accountDialog(AG.Cloud.state().uid ? 'login' : 'signup', { reason: 'Online battles need a free pilot account, so every pilot has a real, friendly name. Log in or make one — it only takes a moment!', after: retry });
+    return true;
+  }
+  S.needAccount = needAcct;
   function quickJoin() {
+    if (needAcct(quickJoin)) return;
     var open = lastRooms.filter(function (r) { return r.status === 'waiting' && !r.locked && r.players < r.max; });
     if (open.length) return joinCode(open[0].code);
     setMsg('No open rooms — creating one for you…');
@@ -7048,8 +7540,13 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     if (fc && fc !== S.profile.friendCode) { S.profile.friendCode = fc; S.profile.friendCodeOk = true; if (AG.Friends) setTimeout(AG.Friends.restart, 0); }
     if (Array.isArray(d.fr)) { var have = {}; (S.profile.friends = S.profile.friends || []).forEach(function (f) { have[f.code] = 1; });
       d.fr.forEach(function (f) { var c = f && AG.Online.cleanFC(f.code); if (c && !have[c] && c !== S.profile.friendCode) { S.profile.friends.push({ code: c, name: AG.NameFilter.safeName(f.name, c), xp: AG.Ranks.clamp(f.xp), added: +f.added || Date.now() }); have[c] = 1; } }); }
-    p.xp = AG.Ranks.clamp(d.xp); p.gold = Math.max(0, d.gold | 0);
-    p.owned = Array.isArray(d.owned) ? d.owned : p.owned; p.items = d.items || p.items; p.loadout = AG.Items.clean(d.loadout);
+    // an import never loses anything this device already has (importing a fresh device's code by mistake used to
+    // wipe the pilot): snapshot first, then keep the best of both — max xp/gold, union of cosmetics, max item counts
+    snapshot(S.profile);
+    p.xp = Math.max(p.xp || 0, AG.Ranks.clamp(d.xp)); p.gold = Math.max(p.gold || 0, d.gold | 0);
+    if (Array.isArray(d.owned)) d.owned.forEach(function (o) { if (typeof o === 'string' && p.owned.indexOf(o) < 0) p.owned.push(o); });
+    if (d.items && typeof d.items === 'object') Object.keys(d.items).forEach(function (k) { p.items[k] = Math.max(p.items[k] | 0, d.items[k] | 0); });
+    p.loadout = AG.Items.clean(d.loadout);
     p.avatar = AG.Online.cleanAvatar(d.avatar); p.rigId = AG.rigById(d.rigId).id;
     S.save(); return null;
   };
@@ -7062,7 +7559,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     pn.appendChild(el('h4', '', 'Your code (this device)')); pn.appendChild(out);
     var cp = btn('', 'Copy code', function () { out.select(); try { navigator.clipboard.writeText(out.value); } catch (e) { document.execCommand('copy'); } cp.textContent = 'Copied ✓'; });
     pn.appendChild(cp);
-    pn.appendChild(el('h4', '', 'Import a code (replaces this device\'s pilot)'));
+    pn.appendChild(el('h4', '', 'Import a code (merges into this device\'s pilot — nothing here is lost)'));
     var inp = el('textarea', 'tcode'); inp.id = 'importCode'; inp.placeholder = 'Paste a GB1-… code here'; pn.appendChild(inp);
     var msg = el('div', 'authmsg');
     var row = el('div', 'row');
@@ -7071,6 +7568,127 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     pn.appendChild(row); pn.appendChild(msg);
     ov.appendChild(pn); ov.onclick = function (e) { if (e.target === ov) ov.remove(); };
     document.body.appendChild(ov);
+  };
+
+  // ---------------------------------------------------------------- pilot accounts (js/cloud.js)
+  function cloudStatus() {
+    var C = AG.Cloud; if (!C) return '';
+    return { syncing: 'Saving…', ok: 'Saved online ✔', offline: 'Offline — will save online when you\'re back', error: 'Online save problem: ' + (C.lastError || 'try again later'), off: '' }[C.status] || '';
+  }
+  S.titleAccount = function (box) {
+    var C = AG.Cloud; box.innerHTML = '';
+    if (!C) { box.appendChild(el('div', 'authmsg', 'Your pilot, rank, gold and items are saved on this device.')); return; }
+    if (C.loggedIn()) {
+      var l = el('div', 'acctin'); l.innerHTML = '☁ Logged in as <b></b> · <span class="cst"></span>';
+      l.querySelector('b').textContent = C.session.name; l.querySelector('.cst').textContent = cloudStatus() || 'progress saved online';
+      box.appendChild(l); return;
+    }
+    var row = el('div', 'row acctbtns');
+    var li = btn('small', '🔑 Log in', function () { S.accountDialog('login'); }); li.id = 'loginBtn';
+    var su = btn('small', '✨ New pilot account', function () { S.accountDialog('signup'); }); su.id = 'signupBtn';
+    row.appendChild(li); row.appendChild(su); box.appendChild(row);
+    box.appendChild(el('div', 'authmsg', C.state().uid ? 'Log in to play online and save your progress online.' : 'A free pilot account lets you play online and keeps your progress safe. Playing offline doesn\'t need one.'));
+  };
+  var acctKey = null;
+  S.syncAccountUi = function () {
+    var C = AG.Cloud; if (!C) return;
+    var key = C.loggedIn() ? 'in:' + C.session.name : 'out';
+    var tl = document.getElementById('acctLine');
+    if (tl) { if (tl.dataset.k !== key) { tl.dataset.k = key; S.titleAccount(tl); } else { var cs = tl.querySelector('.cst'); if (cs) cs.textContent = cloudStatus() || 'progress saved online'; } }
+    var box = document.getElementById('acctBox'); if (!box) return;
+    if (acctKey === key && box.firstChild) { var s2 = box.querySelector('.cst'); if (s2) s2.textContent = cloudStatus(); return; }
+    acctKey = key; box.innerHTML = '';
+    if (!C.loggedIn()) {
+      box.appendChild(el('div', 'np', C.state().uid ? 'Logged out. Log in to save online and play online.' : 'No account yet — your progress is saved on this device only.'));
+      var r = el('div', 'row'); var b1 = btn('small', '🔑 Log in', function () { S.accountDialog('login'); }); b1.id = 'setLoginBtn';
+      var b2 = btn('small', '✨ New account', function () { S.accountDialog('signup'); }); r.appendChild(b1); r.appendChild(b2); box.appendChild(r);
+      return;
+    }
+    var who = el('div', 'np'); who.innerHTML = '☁ Account: <b></b> · <span class="cst"></span>'; who.querySelector('b').textContent = C.session.name; who.querySelector('.cst').textContent = cloudStatus(); box.appendChild(who);
+    var r2 = el('div', 'row');
+    var lo = btn('small', 'Log out', function () {
+      lo.disabled = true; C.logout().then(function () { lo.disabled = false; S.syncAccountUi(); if (S.current === 'title') S.showTitle(); });
+    }); lo.id = 'logoutBtn';
+    var cp = btn('small ghost', 'Change password', function () { pw.classList.toggle('open'); }); cp.id = 'chpwBtn';
+    r2.appendChild(lo); r2.appendChild(cp); box.appendChild(r2);
+    var pw = el('div', 'chpw'); pw.id = 'chpwForm';
+    var o = pwField('Current password', 'chpwOld', 'current-password'), n = pwField('New password (6+ characters)', 'chpwNew', 'new-password'), m = el('div', 'np');
+    var go = btn('small primary', 'Save new password', function () {
+      m.textContent = 'Saving…'; m.className = 'np';
+      C.changePassword(o.input.value, n.input.value).then(function (res) { m.textContent = res.message; m.className = 'np ' + (res.ok ? 'good' : 'bad'); if (res.ok) { o.input.value = ''; n.input.value = ''; } });
+    }); go.id = 'chpwGo';
+    pw.appendChild(o.wrap); pw.appendChild(n.wrap); pw.appendChild(go); pw.appendChild(m); box.appendChild(pw);
+  };
+  function pwField(label, id, ac) {
+    var w = el('label', 'txt pwfield'); w.appendChild(el('span', '', label));
+    var row = el('span', 'pwrow'), i = el('input'); i.type = 'password'; i.id = id; i.maxLength = 72; i.autocomplete = ac; i.spellcheck = false;
+    i.onkeydown = function (e) { e.stopPropagation(); };
+    var eye = el('button', 'btn small ghost pweye', '👁 Show'); eye.type = 'button'; eye.id = id + 'Eye';
+    eye.onclick = function (e) { e.preventDefault(); var show = i.type === 'password'; i.type = show ? 'text' : 'password'; eye.textContent = show ? '🙈 Hide' : '👁 Show'; };
+    row.appendChild(i); row.appendChild(eye); w.appendChild(row);
+    return { wrap: w, input: i };
+  }
+  // mode 'login' | 'signup'; opts { reason, after }
+  S.accountDialog = function (mode, opts) {
+    opts = opts || {};
+    var old = document.getElementById('accountDlg'); if (old) old.remove();
+    var C = AG.Cloud, ov = el('div', 'rigpicker'); ov.id = 'accountDlg';
+    var pn = el('div', 'rpanel account'); ov.appendChild(pn);
+    var tabs = el('div', 'acctabs'), tl = el('button', 'btn small', '🔑 Log in'), ts = el('button', 'btn small', '✨ New pilot');
+    tl.id = 'tabLogin'; ts.id = 'tabSignup'; tabs.appendChild(tl); tabs.appendChild(ts);
+    var h = el('h2'), why = el('p', 'note reason'), nm = el('label', 'txt'), help = el('p', 'note'), msg = el('div', 'authmsg'); msg.id = 'acctMsg';
+    nm.appendChild(el('span', '', 'Pilot name'));
+    var ni = el('input'); ni.id = 'acctName'; ni.maxLength = 14; ni.autocomplete = 'username'; ni.spellcheck = false; ni.autocapitalize = 'off';
+    ni.onkeydown = function (e) { e.stopPropagation(); if (e.key === 'Enter') pf.input.focus(); };
+    nm.appendChild(ni);
+    var pf = pwField('Secret password', 'acctPw', 'current-password');
+    pf.input.onkeydown = function (e) { e.stopPropagation(); if (e.key === 'Enter') submit(); };
+    var go = el('button', 'btn primary big'); go.id = 'acctGo'; go.onclick = function () { AG.audio.click(); submit(); };
+    var off = btn('ghost small', 'Play offline instead', function () { ov.remove(); }); off.id = 'acctClose';
+    var row = el('div', 'row'); row.appendChild(go); row.appendChild(off);
+    if (opts.reason) why.textContent = opts.reason;
+    [tabs, h, why, nm, pf.wrap, help, row, msg].forEach(function (x) { pn.appendChild(x); });
+    var me = S.profile.players[0];
+    function setMode(m) {
+      mode = m; tl.classList.toggle('on', m === 'login'); ts.classList.toggle('on', m === 'signup'); msg.textContent = '';
+      h.textContent = m === 'login' ? 'Welcome back, pilot!' : 'Make your pilot account';
+      go.textContent = m === 'login' ? 'Log in ▶' : 'Create my pilot ▶';
+      pf.input.autocomplete = m === 'login' ? 'current-password' : 'new-password';
+      pf.wrap.firstChild.textContent = m === 'login' ? 'Secret password' : 'Pick a secret password (6+ letters or numbers)';
+      help.innerHTML = m === 'login' ? 'Type the pilot name and secret password you picked. Forgot it? There\'s no e-mail on GearBound accounts, so ask a grown-up to help.' :
+        'Use a fun made-up pilot name, <b>not your real name</b>. Keep your password secret (a grown-up can help you remember it) — there\'s no e-mail, so write it down somewhere safe!' +
+        (C.state().uid ? '' : ' Your progress on this device comes with you.');
+      if (m === 'signup' && !ni.value && me.nameSet) ni.value = me.name;
+    }
+    tl.onclick = function () { AG.audio.click(); setMode('login'); }; ts.onclick = function () { AG.audio.click(); setMode('signup'); };
+    if (mode === 'login' && C.state().name) ni.value = C.state().name;
+    setMode(mode === 'signup' ? 'signup' : 'login');
+    var busy = false;
+    function submit() {
+      if (busy) return;
+      var name = ni.value, pw = pf.input.value;
+      if (mode === 'signup') { var bad = C.checkName(name) || C.checkPassword(pw); if (bad) { msg.textContent = bad; AG.audio.error && AG.audio.error(); return; } }
+      busy = true; go.disabled = true; msg.textContent = mode === 'login' ? 'Logging in…' : 'Creating your pilot…';
+      (mode === 'login' ? C.login(name, pw) : C.signup(name, pw)).then(function (r) {
+        busy = false; go.disabled = false;
+        if (!r.ok) { msg.textContent = r.message; AG.audio.error && AG.audio.error(); return; }
+        ov.remove();
+        S.syncAccountUi();
+        if (S.current === 'title') S.showTitle();
+        var mn = document.getElementById('myName'); if (mn) mn.textContent = S.profile.players[0].name;
+        if (S.setMsg) S.setMsg(r.created ? 'Welcome, ' + r.name + '! Your progress is now saved online.' : 'Logged in as ' + r.name + '.');
+        if (opts.after) opts.after();
+      });
+    }
+    ov.onclick = function (e) { if (e.target === ov) ov.remove(); };
+    document.body.appendChild(ov);
+    setTimeout(function () { (ni.value ? pf.input : ni).focus(); }, 30);
+  };
+  // the cloud replaced this device's profile (login on a new device, another device played since)
+  S.cloudAdopted = function () {
+    var sn = document.getElementById('setName'); if (sn) sn.value = S.profile.players[0].name;
+    if (S.current === 'title' && !document.getElementById('accountDlg')) S.showTitle();
+    var mn = document.getElementById('myName'); if (mn) mn.textContent = S.profile.players[0].name;
   };
 
   // ---------------------------------------------------------------- rig picker
@@ -7278,7 +7896,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   S.initSettings = function () {
     var gear = el('button', 'gearbtn', '⚙'); gear.id = 'gearBtn'; gear.title = 'Menu: leave match, sound, graphics'; gear.setAttribute('aria-label', 'Menu');
     var panel = el('div', 'settings'); panel.id = 'settingsPanel';
-    panel.innerHTML = '<h4>Pilot</h4><label class="txt">Pilot name <span class="pnrow"><input id="setName" maxlength="14" autocomplete="off"><button class="btn small" id="setNameSave">Save</button></span></label><div class="np" id="setNameMsg"></div>' +
+    panel.innerHTML = '<h4>Pilot</h4><label class="txt">Pilot name <span class="pnrow"><input id="setName" maxlength="14" autocomplete="off"><button class="btn small" id="setNameSave">Save</button></span></label><div class="np" id="setNameMsg"></div><div class="acctbox" id="acctBox"></div>' +
       '<div class="matchsec"><h4>Match</h4><button class="btn danger" id="leaveMatchBtn">⏏ Leave match</button><div class="np">Esc also opens this on a keyboard.</div></div>' +
       '<h4>Sound</h4>' +
       '<label>Music <input type="range" id="volMusic" min="0" max="100"></label>' +
@@ -7287,6 +7905,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       '<div class="np" id="nowPlaying"></div>' +
       '<h4>Graphics</h4>' +
       '<label class="txt">Quality <select id="quality"><option value="auto">Auto (' + (AG.lowFx ? 'low' : 'high') + ')</option><option value="high">High</option><option value="low">Low (phones)</option></select></label>' +
+      '<label class="txt">UI size <select id="uiSize"><option value="auto">Auto (' + (Math.min(innerWidth, innerHeight) < 500 ? 'Small' : 'Medium') + ')</option><option value="s">Small (compact)</option><option value="m">Medium</option><option value="l">Large</option></select></label>' +
       '<label class="chk"><input type="checkbox" id="touchCtl"> On-screen touch controls</label>' +
       '<h4>Online</h4>' +
       '<label class="txt">TURN server <input id="turnUrl" placeholder="turn:host:3478"></label>' +
@@ -7297,6 +7916,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       '<details class="adminsec" id="adminSec"><summary>Admin (owner only)</summary><div id="adminBox"></div></details>';
     document.body.appendChild(gear); document.body.appendChild(panel);
     var qs = panel.querySelector('#quality'); qs.value = AG.Touch.quality; qs.onchange = function () { AG.Touch.setQuality(qs.value); };
+    var uz = panel.querySelector('#uiSize'); uz.value = AG.Touch.uiSize || 'auto'; uz.onchange = function () { AG.Touch.setUiSize(uz.value); };
     var tc = panel.querySelector('#touchCtl'); tc.checked = AG.Touch.enabled;
     tc.onchange = function () { AG.Touch.enabled = tc.checked; document.body.classList.toggle('touch', tc.checked); try { localStorage.setItem('gearbound.touch', tc.checked ? '1' : '0'); } catch (e) {} };
     gear.onclick = function () { AG.audio.init(); panel.classList.toggle('open'); S.syncSettings(); };
@@ -7310,9 +7930,19 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       i.onchange = function () { st[k] = i.value.trim(); AG.saveSettings(); };
     });
     var sn = panel.querySelector('#setName'), snm = panel.querySelector('#setNameMsg');
+    function nameDone(why) {
+      snm.textContent = why || 'Saved ✔'; snm.className = 'np ' + (why ? 'bad' : 'good');
+      if (!why) { sn.value = S.profile.players[0].name; var mn = document.getElementById('myName'); if (mn) mn.textContent = sn.value; var wn = document.querySelector('#welcomeName b'); if (wn) wn.textContent = sn.value; if (AG.Friends) AG.Friends.refreshMe(); S.syncAccountUi(); }
+    }
     function saveName() {
-      var why = S.setPilotName(sn.value); snm.textContent = why || 'Saved ✔'; snm.className = 'np ' + (why ? 'bad' : 'good');
-      if (!why) { sn.value = S.profile.players[0].name; var mn = document.getElementById('myName'); if (mn) mn.textContent = sn.value; var wn = document.querySelector('#welcomeName b'); if (wn) wn.textContent = sn.value; if (AG.Friends) AG.Friends.refreshMe(); }
+      // with an account the name lives in the cloud too (same filter + uniqueness, checked by the server)
+      if (AG.Cloud && AG.Cloud.loggedIn()) {
+        if (sn.value.replace(/\s+/g, ' ').trim() === S.profile.players[0].name) return nameDone(null);
+        snm.textContent = 'Checking…'; snm.className = 'np';
+        AG.Cloud.rename(sn.value).then(function (r) { nameDone(r.ok ? S.setPilotName(r.name) : r.message); });
+        return;
+      }
+      nameDone(S.setPilotName(sn.value));
     }
     panel.querySelector('#setNameSave').onclick = function () { AG.audio.click(); saveName(); };
     sn.onkeydown = function (e) { e.stopPropagation(); if (e.key === 'Enter') saveName(); };
@@ -7325,6 +7955,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     }, 500);
   };
   S.syncSettings = function () {
+    S.syncAccountUi();
     var st = AG.settings, $ = function (id) { return document.getElementById(id); };
     if (!$('volMusic')) return;
     if ($('setName') && document.activeElement !== $('setName')) { $('setName').value = S.profile.players[0].name; $('setNameMsg').textContent = ''; }
@@ -7335,6 +7966,15 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
 
   S.init = function () {
     root = document.getElementById('overlay'); S.load(); S.initSettings();
+    if (AG.Cloud) { AG.Cloud.onAdopt = S.cloudAdopted; AG.Cloud.on(S.syncAccountUi); AG.Cloud.init(); }
+    // rescue link (rescue/gearbound/index.html on the old /gearbound/ path) hands progress over as #gb1=<transfer code>;
+    // importCode merges (never loses anything here), then the code is dropped from the address bar
+    var hm = /#gb1=([^&]+)/.exec(location.hash || '');
+    if (hm) { var ierr = null; try { ierr = S.importCode(decodeURIComponent(hm[1])); } catch (e) { ierr = 'bad code'; }
+      try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+      var t = el('div', 'rescuetoast', ierr ? 'Could not bring over the old progress: ' + ierr : 'Old progress restored ✓ (merged — nothing lost)'); t.id = 'rescueToast';
+      t.style.cssText = 'position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:99;background:#1a1430;color:#ffe9a8;border:1px solid #c9a24a;border-radius:10px;padding:10px 16px;font:600 15px system-ui';
+      document.body.appendChild(t); setTimeout(function () { t.remove(); }, 7000); S.rescued = !ierr; }
     if (AG.Admin) AG.Admin.init();
     if (AG.FriendsUI && !/[?&]nofriends\b/.test(location.search)) { AG.FriendsUI.init(); if (AG.GiftsUI) AG.GiftsUI.init(); }
     var ka = AG.Art.get('key_art'); if (ka) document.documentElement.style.setProperty('--keyart', 'url("' + ka.src + '")');
@@ -7559,7 +8199,13 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
         return 'bad';
       }
       return 'retry'; // e.g. not on their friends list yet → keep queued
-    }, function () { return 'retry'; });
+    }, function () { return 'retry'; }).then(function (res) {
+      // friend not reachable right now: ALSO drop a copy in the cloud mailbox if we have an account (they get it on
+      // their next login even if we're offline then). It stays in the outbox until a P2P ack — duplicates are ignored
+      // by gift id, and friends without an account still get it the P2P way.
+      if (res !== 'retry' || !AG.Cloud || !AG.Cloud.loggedIn() || entry.cloud) return res;
+      return AG.Cloud.sendGift(g).then(function (ok) { if (ok) { entry.cloud = Date.now(); save(); emit({ t: 'cloud', g: g }); } return res; });
+    });
     inflight[g.id] = p;
     return p.then(function (x) { delete inflight[g.id]; return x; });
   }
@@ -7615,7 +8261,18 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     return { gift: g, note: note };
   };
 
+  // cloud mailbox (js/cloud.js): gifts friends sent while we were offline; same checks as P2P (admin signatures etc.)
+  G.pollCloud = function () {
+    if (!AG.Cloud || !AG.Cloud.loggedIn() || !F() || G._polling) return Promise.resolve(0);
+    G._polling = true;
+    return AG.Cloud.fetchGifts().then(function (rows) {
+      return Promise.all(rows.map(function (row) {
+        return G.receive(row.gift, null).then(function (r) { if (r && (r.ok || r.err === 'bad')) return AG.Cloud.deleteGift(row.id); }, function () {});
+      })).then(function () { return rows.length; });
+    }).then(function (n) { G._polling = false; return n; }, function () { G._polling = false; return 0; });
+  };
   G.init = function () {
+    if (AG.Cloud) { setInterval(G.pollCloud, 60000); AG.Cloud.on(function (c) { if (c.status === 'ok' && !G._polledOnce) { G._polledOnce = 1; G.pollCloud(); } }); }
     if (!F()) return;
     F().handlers.gift = function (m, code, reply) {
       var id = m.g && m.g.id;
@@ -8194,17 +8851,34 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   AG.fxScale = AG.lowFx ? 0.5 : 1;
   T.setQuality = function (v) { try { localStorage.setItem('gearbound.quality', v); } catch (e) {} location.reload(); };
 
+  // UI size (Settings → UI size): auto = Small on phones (shortest side < 500px), Medium elsewhere.
+  // Applied as a CSS zoom factor (--ui) on the touch controls and the in-battle HUD, plus body.ui-s/m/l for menus.
+  var us = 'auto'; try { us = localStorage.getItem('gearbound.uiSize') || 'auto'; } catch (e) {}
+  T.uiSize = us;
+  T.UI_F = { s: 0.82, m: 1, l: 1.15 };
+  T.applyUi = function () {
+    var b = document.body; if (!b) return;
+    var sz = T.uiSize; if (!T.UI_F[sz]) sz = Math.min(innerWidth, innerHeight) < 500 ? 's' : 'm';
+    T.uiResolved = sz; T.uiF = T.UI_F[sz];
+    document.documentElement.style.setProperty('--ui', String(T.uiF));
+    b.classList.remove('ui-s', 'ui-m', 'ui-l'); b.classList.add('ui-' + sz); b.dataset.uisize = sz;
+  };
+  T.setUiSize = function (v) { T.uiSize = v; try { localStorage.setItem('gearbound.uiSize', v); } catch (e) {} T.applyUi(); };
+  addEventListener('resize', function () { T.applyUi(); });
+  addEventListener('orientationchange', function () { setTimeout(T.applyUi, 200); });
+
   var root, btns = {}, ring, pwLabel, angLabel, fuelBar;
   function mk(cls, html, key, hold) {
     var b = document.createElement('button'); b.className = 'tbtn ' + cls; b.innerHTML = html; b.dataset.key = key;
-    var down = function (e) { e.preventDefault(); AG.audio.init(); b.classList.add('down'); AG.vkey(key, true); if (b.setPointerCapture && e.pointerId != null) try { b.setPointerCapture(e.pointerId); } catch (x) {} };
-    var up = function (e) { e.preventDefault(); b.classList.remove('down'); AG.vkey(key, false); };
+    var down = function (e) { e.preventDefault(); AG.audio.init(); b.classList.add('held'); AG.vkey(key, true); if (b.setPointerCapture && e.pointerId != null) try { b.setPointerCapture(e.pointerId); } catch (x) {} };
+    var up = function (e) { e.preventDefault(); b.classList.remove('held'); AG.vkey(key, false); };
     b.addEventListener('pointerdown', down);
     b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('lostpointercapture', up);
     b.addEventListener('contextmenu', function (e) { e.preventDefault(); });
     root.appendChild(b); btns[key] = b; return b;
   }
   T.init = function () {
+    T.applyUi();
     if (T.enabled) document.body.classList.add('touch');
     if (AG.lowFx) document.body.classList.add('lowfx');
     // iOS Safari: block page pinch / double-tap zoom (the game handles its own pinch)
@@ -8229,14 +8903,20 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     try { if (sessionStorage.getItem('gearbound.portraitOk') === '1') document.body.classList.add('portraitok'); } catch (e) {}
     rot.querySelector('.portraitok').addEventListener('click', function () { document.body.classList.add('portraitok'); try { sessionStorage.setItem('gearbound.portraitOk', '1'); } catch (e) {} });
     document.body.appendChild(root); document.body.appendChild(rot);
+    // a held button must never stay latched (app switch, notification, rotation, keyboard popping up for chat)
+    var releaseAll = function () { Object.keys(btns).forEach(function (k) { var b = btns[k]; if (b && b.classList && b.classList.contains('held')) { b.classList.remove('held'); AG.vkey(k, false); } }); };
+    T.releaseAll = releaseAll;
+    window.addEventListener('blur', releaseAll); window.addEventListener('orientationchange', releaseAll);
+    document.addEventListener('visibilitychange', function () { if (document.hidden) releaseAll(); });
     requestAnimationFrame(tick);
   };
-  var lastSel = -1;
+  var lastSel = -1, wasOn = false;
   function tick() {
     requestAnimationFrame(tick);
     var g = AG.game, on = T.enabled && g && !g.demo && document.body.classList.contains('inbattle');
     root.classList.toggle('on', !!on);
-    if (!on) return;
+    if (!on) { if (wasOn) T.releaseAll(); wasOn = false; return; }
+    wasOn = true;
     var p = g.turns.current, mine = p && g.isMine && g.isMine(p), aim = g.phase === 'aim' && mine;
     root.classList.toggle('idle', !aim);
     // fairness: another pilot's live power, last power and exact angle are never shown
@@ -8591,6 +9271,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     if (this.phase === 'aim' && p && this.isMine(p) && p.mobile.alive) {
       var k = { L: !!keys.ArrowLeft, R: !!keys.ArrowRight, U: !!keys.ArrowUp, D: !!keys.ArrowDown }, ks = JSON.stringify(k);
       if (this.localCharge) k.L = k.R = false;
+      if (this._inTn !== this.turns.turn) { this._inTn = this.turns.turn; this.sentKeys = null; } // host clears inputs each turn: resend a key still held
       if (ks !== this.sentKeys) { this.sentKeys = ks; send(conn, { t: 'in', k: k }); }
       var self = this;
       function shot(i) { var sh = p.mobile.rig.shots[i]; if (sh && sh.special && p.ssCharge < 100) return self.flash('Overdrive not charged yet'); p.shotIndex = i; AG.audio.tick(); send(conn, { t: 'cmd', c: 'shot', v: i }); }
