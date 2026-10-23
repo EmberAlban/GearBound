@@ -27,7 +27,7 @@ Your profile (pilots, gold, XP, owned items, loadout) and settings are saved on 
 | 5–8 | Use the power-up in that item slot (before you fire) |
 | Enter | Chat (online): All/Team toggle, quick chats, Esc closes |
 | Esc / ⚙ → ⏏ Leave match | Exit the match (with a confirm: *Stay* / *Leave match*). Offline or as a client you forfeit (no XP/gold, used items stay spent; online the others play on); as host it ends the match for everyone |
-| ⚙ (top right) | Settings: **Music**/**Effects** volume, mute, Graphics quality (Auto/High/Low), on-screen touch controls, TURN relay (server/user/password) |
+| ⚙ (top right) | Settings: **Music**/**Effects** volume, mute, Graphics quality (Auto/High/Low), on-screen touch controls, TURN relay (server/user/password). The panel has a pinned header with a **✕** close (the same one the Friends panel uses), scrolls inside itself so the ✕ never leaves short or standalone (Add to Dock) windows, and **Esc** closes it — Esc closes the top-most open panel (Friends, gifts, emote picker, rig details, dialogs) the same way |
 
 **Touch (phones/tablets, auto-detected):** ◀ ▶ drive, ▲ ▼ aim, hold the big **FIRE** button to charge and release to shoot,
 1/2/OD shot buttons, PASS, the item bar for power-ups, ⊕ re-centres the camera. Drag the battlefield to look around, pinch to zoom,
@@ -41,7 +41,9 @@ tap the minimap to jump the camera. Phones in portrait get a "rotate your device
   the wind blows, with the strength in the middle: an upward gust lifts long lobs, a downward one drops them short. Some shots resist wind.
 - **Weather columns:** from turn 2, each turn has a 30% chance (max 2 active) to open a column for 2–3 turns, announced with a banner:
   **Lightning Column** +25% damage, **Sunbeam** +20%, **Laser Pillar** +30% (a shell is charged once per column), and **Tornado**:
-  a shell entering it while still *climbing* is flung ×1.35 faster, one entering on the way *down* is braked ×0.6.
+  Small / Medium / Large funnels that reach from the ground to far above the top of the map (no lobbing over them;
+  the pull tapers gently with height). A shell inside swirls around in slow motion, then leaves gently: never faster
+  than 1.12× its entry speed. Climbing shells get a small nudge, falling ones are braked.
 - **Damage** falls off with distance from the blast center, and **armor** reduces it. A direct hit adds a +15% bonus.
 - **Terrain** is a destructible bitmap. Explosions leave craters, rigs fall when the ground under them is gone,
   and any rig that falls into the void at the bottom is destroyed.
@@ -60,7 +62,7 @@ tap the minimap to jump the camera. Phones in portrait get a "rotate your device
 | **Hornet** | Hunter | 820 | 6% | Stinger (fast dart, half wind) | Cog Drone (homes within 420px) | Swarm (3 drones) |
 | **Mason** | Builder | 1150 | 22% | Brick Lob | Rampart (ADDS a 44px mound) | Landslide (damage + new rock) |
 | **Glacier** | Disruptor | 940 | 12% | Frost Shell (+80 delay to targets) | Cold Snap (+160) | Deep Freeze (+300) |
-| **Volt** | Sniper | 880 | 10% | Rail Spike (pierces terrain and rigs) | Chain Bolt (jumps to 3 enemies) | Thunderhead (chains to 5) |
+| **Volt** | Sniper | 880 | 10% | Rail Spike (flat, fast; bursts on contact with a dotted cut) | Chain Bolt (jumps to 3 enemies) | Thunderhead (chains to 5) |
 | **Flak** | Area denial | 1000 | 15% | Flak Burst (airburst, 6 shards) | Oil Bomb (burning oil, 3 turns) | Shrapnel Rain (12 shards) |
 | **Gyro** | Skirmisher | 900 | 10% | Boomerang (curves back) | Twin Rang | Gyre Wheel |
 | **Orrery** | Field control | 900 | 10% | Pulse Orb | Gravity Well (bends every shell for 2 turns) | Singularity |
@@ -117,9 +119,13 @@ simulation applies (`js/perks.js`, used in `main.js` and `physics.js`). The tool
 **Caps on the total from all equipped items:** attack ≤ +8%, shot delay ≤ −6%, max HP ≤ +8%, move ≤ +15%, deflect chance ≤ 8%
 (a deflect halves one hit). The starter kit has no perks. Deflect rolls use the battle's seeded RNG.
 
-**Premium items** (`currency: 'premium'`) are cosmetic or economy-only and never stronger in combat: shell trails (Prism, Comet),
-explosion skins (Confetti Burst, Clockwork Sparks), emotes (Tip of the Hat, Victory Jig), name colors (Gilded, Aurora), and
-Gold/XP gain boosts (+20%). They appear under the shop's **Premium ✦** tab priced "Coming soon" and can't be bought yet.
+**Collector items** cost gold only (there is no second currency) and are priced 5–10× the priciest regular item
+(3,500–7,000 gold), so they are long-term goals. They are cosmetic or economy-only and never stronger in combat: shell
+trails (Prism, Comet, Bubble), explosion skins (Confetti Burst, Clockwork Sparks, Petal Burst), emotes (Tip of the Hat,
+Victory Jig, Big Wave), name colors (Gilded, Aurora), the Prism rig skin, and Gold/XP gain boosts (+20%, not in bot
+matches). They live under the shop's **Collector ✦** tab, can be gifted at their gold price, and are free for the admin.
+Owned as `prem:<id>`; older save key forms are migrated on load, never dropped. The trails, blasts, emotes, name colors
+and Prism skin are collectibles for now (no in-battle visual yet); the two boosts apply to match payouts.
 
 ## Pilot accounts and cloud saves
 There are **no Google/Apple/Facebook/Microsoft logins**. Offline and practice play need no account at all: you type a pilot
@@ -306,7 +312,7 @@ It contains no GunBound sprites, names or likenesses. Everything is embedded in 
 - **Terrain:** a seamless soil/rock texture and a grass/sand/snow top strip for each map.
 - **Rigs:** the three rig hulls, with the barrels as separate rotating sprites.
 - **Riders and items:** 4 rider outfits, 4 hats and 3 pets.
-- **Icons:** 9 shot icons and 10 premium icons.
+- **Icons:** 9 shot icons and 14 collector icons.
 - **Title key art.**
 
 ### Asset pipeline
@@ -391,7 +397,7 @@ js/util.js          AG namespace, CONFIG tuning constants, seeded RNG, WebAudio 
 js/art.js           image/font loader, tinted/pixel caches, soft particle sprites
 js/terrain.js       bitmap terrain: generation, carving, 2.5D render (lit front face + extruded thickness), map themes
 js/avatar.js        rider avatar drawing, clothing/hat/skin/pet catalogs, Pet entity
-js/perks.js         gold-item combat perks + caps, premium (cosmetic/economy) catalog
+js/perks.js         gold-item combat perks + caps, collector (cosmetic/economy, gold-priced) catalog
 js/cloud.js         pilot accounts (name + password) and cloud saves on Supabase; see supabase/ for SQL + the signup Edge Function
 js/items.js         power-up catalog, one-per-turn rule, delay costs, effects (host-validated online)
 js/weather.js       360° wind and weather columns (lightning / sunbeam / laser / tornado)
@@ -407,6 +413,7 @@ js/render.js        painted parallax sky/haze/fog, ambient motes, animated void,
 js/post.js          WebGL post pass: bloom, dynamic lights, grading, vignette, grain (Canvas2D fallback)
 js/hud.js           DOM battle HUD (pilot card, timer ring, minimap, wind, turn order, bars, angle gauge, power, shot cards)
 js/ui.js            in-world name plates/HP pills, messages (legacy canvas HUD kept as reference)
+js/overlays.js      shared ✕ close button + sticky header for overlay panels; Esc closes the top-most panel
 js/screens.js       DOM screens: Title, Room/Lobby (4v4 slots, ready, map pick), Shop, Victory, Settings panel; profile save
 js/main.js          Battle state machine (aim → flight → settle), menu backdrop demo, input, camera, render loop
 build.js            node build.js → dist/gearbound.html (everything inlined) + dist/game.html copy + dist/web/ (deployable PWA folder)
