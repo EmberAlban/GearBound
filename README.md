@@ -244,6 +244,11 @@ the room is open, **Invite** while you're in a room. Online friends are listed f
   The admin device holds an ECDSA P-256 private key (WebCrypto, never leaves the device except in your own backup). Admin powers:
   every shop item free, free gifts, gold/XP grants to friends, a ★ Admin badge. Admin gifts and grants are **signed**, and every
   recipient verifies the signature against `ADMIN_PUBLIC_KEYS`; unsigned/forged "admin" gifts are rejected.
+- **Remove XP / gold** (admin): the gift dialog and admin settings have a *Remove* mode for yourself or a friend. It sends a signed
+  `xpcut` / `goldcut` correction that applies as soon as it arrives (no unwrap). XP cuts are kept in a per-id ledger (`xpCuts`) and the
+  cloud copy keeps *gross* XP (`xpGross:1`), so the server's no-decrease trigger never fires and the cut is never undone by a merge.
+  Limits: recipients need this update first (older builds reject the new gift kind), older builds reading a new cloud save show gross
+  XP, a gold cut can be undone by a max-gold merge with an older device copy, and cuts to friends apply only when they come online.
 
 ### Admin key setup (owner, once)
 1. Open the deployed game (https) or `dist/gearbound.html` on **your own** device.
@@ -468,7 +473,9 @@ TURN_URL='turn:host:3478?transport=tcp,user,pass' tools/runall.sh
 - Progress is stored on each player's device (and copied to the cloud with an account), so a determined player could edit their own save; signatures prevent impersonating the admin or forging admin gifts.
 - Normal (non-admin) gifts are not provably paid for: a player who edits their own save could send gifts without really spending gold.
   Admin "free" purchases are local to the admin device.
-- There are no bots yet, so the 1 XP + 1 gold bot rule is keyed on a `bot` flag and only tested with a synthetic bot pilot.
+- Bots: the 1 XP + 1 gold bot rule is keyed on the `bot` flag. Easy bots hit about 25% of shots (measured 24.85% over 12 easy matches; bottest allows 17-30%).
+- Emote 8 is now **Aww, come on!** (pout face; `COMEON!`, `GRR!`, `AWW!` all work) with its own recorded "come on" clip. It still travels as `grr` on the wire, so older builds show their Grr for it.
+- **Emote voices (v5):** two recorded sets, `fem` and `masc`, 11 clips each, embedded in `js/emote_audio.js` (built by `node tools/emotevoices5.js [dir]` from `fem_<id>.mp3` / `masc_<id>.mp3`; trimmed, mono 24 kHz 40 kbps, about 178 KB; it replaces the old espeak `tools/emotevoices.sh`). Each pilot face picks a set: fem = Wren, Juno, Ivy, Tam; masc = Kit, Rook, Milo, Pax (unknown face = masc). Online, the sender's set travels with the emote (`{t:'emote', id, v}`, relayed as `e.v`), so everyone hears the sender's voice; an emote from an older build (no `v`) uses the sender's pilot face. Older builds ignore `v` and play their own old clips. Mute and the SFX volume apply. There is no manual voice override yet.
 - If the host is voted out (or quits), the match ends for everyone: there is no host migration.
 - Presence/friends and room directory rely on the public PeerJS broker (`0.peerjs.com`); if it's down or rate-limits, friends show
   offline and rooms can only be joined by code. Presence updates take a few seconds.
