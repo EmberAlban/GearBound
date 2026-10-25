@@ -289,6 +289,42 @@ leans back from firing recoil. Equipped clothing (face, skin tone, hair colour, 
 the rig or perches on its back when the rig is idle. Every item is a data entry with a draw function in `js/avatar.js`,
 which is the starting point for a future shop.
 
+### God sets, wings and headpieces (gold premium)
+Four new slots, drawn procedurally in `js/cosmetics.js` (cute chibi style) on top of the painted pilot, so they show
+everywhere the pilot is drawn: battle, waiting-room cards, the lobby/profile preview, results and the shop.
+- **Sets** (Helm + Armour): Zeus, Poseidon, Neo Poseidon, Hades, Athena, Apollo. Wearing the matching helm and armour
+  adds a full-set sparkle. Helms replace the hat while worn.
+- **Wings** (11): Angel, Devil, Fairy, Bee, Bat, Bird, Butterfly, Dragon, Phoenix, Crystal Pixie, Gear Mecha. They
+  flap, buzz or shimmer in real time.
+- **Headpieces** (13): Halo, Dark Halo, Devil Horns, Ram Horns, Unicorn Horn, Cat Ears, Bunny Ears, Bug Antennae,
+  Flower Crown, Tiara, Floating Crown, orbiting Star Ring, Gear Halo.
+- Gold only (no combat stats). Admin gets them free, and they can be gifted at their gold price. They sync online
+  through the avatar (unknown ids are dropped) and save locally and to the cloud with the profile.
+- **Shop preview:** by default it shows the pilot alone, with no rig. It is a full standing chibi with idle life
+  (breathing, sway, weight shift, looking around, blinking and a small hop) plus animated wings and headpieces. It
+  updates live. "⚙ Show my rig" switches back to the rig, and the Rig skins tab always shows the rig. The item
+  cards for helms, armour, wings and headpieces let you try the item on the standing pilot.
+
+### Halloween Candy Hunt (event, ends at the end of Nov 7 2026)
+- **When it runs:** from deploy until **Nov 8 2026 00:00 in the player's local time** (a hard end; `AG.Halloween.END`).
+  While it runs, the lobby is decorated and shows a banner reading "Ends in N days" (or hours), with a link to the
+  candy shop.
+- **Candy per match:**
+  - bot match: a win gives 1 candy; losses and bonuses give nothing
+  - online: a win gives 3 and a loss gives 1
+  - bonuses: +1 for dealing 300 or more damage, +1 per kill (capped at 2), and +2 for the first match of the day
+  - a forfeit or retreat gives 0
+  - candy shows in the HUD, the lobby, the shop and the results (with a pop-up)
+- **Candy shop:** the 🎃 Halloween tab has 31 candy-only items: helms, costumes, wings, headpieces, pets and rig skins
+  (3 of the rig skins are animated). Candy items can't be gifted. Bought items stay forever, and after the end the
+  tab only lists the ones you own.
+- **Leftover candy is a keepsake:** it stays on your profile as a souvenir and is **never converted to gold**. This
+  avoids a gold windfall that would unbalance the gold shop, and keeps candy meaningful.
+- **Admin tools:** the admin can grant and remove candy (for themselves or friends, through signed gifts). Every
+  change goes into a per-player ledger (`candyLog`, the last 60 entries), and admin entries are signed.
+- **Limitation:** candy merges like gold (the higher balance of two devices wins), so spending on one device can be
+  undone by merging with an older save that has more candy.
+
 ## Music (original, procedurally sequenced)
 All music is original and composed for this project. It is written as note data in `js/music.js` and played live by a small
 WebAudio step sequencer (lead, bass, chord stabs/arpeggios, pads, and synthesized kick/snare/hat/"clank" drums), so it works
@@ -512,6 +548,7 @@ TURN_URL='turn:host:3478?transport=tcp,user,pass' tools/runall.sh
   ground can look wrong on a client for up to one shot before it is corrected.
 - Headless test Chrome (SwiftShader) stalls frames with several pages open, so the online tests use generous timeouts; that
   says nothing about real devices, but it is why the tests take minutes.
+- HUD/loading portraits are the painted bust only; helms, wings and headpieces are not drawn on those small static portraits (they are on every live preview and in battle).
 - Touch controls were checked in an emulated iPhone 14 and iPad (landscape and portrait) with real CDP touch events, not on physical devices.
 
 ## Roadmap
