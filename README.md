@@ -325,6 +325,28 @@ everywhere the pilot is drawn: battle, waiting-room cards, the lobby/profile pre
 - **Limitation:** candy merges like gold (the higher balance of two devices wins), so spending on one device can be
   undone by merging with an older save that has more candy.
 
+### Rig skins (permanent, gold)
+- **Palette swaps** (450–550 gold): Crimson, Deep Ocean, Sakura, Ivory, Obsidian, Toxic Lime, Tangerine, Royal Violet.
+- **Animated premium tier** (3000–4000 gold): Molten Core, Rainbow Rush, Aurora, Galaxy, Voltage, Liquid Chrome. Each
+  rig image gets 8 pre-rendered, cached frames and at most 6 sparkles, so the cost per frame stays low.
+- They show in the shop, the waiting room and battle, can be gifted, and sync online.
+
+### Waiting-room backgrounds (`js/roombg.js`)
+- 15 animated gold backgrounds (1200 / 2000 / 3000 gold) plus 4 Halloween candy ones (Haunted Moon, Pumpkin Patch,
+  Foggy Graveyard, Witch's Brew). They have their own shop tab and `roombg` slot, and they are drawn behind your own
+  card in the waiting room only.
+- They sync online (unknown ids are dropped), save locally and to the cloud, and gold ones can be gifted (candy ones can't).
+- **Performance:** each background caches its static layer (LRU of 24) and caps its particles at 40, and all of them
+  share one animation loop. Only visible backgrounds animate. With more than 4 on screen they drop to 20 fps with half
+  the particles, and on low quality they draw lighter variants. `prefers-reduced-motion` shows a still frame,
+  animation pauses when the tab is hidden, and DPR is capped at 1.5.
+
+### Pet personality
+- **Idle cycle:** pets idle, yawn after 10–15 calm seconds (random per pet), then doze with floating z's after 30 s.
+- **Reactions:** startle "!" (a blast nearby, or woken by the owner moving or aiming), hurt (sweat drop when the owner
+  takes damage), cheer (hearts when the owner lands a hit or wins), and sad (after a loss).
+- They work in battle (host, solo and clients) and in menu previews, which use the wall clock.
+
 ## Music (original, procedurally sequenced)
 All music is original and composed for this project. It is written as note data in `js/music.js` and played live by a small
 WebAudio step sequencer (lead, bass, chord stabs/arpeggios, pads, and synthesized kick/snare/hat/"clank" drums), so it works
@@ -339,6 +361,7 @@ as browser autoplay rules require.
 | Map: Verdant Ridge | **Green Ridge Gallop** | D major, 144 BPM, galloping adventure |
 | Map: Ember Dunes | **Ember Caravan** | A harmonic minor, 126 BPM, desert caravan |
 | Map: Frostmere | **Frostmere Chimes** | E minor, 136 BPM, FM bell lead and arpeggios |
+| Sudden Death | **Last Gear Standing** | A minor, 164 BPM, galloping saw-lead chase; crossfades in on the SUDDEN DEATH banner, and the next match goes back to its map track |
 | Victory sting | **Gears of Glory** | about 3 s fanfare, then the lobby track fades back in |
 | Defeat / draw sting | **Rusty Sunset** | about 4 s descending chromatic line |
 
