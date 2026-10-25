@@ -61,7 +61,7 @@ tap the minimap to jump the camera. Phones in portrait get a "rotate your device
 | **Beetle** | Ground control | 980 | 14% | Crawler Mine (crawls 260px to a rig) | Lob Shell | Mine Parade (3 mines) |
 | **Hornet** | Hunter | 820 | 6% | Stinger (fast dart, half wind) | Cog Drone (homes within 420px) | Swarm (3 drones) |
 | **Mason** | Builder | 1150 | 22% | Brick Lob | Rampart (ADDS a 44px mound) | Landslide (damage + new rock) |
-| **Glacier** | Disruptor | 940 | 12% | Frost Shell (+80 delay to targets) | Cold Snap (+160) | Deep Freeze (+300) |
+| **Glacier** | Disruptor | 940 | 12% | Frost Shell (+80 delay to targets) | Cold Snap (+160 delay, SLOWED: half move speed for their next 2 turns) | Deep Freeze (+500 delay to every player hit) |
 | **Volt** | Sniper | 880 | 10% | Rail Spike (flat, fast; bursts on contact with a dotted cut) | Chain Bolt (jumps to 3 enemies) | Thunderhead (chains to 5) |
 | **Flak** | Area denial | 1000 | 15% | Flak Burst (airburst, 6 shards) | Oil Bomb (burning oil, 3 turns) | Shrapnel Rain (12 shards) |
 | **Gyro** | Skirmisher | 900 | 10% | Boomerang (curves back) | Twin Rang | Gyre Wheel |
@@ -358,6 +358,36 @@ everywhere the pilot is drawn: battle, waiting-room cards, the lobby/profile pre
   the particles, and on low quality they draw lighter variants. `prefers-reduced-motion` shows a still frame,
   animation pauses when the tab is hidden, and DPR is capped at 1.5.
 
+### Waiting room and shop (batch 7)
+- An equipped waiting-room background **replaces** the base room background on that pilot's card; only pilots without
+  one keep the base background. The shop draws the background (animated) behind the pilot preview while you preview
+  or equip it.
+- Emotes float **beside the head** (left of it for Team A on the left, right of it for Team B) as an absolutely
+  positioned bubble, so they never resize the rig/READY area.
+- Helmets and headwear sit snugly on the head; halos and other floating headpieces keep floating. Head items follow the
+  face direction and mirror when the pilot flips.
+- Phone landscape shop: the preview panel is sized from its height (aspect 300:220), so it no longer stretches wide.
+- **Rig idle motion** (`js/rigidle.js`): each of the 17 rigs (super rigs included) has its own idle loop (engine shake,
+  suspension bounce, rocking, squash, a periodic "rev" with wheel spin or a rig-specific kick, and a small particle
+  stream such as exhaust, steam, sparks, frost or embers). It is drawn by `Mobile.draw`, so the waiting room and an idle
+  rig in a match look the same; it stops while driving, airborne, knocked back or dead, and is off with
+  `prefers-reduced-motion`. It is cosmetic only (wall clock + per-pilot seed, no network traffic).
+- Waiting-room pets use the in-game behaviour (follow/perch/bob, yawn → doze mood clock), survive room re-renders, and
+  cheer when their pilot hits READY or emotes.
+
+- My Stuff (wardrobe) Room BGs tab: hover or tap a background card to preview it live on your waiting-room card.
+- Phone portrait results screen: the win title shrinks to fit and stays clear of the ⚙ gear button.
+
+### Glacier chill and slow
+- Cold Snap (shot 2): besides +160 delay, every enemy caught is **slowed**: 50% drive speed on their own next 2 turns
+  (fuel is per pixel, so the range is the same but it takes twice as long). They can still move, aim and fire; there
+  is no freeze. A second hit refreshes it to 2 turns (no stacking); a respawn clears it.
+- A slowed rig gets a frosty tint, icicles and drifting snow, a ❄ badge on its name tag (with the number of slowed
+  turns still to come), and its HUD MOVE bar reads "❄ SLOWED" on that turn.
+- The host is the authority: the slow lives on the player and travels in the host snapshot; clients only draw it.
+  Bots take shorter drives while slowed.
+- Deep Freeze (Overdrive) adds +500 delay (was +300) to each player it hits.
+
 ### Pet personality
 - **Idle cycle:** pets idle, yawn after 10–15 calm seconds (random per pet), then doze with floating z's after 30 s.
 - **Reactions:** startle "!" (a blast nearby, or woken by the owner moving or aiming), hurt (sweat drop when the owner
@@ -637,6 +667,9 @@ TURN_URL='turn:host:3478?transport=tcp,user,pass' tools/runall.sh
 - Headless test Chrome (SwiftShader) stalls frames with several pages open, so the online tests use generous timeouts; that
   says nothing about real devices, but it is why the tests take minutes.
 - HUD/loading portraits are the painted bust only; helms, wings and headpieces are not drawn on those small static portraits (they are on every live preview and in battle).
+- Rig idle motion is visual only: the hull and barrel sway a pixel or two, so the drawn barrel can sit up to ~1-2 px off
+  the true aim line while idle. Shots always use the real (unmoved) muzzle.
+- Glacier slow is checked headless (glaciertest, plus a 2-peer sync check in onlinetest), not on real networks.
 - Touch controls were checked in an emulated iPhone 14 and iPad (landscape and portrait) with real CDP touch events, not on physical devices.
 
 ## Roadmap

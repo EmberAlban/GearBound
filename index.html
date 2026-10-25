@@ -692,7 +692,7 @@ body.lowfx .hud .glass, body.lowfx .overlay.dim, body.lowfx .rigpicker { backdro
   .arena { grid-template-columns: 1fr 1fr !important; gap: 8px; } .arena .midcol { grid-column: 1 / -1; order: 3; } .arena > * { min-width: 0; }
   .slot { min-height: 0; padding: 4px; margin-bottom: 5px; } .slot .join { height: 40px; }
   .teamcol h2 { font-size: 15px; margin: 0 0 6px; }
-  .shopwrap { grid-template-columns: 230px 1fr !important; } .shopleft .preview { max-height: 110px; width: auto; }
+  .shopwrap { grid-template-columns: 230px 1fr !important; } .shopleft .preview { height: 132px !important; max-height: 132px; width: auto !important; max-width: 100%; aspect-ratio: 300 / 220; }
   .shopleft .bonus, .shopleft p { font-size: 11px; }
 }
 
@@ -1038,6 +1038,8 @@ body.touch .emotepicker.inmatch { top: 214px; max-height: calc(100vh - 360px); o
 
 .emomute { display: flex; align-items: center; gap: 5px; font-size: 11px; margin-top: 6px; }
 .emopop { position: absolute; left: 50%; top: -46px; transform: translateX(-50%); display: flex; align-items: center; gap: 2px; pointer-events: none; z-index: 5; }
+.emopop.side-l, .emopop.side-r { transform: none; flex-direction: column; gap: 0; filter: drop-shadow(0 2px 3px rgba(0,0,0,.45)); } /* beside the head (js/emotes.js placePop) */
+.emopop.side-l .emobub, .emopop.side-r .emobub { font-size: 10px; padding: 1px 6px; margin-top: -4px; }
 .slot { position: relative; }
 .emobub { background: #fff; border: 1.5px solid #7a4a14; border-radius: 12px; padding: 2px 8px; font-weight: 700; font-size: 12px; color: #3a2410; white-space: nowrap; }
 .emotoast { position: fixed; left: 50%; top: 70px; transform: translateX(-50%); z-index: 70; background: rgba(20,14,8,.82); color: #fff; padding: 5px 12px; border-radius: 12px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .3s; }
@@ -1119,6 +1121,7 @@ body.inbattle .settings { overflow: hidden; }
 .item.hwitem { background: linear-gradient(160deg, rgba(90,40,120,0.45), rgba(200,90,30,0.18)); border-color: rgba(255,150,60,0.4); }
 .note.hwnote { color: #ffd9a8; }
 .itemicon.cosicon { background: rgba(20,16,36,0.55); }
+.itemicon.flipx { transform: scaleX(-1); } /* hat art painted facing left: shown the way the pilots face */
 .hwresults { margin: 8px auto; max-width: 720px; display: flex; flex-direction: column; gap: 6px; }
 .hwrow { display: flex; align-items: center; gap: 10px; padding: 6px 12px; border-radius: 12px; background: linear-gradient(100deg, rgba(58,29,92,0.85), rgba(200,87,26,0.55)); border: 1px solid rgba(255,170,80,0.45); }
 .hwrow em { font: 800 18px var(--display); font-style: normal; color: #ffb347; }
@@ -1129,7 +1132,14 @@ body.inbattle .settings { overflow: hidden; }
 /* waiting-room backgrounds (item 20): animated canvas behind the player's own card */
 .slot.hasbg { position: relative; overflow: hidden; }
 .slot.hasbg > canvas.roombg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; border-radius: inherit; }
-.slot.hasbg > :not(canvas.roombg) { position: relative; z-index: 1; }
+.slot.hasbg > :not(canvas.roombg):not(.emopop) { position: relative; z-index: 1; } /* (the emote bubble stays absolute: it must never take part in the card's layout) */
+.slot.hasbg > canvas.preview { box-shadow: none; } /* their own background replaces the base battlefield picture */
+/* shop: the room background plays behind the pilot preview */
+.pvbg { position: relative; display: block; width: max-content; max-width: 100%; margin: 0 auto; border-radius: 12px; overflow: hidden; }
+.pvbg > canvas.pvbgcv { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.pvbg > canvas.preview { position: relative; z-index: 1; }
+.pvbg.hasbg > canvas.preview { box-shadow: none; }
+.item .pwrap.bgprev { cursor: pointer; }
 .slot.hasbg .slotbody { background: rgba(12,16,34,0.55); border-radius: 10px; padding: 4px 6px; }
 .pwrap.bgprev { position: relative; width: 150px; height: 96px; border-radius: 10px; overflow: hidden; margin: 0 auto; }
 .pwrap.bgprev canvas.shopbg { width: 100%; height: 100%; display: block; }
@@ -1237,13 +1247,15 @@ body.inbattle .settings { overflow: hidden; }
 .wcname { font-weight: 800; font-size: 17px; text-shadow: 0 2px 4px #000; } .wcsub { font-size: 12px; opacity: .85; text-shadow: 0 1px 3px #000; }
 @media (max-width: 700px) {
   .wardrobe .roomhead { flex-wrap: wrap; } .wardhb { margin-left: 0; }
-  .wardrobe .shopleft .preview { max-height: 170px; width: auto; }
+  .wardrobe .shopleft .preview { height: 170px !important; max-height: 170px; width: auto !important; max-width: 100%; aspect-ratio: 300 / 220; } /* inline width:300px used to squash it */
   .wardrobe .items { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); max-height: none; }
   .wardrobe .tabs .tab { font-size: 12px; padding: 5px 8px; }
 }
 @media (max-height: 520px) and (orientation: landscape) {
   .wardrobe .wardsum, .wardrobe .wardlo { margin-top: 6px; padding: 6px; } .wardrobe .slot.wcard { min-height: 120px; }
 }
+/* phone portrait results: "TEAM A VICTORY!" ran under the ⚙ gear (mobiletest gearResults) — shrink to fit + keep clear of it */
+@media (max-width: 520px) { .title.wintitle { font-size: min(40px, 7.4vw) !important; letter-spacing: 2px; width: fit-content; max-width: calc(100% - 104px); margin-left: auto; margin-right: auto; } }
 
 </style>
 </head>
@@ -3179,6 +3191,41 @@ AG.ADMIN_PUBLIC_KEYS = Object.freeze([
     miner: { w: 0.84, by: 0.32, dx: 0.04 },
     wreath: { w: 0.8, by: 0.2, dx: 0.04 }
   };
+  // Batch 7: how each painted hat is WORN, in head units (w = x head width, by = hat bottom as a fraction of the head
+  // height from the skull top, dx = x head width, sy = vertical squash). flip = the art was painted facing left (riders
+  // face right, so it is mirrored to face the same way as the pilot; the rig/stand transform mirrors it again when the
+  // pilot faces left). cut = polygon (fractions of the hat art) whose dark lining is knocked out so the face and hair
+  // show through the opening — that is what makes a helmet read as "on" the head instead of a lid hovering above it.
+  var HAT_SEAT = {
+    cap: { w: 1.04, rim: 0.5, lift: -0.02, sy: 0.9, cut: [[0.18, 0.56], [0.5, 0.47], [0.93, 0.52], [0.93, 0.78], [0.8, 1.0], [0.26, 1.0], [0.2, 0.75]] },
+    crown: { w: 0.56, rim: 0.92, lift: 0.2, dx: 0.02 },
+    tophat: { w: 0.76, rim: 0.95, lift: 0.1 },
+    horns: { w: 1.08, rim: 0.5, lift: 0.0, sy: 0.92, cut: [[0.15, 0.42], [0.85, 0.42], [0.85, 1.0], [0.15, 1.0]], clear: [[0.2, 0.56], [0.42, 0.5], [0.42, 0.84], [0.52, 0.84], [0.52, 0.5], [0.8, 0.56], [0.8, 1.0], [0.2, 1.0]] },
+    propeller: { w: 0.98, rim: 0.84, lift: 0.02, dx: 0.02, flip: 1 },
+    tricorn: { w: 1.1, rim: 0.8, lift: 0.06 },
+    miner: { w: 0.98, rim: 0.9, lift: 0.03, dx: 0.02, flip: 1 },
+    wreath: { w: 0.94, rim: 0.65, lift: 0.1 }
+  };
+  var hatPrep = {};
+  function inPoly(x, y, P) { var ins = false; for (var i = 0, j = P.length - 1; i < P.length; j = i++) { if (((P[i][1] > y) !== (P[j][1] > y)) && (x < (P[j][0] - P[i][0]) * (y - P[i][1]) / (P[j][1] - P[i][1]) + P[i][0])) ins = !ins; } return ins; }
+  // The hat art prepared for wearing (mirrored / lining knocked out), cached; falls back to the raw image.
+  function hatArt(id) {
+    if (hatPrep[id] !== undefined) return hatPrep[id] || AG.Art.get('hat_' + id);
+    var im = AG.Art.get('hat_' + id), S = HAT_SEAT[id];
+    if (!im || !im.naturalWidth || !S || (!S.flip && !S.cut && !S.clear)) return im;
+    try {
+      var W = im.naturalWidth, H = im.naturalHeight, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+      var c = cv.getContext('2d'); if (S.flip) { c.translate(W, 0); c.scale(-1, 1); } c.drawImage(im, 0, 0); c.setTransform(1, 0, 0, 1, 0, 0);
+      if (S.cut || S.clear) { var d = c.getImageData(0, 0, W, H), q = d.data;
+        for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) { var u = x / W, v = y / H, k = (y * W + x) * 4;
+          if (S.clear && inPoly(u, v, S.clear)) { q[k + 3] = 0; continue; } // cut away entirely (e.g. cheek plates that would hide the face)
+          if (!S.cut || !inPoly(u, v, S.cut)) continue;
+          var l = q[k] * 0.3 + q[k + 1] * 0.55 + q[k + 2] * 0.15; // the lining is the dark shadowed inside
+          if (l < 70) q[k + 3] = 0; else if (l < 105) q[k + 3] = Math.round(q[k + 3] * (l - 70) / 35); }
+        c.putImageData(d, 0, 0); }
+      hatPrep[id] = cv; return cv;
+    } catch (er) { hatPrep[id] = null; return im; }
+  }
   var skinCache = typeof WeakMap === 'function' ? new WeakMap() : null;
   // Returns the image re-painted with a rig skin (cached per image+skin); falls back to the image itself.
   function skinned(im, skinId) {
@@ -3330,7 +3377,7 @@ AG.ADMIN_PUBLIC_KEYS = Object.freeze([
   }
 
   var Avatar = {
-    SKINS: SKINS, OUTFITS: OUTFITS, HATS: HATS, PETS: PETS, FACES: FACES, HAIRS: HAIRS, RIGSKINS: RIGSKINS, skinned: skinned,
+    SKINS: SKINS, OUTFITS: OUTFITS, HATS: HATS, HAT_SEAT: HAT_SEAT, _hatArt: hatArt, PETS: PETS, FACES: FACES, HAIRS: HAIRS, RIGSKINS: RIGSKINS, skinned: skinned,
     // emote voice set for a pilot: 'fem' or 'masc', from the face they picked (Kit and Pax read as boys, Tam as a girl)
     voiceOf: function (a) { var f = a && FACES.filter(function (x) { return x.id === a.face; })[0]; return (f || FACES[0]).voice || 'masc'; },
     random: function (rng) {
@@ -3414,17 +3461,20 @@ AG.ADMIN_PUBLIC_KEYS = Object.freeze([
             c.beginPath(); c.moveTo(ex - erx, ey + RH * 0.008); c.quadraticCurveTo(ex, ey + RH * 0.035, ex + erx, ey + RH * 0.008); c.stroke(); });
         }
         // hats are fitted to each painted head (skull top / width measured by tools/build_riders.py)
-        var fitT = (A.meta._riders || {}).hatfit || {}, hf = fitT[hat.id], him = hf && A.get('hat_' + hat.id);
+        var hseat = HAT_SEAT[hat.id], him = hseat && A.get('hat_' + hat.id);
         if (Cos && Cos.hidesHat(av)) { /* a helm or hat-like headpiece replaces the hat */ }
         else if (him && rmeta && rmeta.hw) {
-          var hw = RW * rmeta.hw * hf[0], hh = hw * him.naturalHeight / him.naturalWidth;
-          c.drawImage(him, (rmeta.hx - 0.5) * RW - hw / 2 + hf[2] * RW, -RH + (rmeta.top + rmeta.hh * hf[1]) * RH - hh, hw, hh);
+          var hart = hatArt(hat.id), hw = RW * rmeta.hw * hseat.w, hh = hw * him.naturalHeight / him.naturalWidth * (hseat.sy || 1);
+          var brow = -RH + (E[0] - 0.07 - (hseat.lift || 0) * rmeta.hh) * RH; // the brow line, just above the painted eyes
+          c.drawImage(hart, (rmeta.hx - 0.5) * RW - hw / 2 + (hseat.dx || 0) * rmeta.hw * RW, brow - hseat.rim * hh, hw, hh);
         } else {
           var hs = HAT_FIT[hat.id]; him = hs && A.get('hat_' + hat.id);
-          if (him) { var hw2 = RW * hs.w, hh2 = hw2 * him.naturalHeight / him.naturalWidth; c.drawImage(him, -hw2 / 2 + RW * hs.dx, -RH * (1 - hs.by) - hh2, hw2, hh2); }
+          if (him) { var hw2 = RW * hs.w, hh2 = hw2 * him.naturalHeight / him.naturalWidth; c.drawImage(hatArt(hat.id), -hw2 / 2 + RW * hs.dx, -RH * (1 - hs.by) - hh2, hw2, hh2); }
         }
         if (Cos) { var rm = rmeta && rmeta.hw ? rmeta : { hx: 0.5, top: 0.2, hw: 0.81 };
-          Cos.drawHead(c, av, { x: (rm.hx - 0.5) * RW, top: -RH + rm.top * RH, w: RW * rm.hw }, ct); }
+          // helms are seated by the brow (the brim's lower edge, ~0.29 head-widths below the skull line, rests on the brow), so they never ride above the
+          // hair or slide over the eyes on small-headed faces; floating/worn headpieces keep the measured skull top
+          Cos.drawHead(c, av, { x: (rm.hx - 0.5) * RW, top: -RH + rm.top * RH, w: RW * rm.hw, helmTop: -RH + (E[0] - 0.07) * RH - 0.29 * RW * rm.hw }, ct); }
         c.restore();
         // team colour pennant on the shoulder so you can read teams at a glance
         var shY = -bodyH * br + 0.12 * RH * br;
@@ -3550,7 +3600,18 @@ AG.ADMIN_PUBLIC_KEYS = Object.freeze([
     var pr = m.rig.sprite && AG.rigHasSprite && AG.rigHasSprite(m.rig) ? m.rig.sprite.perch : { x: -14, y: -24 };
     if (this.def.perch && !m.moving && m.grounded) target = m.localToWorld(pr.x, pr.y); // perch on rig's back
     else target = m.localToWorld(pr.x - 6, pr.y - 16 + Math.sin(this.t * 0.07) * 4);
+    if (m._idlDy) target.y += m._idlDy; // rides the rig's idle bounce (rigidle.js)
     this.x = AG.lerp(this.x, target.x, 0.12); this.y = AG.lerp(this.y, target.y, 0.12);
+  };
+  // Waiting room: the very same follow / perch / bob and mood clock as Pet.update, stepped by k frames (60 fps units).
+  Pet.prototype.roomUpdate = function (k) {
+    k = Math.max(0, Math.min(k || 0, 30)); this._driven = true; this.t += k; this.tickMood(k);
+    var m = this.mobile, pr = m.rig.sprite && AG.rigHasSprite && AG.rigHasSprite(m.rig) ? m.rig.sprite.perch : { x: -14, y: -24 }, target;
+    if (this.def.perch && m.grounded) target = m.localToWorld(pr.x, pr.y);
+    else target = m.localToWorld(pr.x - 6, pr.y - 16 + Math.sin(this.t * 0.07) * 4);
+    if (m._idlDy) target.y += m._idlDy;
+    if (this._fresh || this._rx == null) { this.x = target.x; this.y = target.y; this._fresh = false; this._rx = 1; }
+    var a = 1 - Math.pow(0.88, k); this.x += (target.x - this.x) * a; this.y += (target.y - this.y) * a;
   };
   Pet.prototype.draw = function (c) {
     if (this.def.id === 'none') return;
@@ -3733,15 +3794,15 @@ AG.ADMIN_PUBLIC_KEYS = Object.freeze([
       trident(c, 0, -0.32, 0.36, '#3ff6ff'); c.restore(); glow(c, 0, 0.09, 0.4, '#3ff6ff', 0.25 * p); },
     hades: function (c, t) { flame(c, 0, -0.18, 0.36, 0.55, t, '#2f6dff', '#c4f0ff'); flame(c, 0.02, -0.18, 0.18, 0.32, t + 1, '#7fd0ff', '#ffffff');
       dome(c, '#585d93', '#1f2140'); brim(c, '#b8c2d8'); c.fillStyle = '#7fb6ff'; star(c, 0, 0.04, 0.07, 4, 0.4); c.fill(); glow(c, 0, -0.35, 0.35, '#4f8cff', 0.25); },
-    athena: function (c, t) { var sw = Math.sin(t * 2) * 0.03; c.beginPath(); c.moveTo(-0.15, -0.22); c.bezierCurveTo(-0.3 + sw, -0.75, 0.55 + sw, -0.75, 0.62, -0.05); c.quadraticCurveTo(0.45, -0.45, 0.15, -0.22); c.closePath();
-      c.fillStyle = grad(c, -0.7, -0.1, '#e07ad0', '#8a2d82'); c.fill(); ink(c, 0.035);
+    athena: function (c, t) { var sw = Math.sin(t * 2) * 0.03; c.save(); c.scale(-1, 1); c.beginPath(); c.moveTo(-0.15, -0.22); c.bezierCurveTo(-0.3 + sw, -0.75, 0.55 + sw, -0.75, 0.62, -0.05); c.quadraticCurveTo(0.45, -0.45, 0.15, -0.22); c.closePath();
+      c.fillStyle = grad(c, -0.7, -0.1, '#e07ad0', '#8a2d82'); c.fill(); ink(c, 0.035); c.restore();
       dome(c, '#ffffff', '#9aa6bd'); [-1, 1].forEach(function (s) { c.beginPath(); c.moveTo(s * 0.55, 0.1); c.quadraticCurveTo(s * 0.62, 0.45, s * 0.42, 0.5); c.lineTo(s * 0.45, 0.18); c.closePath(); c.fillStyle = '#cfd7e6'; c.fill(); ink(c, 0.03); });
       c.fillStyle = '#c9a052'; circ(c, -0.06, -0.02, 0.05); c.fill(); circ(c, 0.06, -0.02, 0.05); c.fill(); c.fillStyle = INK; circ(c, -0.06, -0.02, 0.02); c.fill(); circ(c, 0.06, -0.02, 0.02); c.fill(); },
     apollo: function (c, t) { c.save(); c.translate(0, -0.05); c.rotate(t * 0.4); for (var i = 0; i < 12; i++) { c.rotate(TAU / 12); c.beginPath(); c.moveTo(-0.05, -0.42); c.lineTo(0, -0.62 - (i % 2) * 0.08); c.lineTo(0.05, -0.42); c.closePath(); c.fillStyle = i % 2 ? '#ffe27a' : '#ff9d2e'; c.fill(); ink(c, 0.02); } c.restore();
       glow(c, 0, -0.1, 0.6, '#ffd36b', 0.3); dome(c, '#ffe58a', '#f08a1c'); brim(c, '#fff4cf'); circ(c, 0, 0.03, 0.065); c.fillStyle = '#e8413a'; c.fill(); ink(c, 0.025); },
     pumpkin: function (c, t) { c.save(); c.translate(0, -0.06); pumpkin(c, 0, 0, 0.42, true); c.restore(); c.fillStyle = '#5aa33a'; c.beginPath(); c.ellipse(0.2, -0.48, 0.14, 0.06, -0.5, 0, TAU); c.fill(); ink(c, 0.025); },
     mummy: function (c, t) { dome(c, '#fbf6e8', '#d8cdb0', 0.36); c.strokeStyle = 'rgba(120,100,70,0.55)'; c.lineWidth = 0.02; for (var k = 0; k < 5; k++) { c.beginPath(); c.moveTo(-0.55, 0.15 - k * 0.09); c.lineTo(0.55, 0.08 - k * 0.1 + 0.05); c.stroke(); }
-      var fl = Math.sin(t * 3) * 0.05; c.beginPath(); c.moveTo(0.5, 0.0); c.quadraticCurveTo(0.75, 0.05 + fl, 0.82, 0.25 + fl); c.lineTo(0.72, 0.27 + fl); c.quadraticCurveTo(0.66, 0.1, 0.48, 0.08); c.closePath(); c.fillStyle = '#fbf6e8'; c.fill(); ink(c, 0.025); },
+      var fl = Math.sin(t * 3) * 0.05; c.save(); c.scale(-1, 1); c.beginPath(); c.moveTo(0.5, 0.0); c.quadraticCurveTo(0.75, 0.05 + fl, 0.82, 0.25 + fl); c.lineTo(0.72, 0.27 + fl); c.quadraticCurveTo(0.66, 0.1, 0.48, 0.08); c.closePath(); c.fillStyle = '#fbf6e8'; c.fill(); ink(c, 0.025); c.restore(); },
     franken: function (c, t) { c.beginPath(); c.moveTo(-0.56, 0.18); c.lineTo(-0.52, -0.25); c.lineTo(0.52, -0.25); c.lineTo(0.56, 0.18); c.quadraticCurveTo(0, 0.26, -0.56, 0.18); c.closePath(); c.fillStyle = grad(c, -0.25, 0.2, '#7bd66a', '#3e8d3a'); c.fill(); ink(c, 0.04);
       c.strokeStyle = INK; c.lineWidth = 0.02; c.beginPath(); c.moveTo(-0.2, -0.05); c.lineTo(0.2, -0.05); for (var k = -2; k <= 2; k++) { c.moveTo(k * 0.08, -0.1); c.lineTo(k * 0.08, 0); } c.stroke();
       [-1, 1].forEach(function (s) { c.fillStyle = '#b9c2cc'; c.fillRect(s * 0.58 - 0.07, 0.02, 0.14, 0.1); ink(c, 0.001); c.fillStyle = '#8a95a3'; c.fillRect(s * 0.66 - 0.03, -0.01, 0.06, 0.16); }); },
@@ -3873,7 +3934,7 @@ AG.ADMIN_PUBLIC_KEYS = Object.freeze([
     gearhalo: function (c, t, y0) { var y = y0 - 0.24 + Math.sin(t * 2) * 0.02; c.save(); c.translate(0, y); c.scale(1, 0.3); c.rotate(t * 1.2); c.fillStyle = '#c9a052'; star(c, 0, 0, 0.36, 12, 0.85); c.fill(); ink(c, 0.05);
       c.globalCompositeOperation = 'destination-out'; circ(c, 0, 0, 0.22); c.fill(); c.restore(); c.save(); c.translate(0, y); c.scale(1, 0.3); c.strokeStyle = INK; c.lineWidth = 0.05; circ(c, 0, 0, 0.22); c.stroke(); c.restore(); },
     witchhat: function (c, t, y0) { var b = Math.sin(t * 1.5) * 0.04; c.beginPath(); c.ellipse(0, y0 + 0.1, 0.62, 0.12, 0, 0, TAU); c.fillStyle = '#3a1a66'; c.fill(); ink(c, 0.035);
-      c.beginPath(); c.moveTo(-0.32, y0 + 0.08); c.quadraticCurveTo(-0.15, y0 - 0.4, 0.05, y0 - 0.62); c.quadraticCurveTo(0.3 + b, y0 - 0.66, 0.38 + b, y0 - 0.5); c.quadraticCurveTo(0.2, y0 - 0.45, 0.32, y0 + 0.08); c.closePath(); c.fillStyle = grad(c, y0 - 0.6, y0, '#8a4ad8', '#4a2286'); c.fill(); ink(c, 0.035);
+      c.save(); c.scale(-1, 1); c.beginPath(); c.moveTo(-0.32, y0 + 0.08); c.quadraticCurveTo(-0.15, y0 - 0.4, 0.05, y0 - 0.62); c.quadraticCurveTo(0.3 + b, y0 - 0.66, 0.38 + b, y0 - 0.5); c.quadraticCurveTo(0.2, y0 - 0.45, 0.32, y0 + 0.08); c.closePath(); c.fillStyle = grad(c, y0 - 0.6, y0, '#8a4ad8', '#4a2286'); c.fill(); ink(c, 0.035); c.restore(); // the floppy tip trails behind the pilot
       c.fillStyle = '#43d17a'; c.fillRect(-0.3, y0 - 0.04, 0.6, 0.08); c.fillStyle = '#ffd24a'; c.fillRect(-0.05, y0 - 0.05, 0.1, 0.1); c.fillStyle = '#43d17a'; c.fillRect(-0.025, y0 - 0.025, 0.05, 0.05); },
     spookycat: function (c, t, y0) { c.save(); c.translate(0, y0); ear(c, -0.3, -0.35, 0.3, '#2d2838', '#b36bff'); ear(c, 0.3, 0.35, 0.3, '#2d2838', '#b36bff'); c.restore(); c.fillStyle = '#ff8a1e'; star(c, 0.3, y0 - 0.02, 0.05, 5); c.fill(); },
     pumporbit: function (c, t, y0) { for (var i = 0; i < 3; i++) { var a = t * 1.2 + i * TAU / 3, front = Math.sin(a) > 0; c.save(); c.globalAlpha = front ? 1 : 0.55; pumpkin(c, Math.cos(a) * 0.62, y0 + 0.05 + Math.sin(a) * 0.12, front ? 0.11 : 0.08, true); c.restore(); } },
@@ -3905,7 +3966,7 @@ AG.ADMIN_PUBLIC_KEYS = Object.freeze([
   Cos.drawHead = function (c, av, hf, t) {
     var hasHelm = av && av.head && av.head !== 'none' && HEAD_DRAW[av.head], hp = av && av.headpiece && av.headpiece !== 'none' && HP_DRAW[av.headpiece];
     if (!hasHelm && !hp) return;
-    c.save(); c.translate(hf.x, hf.top); c.scale(hf.w, hf.w);
+    c.save(); c.translate(hf.x, hasHelm && hf.helmTop != null ? hf.helmTop : hf.top); c.scale(hf.w, hf.w);
     if (hasHelm) HEAD_DRAW[av.head](c, t);
     if (hp) hp(c, t, hasHelm ? -0.24 : 0);
     c.restore();
@@ -5705,8 +5766,8 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       hp: 940, armor: 0.12, angleMin: 15, angleMax: 60, fuel: 120, speed: 0.75, moveDelay: 1.1, sprite: { w: 52 },
       shots: [
         { name: 'Frost Shell', kind: 'freeze', delay: 620, damage: 170, radius: 28, freeze: 80, trail: '#dff6ff', desc: 'Chills enemies hit: +80 delay.' },
-        { name: 'Cold Snap', kind: 'freeze', delay: 760, damage: 120, radius: 40, freeze: 160, trail: '#bfe9ff', desc: 'Wide frost burst: +160 delay to everyone caught.' },
-        { name: 'Deep Freeze', kind: 'freeze', delay: 1000, damage: 280, radius: 52, freeze: 300, special: true, size: 6, trail: '#ffffff', desc: 'Massive freeze: +300 delay. Overdrive.' }] }),
+        { name: 'Cold Snap', kind: 'freeze', delay: 760, damage: 120, radius: 40, freeze: 160, slow: 0.5, slowTurns: 2, trail: '#bfe9ff', desc: 'Wide frost burst: +160 delay and SLOWED (half move speed) for their next 2 turns.' },
+        { name: 'Deep Freeze', kind: 'freeze', delay: 1000, damage: 280, radius: 52, freeze: 500, special: true, size: 6, trail: '#ffffff', desc: 'Massive freeze: +500 delay to every player hit. Overdrive.' }] }),
     R2({ id: 'volt', name: 'Volt', tagline: 'Tesla car. Piercing rails and chain lightning.', role: 'Sniper', color: '#d35400', accent: '#7fd8ff',
       hp: 880, armor: 0.1, angleMin: 10, angleMax: 60, fuel: 110, speed: 0.75, moveDelay: 1.0, sprite: { w: 50 },
       shots: [
@@ -5909,7 +5970,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     meta.wheels.forEach(function (wh) {
       var im = A.get(wh.n); if (!im) return;
       var cx = (wh.u - sp.ax) * ss.w, cy = (wh.v - 1) * ss.h, r = wh.r * ss.w, d = (wh.d || wh.r * 2.04) * ss.w;
-      var ang = dist / Math.max(0.5, r * S) + (rig.id === 'lancer' ? t * 0.035 : 0);
+      var ang = dist / Math.max(0.5, r * S) + (rig.id === 'lancer' ? t * 0.035 : 0) + (m.idleWheel || 0); // + idle rev spin (rigidle.js)
       c.save(); c.translate(cx, cy); c.rotate(ang); c.drawImage(im, -d / 2, -d / 2, d, d); c.restore();
     });
     if (meta.overPoly) { // static struts/arms painted in front of a wheel: redraw just that hull outline on top
@@ -5923,6 +5984,26 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     }
   }
 
+  // ice-blue silhouette of a hull sprite (one small offscreen canvas per rig, built once) for the SLOWED tint
+  var frostCache = typeof WeakMap === 'function' ? new WeakMap() : null;
+  function frosted(im) {
+    var f = frostCache && frostCache.get(im); if (f) return f;
+    var w = Math.min(im.naturalWidth || im.width || 64, 160), h = Math.max(1, Math.round(w * (im.naturalHeight || im.height || 64) / (im.naturalWidth || im.width || 64)));
+    f = document.createElement('canvas'); f.width = w; f.height = h;
+    var x = f.getContext('2d'); x.drawImage(im, 0, 0, w, h); x.globalCompositeOperation = 'source-atop';
+    var gr = x.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#f2fdff'); gr.addColorStop(1, '#7fd0ff'); x.fillStyle = gr; x.fillRect(0, 0, w, h);
+    if (frostCache) frostCache.set(im, f);
+    return f;
+  }
+  // icicles + drifting snow on a slowed rig (rig-local space), (the ❄ badge sits on the name tag, ui.js)
+  function drawChill(c, m, ss, ax) {
+    var t = m.anim, w = ss.w, x0 = -w * ax, y = -ss.h * 0.38;
+    c.save(); c.fillStyle = 'rgba(225,248,255,0.92)'; c.strokeStyle = 'rgba(90,170,230,0.8)'; c.lineWidth = 0.6;
+    for (var i = 0; i < 5; i++) { var ix = x0 + w * (0.18 + i * 0.16), il = 3 + ((i * 7) % 4); c.beginPath(); c.moveTo(ix - 1.6, y); c.lineTo(ix + 1.6, y); c.lineTo(ix, y + il); c.closePath(); c.fill(); c.stroke(); }
+    c.fillStyle = '#ffffff';
+    for (var k = 0; k < 6; k++) { var ph = (t * 0.012 + k / 6) % 1, sx = x0 + w * ((k * 0.37 + 0.1) % 1) + Math.sin(t * 0.05 + k) * 2, sy = -ss.h * 1.05 + ph * ss.h * 1.1; c.globalAlpha = Math.sin(ph * Math.PI) * 0.9; c.fillRect(sx - 0.8, sy - 0.8, 1.6, 1.6); }
+    c.restore();
+  }
   function drawSpriteRig(c, rig, m, ss) {
     var sp = rig.sprite, A = AG.Art, t = m.anim, oy = sp.lift || 0, sy = 1;
     var rsk = m.player && m.player.avatar && m.player.avatar.rigskin, paint;
@@ -5963,6 +6044,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     // hull
     c.save(); c.translate(0, oy); c.scale(1, sy);
     c.drawImage(paint(ss.im), -ss.w * sp.ax, -ss.h, ss.w, ss.h);
+    if (m.chilled && m.chilled()) { c.save(); c.globalAlpha = 0.5 + Math.sin(t * 0.07) * 0.08; c.drawImage(frosted(ss.im), -ss.w * sp.ax, -ss.h, ss.w, ss.h); c.restore(); } // frosty tint (Cold Snap)
     drawWheels(c, rig, m, ss, sp, t);
     c.restore();
     if (rig.riderFront || rig.seatBehindGun) rider();
@@ -6125,7 +6207,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   Mobile.prototype.move = function (terrain, dir) {
     this.facing = dir;
     if (!this.grounded || this.fuel <= 0) { this.moving = false; return 0; }
-    var nx = this.x + dir * this.rig.speed, ny = this.y;
+    var sp = this.speedNow(), nx = this.x + dir * sp, ny = this.y;
     if (nx < 5 || nx > terrain.w - 5) return 0;
     var climbed = 0;
     while (terrain.solid(nx, ny) && climbed <= this.rig.climb) { ny--; climbed++; }
@@ -6135,10 +6217,15 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     while (!this.footSolid(terrain, nx, ny) && down < this.rig.climb) { ny++; down++; }
     if (!this.footSolid(terrain, nx, ny)) ny -= down; // let gravity handle the drop
     this.x = nx; this.y = ny;
-    this.fuel = Math.max(0, this.fuel - this.rig.speed);
-    this.moving = true; this.walkPhase += 0.25;
-    return this.rig.speed;
+    this.fuel = Math.max(0, this.fuel - sp); // fuel is per px driven: a slowed rig keeps its range but needs twice the time
+    this.moving = true; this.walkPhase += 0.25 * sp / this.rig.speed;
+    return sp;
   };
+  // Glacier's Cold Snap: the pilot's own next turn(s) drive at half speed. Player state (host-authoritative, synced):
+  //   slowTurns = slowed turns still to come, slowNow = this (current) turn is a slowed one, slowMul = speed factor.
+  Mobile.prototype.slowed = function () { return !!(this.player && this.player.slowNow); };
+  Mobile.prototype.chilled = function () { var p = this.player; return !!p && ((p.slowTurns || 0) > 0 || this.slowed()); };
+  Mobile.prototype.speedNow = function () { return this.rig.speed * (this.slowed() ? (this.player.slowMul || 0.5) : 1); };
 
   Mobile.prototype.changeAngle = function (d) {
     this.angle = AG.clamp(this.angle + d, this.rig.angleMin, this.rig.angleMax);
@@ -6192,6 +6279,9 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     c.translate(this.x, this.y + (emo ? emo.dy : 0));
     c.rotate(this.tilt + (emo ? emo.rot : 0));
     c.scale(this.facing * S, S);
+    var idl = AG.RigIdle && AG.RigIdle.active(this) ? AG.RigIdle.get(this) : null; // each rig's own idle motion (match + waiting room)
+    this.idleWheel = idl ? idl.wheel : 0; this.idleRev = idl ? idl.rev : 0; this._idlDy = idl ? idl.dy * S : 0;
+    if (idl) { c.translate(idl.dx, idl.dy); c.rotate(idl.rot); c.scale(1, idl.sy); }
     if (this.hurt > 0 && (this.hurt >> 2) % 2) c.globalAlpha = 0.5;
     // Aim range arc (active only)
     if (isActive) {
@@ -6213,6 +6303,9 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       var pz = this.pilotPose();
       AG.Avatar.drawRider(c, this.player.avatar, rig.mount.x, rig.mount.y + bob + (this.idleBob || 0) - 2, -this.recoil * 0.35 + (this.idleLean || 0) + (pz.lean || 0), this.player, pz);
     }
+    if (idl) AG.RigIdle.drawFx(c, this, idl, ss || { w: 40, h: 30 }, rig.sprite && rig.sprite.ax != null ? rig.sprite.ax : 0.5);
+    var chill = this.chilled();
+    if (chill) drawChill(c, this, ss || { w: 40, h: 30 }, rig.sprite && rig.sprite.ax != null ? rig.sprite.ax : 0.5);
     c.restore();
     if (this._emote && AG.Collector) AG.Collector.drawEmote(c, this, this.anim);
   };
@@ -6782,7 +6875,9 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     enemiesOf(g, p.owner).forEach(function (m) {
       var c = m.center(); if (AG.dist(c.x, c.y, p.x, p.y) > R + m.hitR()) return;
       m.player.delay += add;
-      g.effects.push({ type: 'text', x: c.x, y: c.y - 74, text: 'FROZEN +' + add + ' delay', color: '#bfe9ff', big: false, life: 80, max: 80 });
+      var sl = p.shot.slow ? ' · SLOWED' : '';
+      if (sl) { m.player.slowTurns = Math.max(m.player.slowTurns || 0, p.shot.slowTurns || 2); m.player.slowMul = p.shot.slow; } // Cold Snap: half speed for their next turns (host-side; synced)
+      g.effects.push({ type: 'text', x: c.x, y: c.y - 74, text: 'FROZEN +' + add + ' delay' + sl, color: '#bfe9ff', big: false, life: 80, max: 80 });
       spawnSparks(g, c.x, c.y, '#dff6ff', 18);
     });
     g.effects.push({ type: 'ice', x: p.x, y: p.y, r: R, life: 50, max: 50 });
@@ -6886,6 +6981,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     }
   }
   Physics.areaDamage = areaDamage;
+  Physics.freezeArea = freezeArea; // (tests: Glacier chill / slow)
   Physics.explode = function (g, x, y, radius, damage, owner, big, look, noCarve) {
     var cr = radius * (C.CRATER_SCALE || 1); // bigger craters; damage reach stays on `radius`
     if (typeof noCarve === 'number') { cr = noCarve; g.terrain.carve(x, y, cr); } // a fixed crater size (Rail Spike)
@@ -7458,7 +7554,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     this.id = o.id; this.name = o.name; this.team = o.team || 'A';
     this.teamColor = TEAM_COLORS[this.team] || '#fff';
     this.rigId = o.rigId; this.avatar = o.avatar;
-    this.delay = 0; this.ssCharge = 0; this.lastPower = null; this.shotIndex = 0;
+    this.delay = 0; this.slowTurns = 0; this.slowNow = false; this.ssCharge = 0; this.lastPower = null; this.shotIndex = 0;
     this.turnsTaken = 0; this.tieBreak = 0;
     this.stats = { damage: 0, kills: 0, shots: 0 };
     this.mobile = null;
@@ -7610,7 +7706,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     p.ssCharge = 0; if (p.shotIndex === 2) p.shotIndex = 0;
     var mx = 0; g.players.forEach(function (q) { if (q !== p && q.mobile.alive) mx = Math.max(mx, q.delay); });
     p.delay = Math.round(mx + R.DELAY_PAD);
-    p.respawnsLeft--; p.deadTurn = -1; p.respawnAt = -1; p.pickT = 0; p.pickLeft = 0;
+    p.respawnsLeft--; p.deadTurn = -1; p.respawnAt = -1; p.pickT = 0; p.pickLeft = 0; p.slowTurns = 0; p.slowNow = false; // a fresh rig comes back un-chilled
     p.protect = true; // until their own next turn starts (cleared in startTurn)
     p.stats.respawns = (p.stats.respawns || 0) + 1;
     delete g.rspReq[p.id];
@@ -7926,13 +8022,13 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
           else if (Math.random() < S.tune.driveP) S.driveDir = Math.random() < 0.6 ? dirT : -dirT;
           if (S.driveDir && !safeAhead(g, m, S.driveDir)) S.driveDir = edge ? 0 : -S.driveDir;
           if (S.driveDir && !safeAhead(g, m, S.driveDir)) S.driveDir = 0;
-          S.driveGoal = S.driveDir ? m.x + S.driveDir * (edge ? rand(90, 150) : b0 && b0.en > 0 ? rand(25, 70) : rand(70, 160)) : m.x;
+          S.driveGoal = S.driveDir ? m.x + S.driveDir * (edge ? rand(90, 150) : (b0 && b0.en > 0 ? rand(25, 70) : rand(70, 160)) * (m.slowed() ? 0.55 : 1)) : m.x; // slowed (Glacier): shorter hops, the clock is ticking
           S.phase = 'drive'; S.df = 0; S.lastX = m.x; S.stuck = 0;
         }
         break;
       case 'drive':
         S.df++;
-        if (S.driveDir && S.df > 6 && Math.abs(m.x - S.driveGoal) > m.rig.speed && m.fuel > 0 && S.df < 200 && safeAhead(g, m, S.driveDir) && S.stuck < 15) {
+        if (S.driveDir && S.df > 6 && Math.abs(m.x - S.driveGoal) > m.speedNow() && m.fuel > 0 && S.df < (m.slowed() ? 400 : 200) && safeAhead(g, m, S.driveDir) && S.stuck < 15) {
           out.K[S.driveDir < 0 ? 'L' : 'R'] = true;
           if (Math.abs(m.x - S.lastX) < 0.05) S.stuck++; else S.stuck = 0; S.lastX = m.x;
         } else if (m.facing !== dirT) { out.K[dirT < 0 ? 'L' : 'R'] = true; } // face the target (a tap)
@@ -9173,7 +9269,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     set('hpv', $.hp.val, 'text', m.hp + ' / ' + m.maxHp);
     set('hpf', $.hp.fill, 'width', (100 * m.hp / m.maxHp).toFixed(1) + '%');
     cls('hp', $.hp.row, 'low', m.hp / m.maxHp < 0.35);
-    set('mvv', $.mv.val, 'text', Math.round(100 * m.fuel / m.maxFuel) + '%');
+    set('mvv', $.mv.val, 'text', (m.slowed && m.slowed() ? '❄ SLOWED · ' : '') + Math.round(100 * m.fuel / m.maxFuel) + '%'); // Glacier Cold Snap
     set('mvf', $.mv.fill, 'width', Math.min(100, 100 * m.fuel / m.maxFuel).toFixed(1) + '%');
     var odr = p.ssCharge >= 100;
     set('odn', $.od.name, 'text', 'OVERDRIVE');
@@ -9462,6 +9558,13 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       if (AG.Respawn && AG.Respawn.hasToken(g, m.player)) { // respawn token
         var hx = x + Math.max(tw, bw + 8) / 2 - 2, hy = y - 20; c.fillStyle = 'rgba(8,12,28,0.85)'; c.beginPath(); c.arc(hx, hy, 8, 0, Math.PI * 2); c.fill();
         c.fillStyle = '#ff7a8a'; c.font = '600 11px ' + F; c.fillText('♥', hx, hy + 1); c.font = '600 12px ' + F;
+      }
+      if (m.chilled && m.chilled()) { // Glacier Cold Snap: ❄ badge on the tag's left corner (count = slowed turns still to come)
+        var sx = x - Math.max(tw, bw + 8) / 2 + 2, sy = y - 20, sn = m.slowed() ? '' : String(m.player.slowTurns || '');
+        c.fillStyle = 'rgba(20,70,130,0.92)'; c.beginPath(); c.arc(sx, sy, 9, 0, Math.PI * 2); c.fill(); c.strokeStyle = '#bfe9ff'; c.lineWidth = 1.2; c.stroke();
+        c.fillStyle = '#e8fbff'; c.font = '700 11px ' + F; c.fillText('❄', sx, sy + 1);
+        if (sn) { c.font = '700 9px ' + F; c.fillStyle = '#fff'; c.fillText(sn, sx + 8, sy + 7); }
+        c.font = '600 12px ' + F;
       }
       c.fillStyle = 'rgba(0,0,0,0.6)'; AG.roundRect(c, x - bw / 2, y - 3, bw, 6, 3); c.fill();
       var hg = c.createLinearGradient(x - bw / 2, 0, x + bw / 2, 0);
@@ -10438,7 +10541,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       }),
       p: g.players.map(function (p) {
         return [p.delay, r1(p.ssCharge), p.shotIndex, p.lastPower, p.stats.damage, p.stats.kills, p.stats.shots, p.shield, p.itemsUsed.map(function (u) { return u ? 1 : 0; }), p.itemTurn, p.tieBreak,
-          p.respawnsLeft, p.deadTurn, p.respawnAt, p.out ? 1 : 0, p.protect ? 1 : 0, p.pickLeft || 0, p.stats.respawns || 0];
+          p.respawnsLeft, p.deadTurn, p.respawnAt, p.out ? 1 : 0, p.protect ? 1 : 0, p.pickLeft || 0, p.stats.respawns || 0, p.slowTurns || 0, p.slowNow ? 1 : 0, p.slowMul || 0];
       }),
       pr: g.projectiles.map(function (pr) {
         if (!pr._id) pr._id = ++g._pid;
@@ -10494,6 +10597,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       p.delay = b[0]; p.ssCharge = b[1]; if (!(g.turns.current === p && g.isMine(p))) p.shotIndex = b[2]; p.lastPower = b[3];
       p.stats.damage = b[4]; p.stats.kills = b[5]; p.stats.shots = b[6]; p.shield = b[7]; p.itemsUsed = b[8].map(function (u) { return !!u; }); p.itemTurn = b[9]; p.tieBreak = b[10];
       if (b.length > 11) { p.respawnsLeft = b[11]; p.deadTurn = b[12]; p.respawnAt = b[13]; p.out = !!b[14]; p.protect = !!b[15]; p.pickLeft = b[16]; p.stats.respawns = b[17]; }
+      if (b.length > 18) { p.slowTurns = b[18] | 0; p.slowNow = !!b[19]; p.slowMul = b[20] || 0.5; } // Glacier slow (host-authoritative)
     }
     var byId = {}; g.projectiles.forEach(function (pr) { byId[pr._id] = pr; });
     g.projectiles = s.pr.map(function (a) {
@@ -11281,7 +11385,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     if (st.f) {
       st.ft += k; var f = st.ft;
       if (st.f === 'hop') { var p = Math.min(1, f / 30); o.dy = -Math.sin(p * Math.PI) * 7; o.sy = 1 + (p < 0.15 || p > 0.85 ? -0.06 : 0.04); o.sx = 2 - o.sy; if (f >= 30) st.f = null; }
-      else if (st.f === 'rev') { m.moving = true; m.walkPhase = (m.walkPhase || 0) + 0.18 * k; o.rot = Math.sin(f * 0.5) * 0.015; if (f >= 50) { st.f = null; m.moving = false; } } // treads / legs / wheels turn
+      else if (st.f === 'rev') { if (f <= k && AG.RigIdle) AG.RigIdle.rev(m); o.rev = 1; if (f >= 50) st.f = null; } // the rig's own rev (rigidle.js): engine roar, wheels spin, exhaust burst
       else if (st.f === 'puff') { if (f <= k) m.recoil = 1; if (f >= 30) st.f = null; o.puff = f; }
       else if (st.f === 'sweep') { m.angle += Math.sin(Math.min(1, f / 60) * Math.PI) * 14; if (f >= 60) st.f = null; }
       else if (st.f === 'pet') { o.petDy = -Math.abs(Math.sin(f * 0.21)) * 6; if (f >= 45) st.f = null; }
@@ -11298,6 +11402,150 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     c.restore();
   };
   AG.LobbyFX = L;
+})(window.AG);
+
+</script>
+<script>
+/* js/rigidle.js */
+// rigidle.js — every rig's own idle life (drawing only, never gameplay): engine shake, suspension bounce, rocking,
+// exhaust / steam / sparks / embers, spinning parts, plus a periodic "rev" burst. Used by Mobile.draw whenever a rig
+// is alive, on the ground (or hovering) and not driving, so the match and the waiting room show the SAME motion.
+// Driven by the wall clock (m.idleClock overrides it in tests) and a per-pilot phase, so it needs no network sync and
+// costs a handful of canvas ops per rig. Reduced motion: no shake, no particles.
+(function (AG) {
+  'use strict';
+  var TAU = Math.PI * 2;
+  // kind of motion per rig — every rig differs (amplitudes in rig-local px / radians; hz = cycles per second)
+  // shake: engine buzz; bounce: suspension; rock: side rocking; sq: squash; fx: particle style; rev: seconds between revs
+  var P = {
+    bastion:   { shake: 0.28, shz: 7,  bounce: 0.55, bhz: 1.1, rock: 0.006, rhz: 0.35, sq: 0.012, fx: 'smoke',  rev: 5.5, revLen: 1.1, wheel: 1.2, kick: 'chug' },
+    skipper:   { shake: 0.08, shz: 9,  bounce: 1.1,  bhz: 1.7, rock: 0.01,  rhz: 0.5,  sq: 0.035, fx: 'steam',  rev: 4.5, revLen: 0.7, wheel: 0.8, kick: 'boing' },
+    lancer:    { shake: 0,    shz: 0,  bounce: 0.4,  bhz: 0.6, rock: 0.025, rhz: 0.3,  sq: 0,     fx: 'crystal',rev: 6,   revLen: 0.9, wheel: 0,   kick: 'flare' },
+    lodestone: { shake: 0.18, shz: 13, bounce: 0.3,  bhz: 0.8, rock: 0.004, rhz: 0.4,  sq: 0.008, fx: 'magnet', rev: 5,   revLen: 1.0, wheel: 0.6, kick: 'pulse' },
+    carom:     { shake: 0.12, shz: 10, bounce: 0.35, bhz: 1.3, rock: 0.022, rhz: 0.8,  sq: 0.01,  fx: 'exhaust',rev: 4,   revLen: 0.9, wheel: 2.2, kick: 'wheelie' },
+    beetle:    { shake: 0.06, shz: 6,  bounce: 0.25, bhz: 0.5, rock: 0.008, rhz: 0.25, sq: 0.022, fx: 'dust',   rev: 5.5, revLen: 0.8, wheel: 0.9, kick: 'scuttle' },
+    hornet:    { shake: 0.35, shz: 22, bounce: 1.2,  bhz: 0.9, rock: 0.02,  rhz: 0.6,  sq: 0,     fx: 'wings',  rev: 4.5, revLen: 0.8, wheel: 0,   kick: 'zoom' },
+    mason:     { shake: 0.1,  shz: 5,  bounce: 0.3,  bhz: 0.7, rock: 0.018, rhz: 0.4,  sq: 0.015, fx: 'dust',   rev: 6,   revLen: 0.9, wheel: 0.5, kick: 'stomp' },
+    glacier:   { shake: 0.12, shz: 15, bounce: 0.35, bhz: 0.9, rock: 0.006, rhz: 0.45, sq: 0.01,  fx: 'frost',  rev: 5,   revLen: 1.0, wheel: 0.7, kick: 'shiver' },
+    volt:      { shake: 0.15, shz: 12, bounce: 0.4,  bhz: 1.2, rock: 0.008, rhz: 0.6,  sq: 0.012, fx: 'sparks', rev: 4,   revLen: 0.9, wheel: 2.4, kick: 'zap' },
+    flak:      { shake: 0.32, shz: 9,  bounce: 0.45, bhz: 1.4, rock: 0.007, rhz: 0.5,  sq: 0.014, fx: 'smoke',  rev: 4.5, revLen: 0.8, wheel: 1.6, kick: 'backfire' },
+    gyro:      { shake: 0.08, shz: 10, bounce: 0.25, bhz: 0.9, rock: 0.045, rhz: 0.55, sq: 0.006, fx: 'exhaust',rev: 4,   revLen: 1.0, wheel: 3.2, kick: 'spin' },
+    orrery:    { shake: 0,    shz: 0,  bounce: 0.9,  bhz: 0.45,rock: 0.015, rhz: 0.25, sq: 0,     fx: 'orbit',  rev: 6,   revLen: 1.2, wheel: 0,   kick: 'orbit' },
+    spindle:   { shake: 0.05, shz: 8,  bounce: 0.3,  bhz: 0.6, rock: 0.012, rhz: 0.45, sq: 0.02,  fx: 'dust',   rev: 4.5, revLen: 0.6, wheel: 0,   kick: 'twitch' },
+    phoenix:   { shake: 0.1,  shz: 14, bounce: 1.0,  bhz: 0.7, rock: 0.02,  rhz: 0.35, sq: 0,     fx: 'embers', rev: 5,   revLen: 1.0, wheel: 0,   kick: 'flame' },
+    leviathan: { shake: 0.06, shz: 8,  bounce: 0.9,  bhz: 0.5, rock: 0.03,  rhz: 0.28, sq: 0,     fx: 'spray',  rev: 5.5, revLen: 1.0, wheel: 0,   kick: 'splash' },
+    aurora:    { shake: 0,    shz: 0,  bounce: 1.1,  bhz: 0.4, rock: 0.022, rhz: 0.22, sq: 0,     fx: 'stars',  rev: 6,   revLen: 1.3, wheel: 0,   kick: 'shoot' }
+  };
+  // (super rigs: phoenix / leviathan / aurora; every one of the 17 has its own entry)
+  var DEF = { shake: 0.15, shz: 9, bounce: 0.4, bhz: 1, rock: 0.01, rhz: 0.5, sq: 0.01, fx: 'exhaust', rev: 5, revLen: 0.9, wheel: 1, kick: 'chug' };
+  function phash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0) % 10007) / 10007; }
+  function reduced() { return AG.LobbyFX && AG.LobbyFX.reduced && AG.LobbyFX.reduced(); }
+  function now(m) { return m.idleClock != null ? m.idleClock : (window.performance && performance.now ? performance.now() : Date.now()); }
+  var RI = { PROFILES: P };
+  RI.profile = function (rig) { return P[rig && rig.id] || DEF; };
+  RI.active = function (m) { return !!(m && m.alive && !m.moving && !m.kx && (m.grounded || (m.rig && m.rig.hover)) && !m.noIdle); };
+  // Kick a rev now (waiting-room flourish, or anything that wants the engine to roar)
+  RI.rev = function (m) { m._revAt = now(m); };
+  // Motion for this frame: { dx, dy, rot, sy, wheel, rev (0..1 envelope), t, p }
+  RI.get = function (m) {
+    var p = RI.profile(m.rig), ms = now(m);
+    if (m._iseed == null) m._iseed = phash(String((m.player && (m.player.name || m.player.id)) || '') + '|' + (m.rig && m.rig.id));
+    var sd = m._iseed, t = ms / 1000 + sd * 50;
+    var o = { dx: 0, dy: 0, rot: 0, sy: 1, wheel: 0, rev: 0, t: t, p: p, kick: p.kick };
+    if (reduced()) return o;
+    // periodic rev (own phase per pilot) or a kicked one
+    var per = p.rev * (0.85 + sd * 0.4), ph = (t % per) / per, rl = p.revLen / per, rev = ph < rl ? Math.sin(ph / rl * Math.PI) : 0;
+    if (m._revAt != null) { var ka = (ms - m._revAt) / 1000; if (ka >= 0 && ka < p.revLen) rev = Math.max(rev, Math.sin(ka / p.revLen * Math.PI)); }
+    o.rev = rev;
+    var sh = p.shake * (1 + rev * 2.2);
+    o.dx = Math.sin(t * TAU * p.shz) * sh * 0.6; o.dy = Math.sin(t * TAU * p.shz * 1.37 + 1) * sh;
+    var b = Math.sin(t * TAU * p.bhz); o.dy += b * p.bounce * (p.sq ? 0.5 : 1); o.sy = 1 + (p.sq ? -b * p.sq : 0);
+    o.rot = Math.sin(t * TAU * p.rhz + sd * 6) * p.rock;
+    var dt = m._iwl != null ? Math.min(0.1, Math.max(0, (ms - m._iwl) / 1000)) : 0; m._iwl = ms;
+    m._iwa = ((m._iwa || 0) + rev * p.wheel * 9 * dt) % (TAU * 100); // wheels / treads spin up on a rev
+    o.wheel = m._iwa + Math.sin(t * TAU * 0.4) * 0.05 * p.wheel; // ...and rock a hair on the brakes
+    var k = p.kick, r = rev;
+    if (k === 'boing') { o.dy -= r * 3.2; o.sy -= r * 0.05 * Math.cos(r * Math.PI); }
+    else if (k === 'wheelie') o.rot -= r * 0.09;
+    else if (k === 'zoom') o.dy -= r * 3;
+    else if (k === 'stomp') { o.dy += r * 0.8; o.sy -= r * 0.04; }
+    else if (k === 'scuttle') o.dx += Math.sin(t * TAU * 6) * r * 0.9;
+    else if (k === 'spin') o.rot += Math.sin(t * TAU * 1.2) * r * 0.05;
+    else if (k === 'flame' || k === 'shoot') o.dy -= r * 2.2;
+    else if (k === 'splash') o.rot += Math.sin(t * TAU * 0.9) * r * 0.04;
+    else if (k === 'backfire') o.dx -= r * 0.8;
+    else if (k === 'chug') o.dy += Math.abs(Math.sin(t * TAU * 2.2)) * r * -0.9;
+    return o;
+  };
+  // particle stream: n slots cycling with period life (s); f(phase, index)
+  function stream(n, t, life, f) { for (var i = 0; i < n; i++) { var ph = ((t / life) + i / n) % 1; f(ph, i); } }
+  // Effects in rig-local space (already flipped by facing; +x is the gun side). ss = sprite box {w, h}, ax = anchor.
+  RI.drawFx = function (c, m, o, ss, ax) {
+    if (!o || reduced()) return;
+    var p = o.p, t = o.t, r = o.rev, w = ss.w, h = ss.h, rear = -w * ax * 0.9, sp = m.rig.sprite || {};
+    var sx = sp.stack ? sp.stack.x : rear + w * 0.08, sy = sp.stack ? sp.stack.y : -h * 0.42;
+    c.save();
+    switch (p.fx) {
+      case 'smoke': case 'exhaust': {
+        var dark = p.fx === 'smoke', n = dark ? 4 : 3, life = dark ? 1.6 : 1.1, ex = p.fx === 'exhaust' ? rear : sx, ey = p.fx === 'exhaust' ? -h * 0.18 : sy;
+        stream(n + (r > 0.2 ? 2 : 0), t, life * (1 - r * 0.4), function (ph) {
+          c.globalAlpha = (0.32 + r * 0.3) * (1 - ph); c.fillStyle = dark ? '#5d5a58' : '#d8d6d2';
+          c.beginPath(); c.arc(ex - ph * (dark ? 6 : 10) - r * ph * 6, ey - ph * (dark ? 16 : 6), 1.2 + ph * (dark ? 4 : 3), 0, TAU); c.fill(); });
+        if (p.kick === 'backfire' && r > 0.6) { c.globalCompositeOperation = 'lighter'; c.globalAlpha = (r - 0.6) * 2.2; c.fillStyle = '#ffb040'; c.beginPath(); c.arc(rear - 2, -h * 0.18, 2.6, 0, TAU); c.fill(); }
+        break; }
+      case 'steam':
+        stream(3, t, 1.3, function (ph, i) { c.globalAlpha = (0.28 + r * 0.35) * (1 - ph); c.fillStyle = '#f4f7fa';
+          c.beginPath(); c.arc(sx + Math.sin(ph * 5 + i) * 1.5, sy - 4 - ph * 12, 1 + ph * 3, 0, TAU); c.fill(); });
+        break;
+      case 'crystal': case 'sparks': case 'magnet': {
+        c.globalCompositeOperation = 'lighter';
+        var col = p.fx === 'magnet' ? '220,140,255' : p.fx === 'sparks' ? '150,220,255' : '170,245,255', cx = sp.crystal ? sp.crystal.x : 0, cy = sp.crystal ? sp.crystal.y : -h * 0.55;
+        if (p.fx === 'magnet') { var rr = ((t * 0.9) % 1); c.globalAlpha = 0.35 * (1 - rr) + r * 0.3; c.strokeStyle = 'rgba(' + col + ',1)'; c.lineWidth = 0.8; c.beginPath(); c.ellipse(0, -h * 0.45, 6 + rr * 18, 3 + rr * 8, 0, 0, TAU); c.stroke(); }
+        var on = p.fx === 'sparks' ? ((t * 7) | 0) % 5 === 0 || r > 0.4 : ((t * 4) | 0) % 6 === 0 || r > 0.5;
+        if (on) { c.globalAlpha = 0.8; c.strokeStyle = 'rgba(' + col + ',0.95)'; c.lineWidth = 0.6; var bx = p.fx === 'crystal' ? cx : -w * 0.1, by = p.fx === 'crystal' ? cy : -h * 0.8;
+          c.beginPath(); c.moveTo(bx, by); for (var z = 1; z <= 4; z++) c.lineTo(bx + Math.sin(t * 31 + z * 2) * 3, by - z * 2.2); c.stroke(); }
+        stream(3, t, 0.9, function (ph, i) { c.globalAlpha = (0.5 + r * 0.4) * (1 - ph); c.fillStyle = 'rgba(' + col + ',1)';
+          c.fillRect(Math.sin(i * 2.4 + t) * w * 0.3, -h * 0.5 - ph * 10 - i * 2, 1.2, 1.2); });
+        break; }
+      case 'dust':
+        if (r > 0.05) stream(4, t, 0.7, function (ph, i) { c.globalAlpha = 0.35 * r * (1 - ph); c.fillStyle = '#b8a07a';
+          c.beginPath(); c.arc((i % 2 ? 1 : -1) * (w * 0.3 + ph * 8), -1 - ph * 3, 1 + ph * 2.5, 0, TAU); c.fill(); });
+        break;
+      case 'wings': // translucent buzzing wing blur
+        c.globalAlpha = 0.22 + r * 0.2; c.fillStyle = '#e8f6ff';
+        var fl = Math.abs(Math.sin(t * TAU * 11)); c.beginPath(); c.ellipse(-w * 0.05, -h * 0.85, 9, 2 + fl * 4, -0.3, 0, TAU); c.fill();
+        c.beginPath(); c.ellipse(-w * 0.2, -h * 0.8, 7, 1.5 + fl * 3, -0.5, 0, TAU); c.fill();
+        break;
+      case 'frost':
+        stream(4, t, 1.8, function (ph, i) { c.globalAlpha = (0.25 + r * 0.3) * Math.sin(ph * Math.PI); c.fillStyle = '#dff4ff';
+          c.beginPath(); c.arc((i - 1.5) * w * 0.2 - ph * 6, -2 - ph * 4, 2 + ph * 3, 0, TAU); c.fill(); });
+        c.globalCompositeOperation = 'lighter'; stream(2, t, 1.2, function (ph, i) { c.globalAlpha = 0.7 * Math.sin(ph * Math.PI); c.fillStyle = '#ffffff'; c.fillRect((i ? 0.25 : -0.2) * w, -h * (0.4 + ph * 0.5), 1, 1); });
+        break;
+      case 'orbit':
+        c.globalCompositeOperation = 'lighter';
+        for (var j = 0; j < 3; j++) { var a = t * TAU * (0.25 + j * 0.08) * (1 + r * 2) + j * 2.1, ox = Math.cos(a) * w * (0.42 + j * 0.06), oy = -h * 0.5 + Math.sin(a) * h * 0.18;
+          c.globalAlpha = Math.sin(a) > 0 ? 0.85 : 0.4; c.fillStyle = ['#ffd36b', '#b98cff', '#8ce8ff'][j]; c.beginPath(); c.arc(ox, oy, 1.3, 0, TAU); c.fill(); }
+        break;
+      case 'embers':
+        c.globalCompositeOperation = 'lighter';
+        var fh = 3 + Math.sin(t * 23) * 1 + r * 4; c.globalAlpha = 0.6; c.fillStyle = '#ff9a30';
+        [-0.22, 0.18].forEach(function (u) { c.beginPath(); c.moveTo(w * u - 2.2, -2); c.lineTo(w * u, -2 + fh); c.lineTo(w * u + 2.2, -2); c.closePath(); c.fill(); });
+        stream(4, t, 1.1, function (ph, i) { c.globalAlpha = (0.7 + r * 0.3) * (1 - ph); c.fillStyle = i % 2 ? '#ffd070' : '#ff6a20'; c.fillRect(Math.sin(i * 3 + ph * 4) * w * 0.3, -h * 0.3 - ph * 18, 1.4, 1.4); });
+        break;
+      case 'spray':
+        stream(5, t, 0.8 * (1 - r * 0.3), function (ph, i) { c.globalAlpha = 0.55 * (1 - ph); c.fillStyle = i % 2 ? '#bff4ff' : '#ffffff';
+          var dir = i % 2 ? 1 : -1; c.beginPath(); c.arc(dir * (w * 0.2 + ph * (6 + r * 8)), -1 - Math.sin(ph * Math.PI) * (4 + r * 6), 0.9 + (1 - ph) * 0.6, 0, TAU); c.fill(); });
+        break;
+      case 'stars':
+        c.globalCompositeOperation = 'lighter';
+        for (var q = 0; q < 4; q++) { var tw = Math.sin(t * TAU * (0.6 + q * 0.17) + q * 1.7); if (tw < 0.2) continue; c.globalAlpha = tw * 0.9; c.fillStyle = q % 2 ? '#a0ffd0' : '#ffffff';
+          var qx = (q - 1.5) * w * 0.22, qy = -h * (0.7 + (q % 2) * 0.2); c.fillRect(qx - 1.5 * tw, qy - 0.3, 3 * tw, 0.6); c.fillRect(qx - 0.3, qy - 1.5 * tw, 0.6, 3 * tw); }
+        if (r > 0.1) { c.globalAlpha = r; c.strokeStyle = '#e0c0ff'; c.lineWidth = 0.8; var sxp = -w * 0.6 + r * w * 1.1; c.beginPath(); c.moveTo(sxp, -h * 1.05); c.lineTo(sxp - 8, -h * 1.05 + 3); c.stroke(); }
+        break;
+    }
+    c.restore();
+  };
+  AG.RigIdle = RI;
 })(window.AG);
 
 </script>
@@ -11556,6 +11804,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     drawPreview(pv, 0); pv.drawn = true;
     return cv;
   }
+  var roomPets = {}; S._roomPets = function () { return roomPets; }; // (tests)
   function drawPreview(pv, k) {
     var pl = pv.getPl(); if (!pl) return; k = k || 0;
     var c = pv.cv.getContext('2d'), w = pv.w, h = pv.h;
@@ -11563,7 +11812,10 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var th = AG.Terrain.THEMES[S.profile.theme] || AG.Terrain.THEMES[0], A = AG.Art;
     var gy = h - 16, bg = A.get('bg_' + th.art);
     var bkey = th.art + '|' + !!bg + '|' + w + 'x' + h; // the backdrop is static: paint it once, then blit it each frame
-    if (pv.bkey === bkey && pv.back) { c.drawImage(pv.back, 0, 0, w, h); }
+    if (pv.noBack && pv.noBack(pl)) { // a room background plays behind this card (waiting room) / the shop preview: no base battlefield
+      c.clearRect(0, 0, w, h); var shd0 = c.createRadialGradient(w / 2, gy, 2, w / 2, gy, w * 0.3); shd0.addColorStop(0, 'rgba(0,0,0,0.4)'); shd0.addColorStop(1, 'rgba(0,0,0,0)');
+      c.save(); c.translate(0, gy); c.scale(1, 0.22); c.fillStyle = shd0; c.beginPath(); c.arc(w / 2, 0, w * 0.3, 0, Math.PI * 2); c.fill(); c.restore(); }
+    else if (pv.bkey === bkey && pv.back) { c.drawImage(pv.back, 0, 0, w, h); }
     else {
     var real = c; pv.back = document.createElement('canvas'); pv.back.width = pv.cv.width; pv.back.height = pv.cv.height; pv.bkey = bkey;
     c = pv.back.getContext('2d'); c.setTransform(pv.dpr, 0, 0, pv.dpr, 0, 0);
@@ -11590,7 +11842,9 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     if (!pv.m || pv.key !== key) {
       var fake = { avatar: pl.avatar, teamColor: AG.TEAM_COLORS[pl.team], name: pl.name };
       pv.m = new AG.Mobile(fake, AG.rigById(pl.rigId === 'random' ? AG.RIGS[0].id : pl.rigId), 0, 0); pv.random = pl.rigId === 'random'; pv.m.facing = pl.team === 'B' ? -1 : 1;
-      pv.pet = new AG.Avatar.Pet(pv.m); pv.key = key;
+      var pk = (pl.id || pl.name || '') + '|' + pl.team + '|' + (pl.avatar && pl.avatar.pet), cp = roomPets[pk]; // the same pet survives room re-renders (mood, yawns, dozing)
+      if (cp && cp.def.id === (pl.avatar && pl.avatar.pet || 'none')) { cp.mobile = pv.m; pv.pet = cp; } else { pv.pet = new AG.Avatar.Pet(pv.m); pv.pet._fresh = true; roomPets[pk] = pv.pet; }
+      pv.key = key;
     }
     var t0 = pv.t; pv.t += k;
     if (pv.random && Math.floor(pv.t / 75) !== Math.floor(t0 / 75)) { var nr = AG.RIGS[(pv.t / 75 | 0) % AG.RIGS.length]; pv.m.rig = nr; } // Random: shuffle through the roster
@@ -11602,9 +11856,9 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     c.translate(0, io.dy); c.rotate(io.rot); c.scale(io.sx, io.sy);
     m.x = 0; m.y = 0; m.drawShadowless = true; m.draw(c, false);
     if (io.puff) AG.LobbyFX.puff(c, m, io.puff);
-    pv.pet.t = pv.t;
-    var pp = m.localToWorld(-16, (pv.pet.def.perch ? -24 : -40 + Math.sin(pv.t * 0.07) * 3) + io.petDy);
-    pv.pet.x = pp.x; pv.pet.y = pp.y; pv.pet.draw(c);
+    var pet = pv.pet; if (pet._ready != null && !!pl.ready !== pet._ready && pl.ready) pet.react('cheer'); pet._ready = !!pl.ready; // READY → a happy hop
+    pet.roomUpdate(k); // same follow / perch / bob / yawn / doze as in the match (avatar.js Pet.update)
+    if (io.petDy) { pet.y += io.petDy; pet.draw(c); pet.y -= io.petDy; } else pet.draw(c);
     c.restore();
     if (pv.random) { c.save(); c.font = '800 ' + Math.round(h * 0.3) + 'px ' + AG.Render.FONT; c.textAlign = 'center'; c.textBaseline = 'middle';
       c.lineWidth = 5; c.strokeStyle = 'rgba(10,8,30,.85)'; c.strokeText('?', w * 0.82, h * 0.28); c.fillStyle = '#ffd36b'; c.fillText('?', w * 0.82, h * 0.28); c.restore(); }
@@ -12124,7 +12378,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   function slot(pl, team) {
     var R = O().room, online = R.mode !== 'local', mine = pl && pl.owner === R.me;
     var s = el('div', 'slot' + (pl ? '' : ' empty') + (pl && pl.ready ? ' ready' : '') + (pl && online && !mine ? ' remote' : '') + (mine && online ? ' me' : ''));
-    if (pl) { s.dataset.owner = pl.owner || ''; s.dataset.sid = pl.sid || ''; if (pl.bot) s.dataset.bot = '1'; } // emotes pop up by the seat
+    if (pl) { s.dataset.owner = pl.owner || ''; s.dataset.sid = pl.sid || ''; s.dataset.team = team; if (pl.bot) s.dataset.bot = '1'; } // emotes pop up by the seat
     if (!pl) {
       if (R.mode === 'client') { s.appendChild(el('div', 'openslot', 'Open slot')); return s; }
       s.appendChild(btn('ghost join', online ? '+ Add local pilot' : '+ Join Team ' + team, function () {
@@ -12137,6 +12391,8 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var rbg = AG.RoomBG && pl.avatar && pl.avatar.roombg;
     if (rbg && rbg !== 'none' && AG.RoomBG.has(rbg)) { var rcv = document.createElement('canvas'); rcv.className = 'roombg'; s.classList.add('hasbg'); s.appendChild(rcv); AG.RoomBG.mount(rcv, rbg); } // behind this player's own card
     s.appendChild(preview(124, 84, function () { return pl; }, 0.82));
+    if (s.classList.contains('hasbg')) previews[previews.length - 1].noBack = function () { return true; }; // their own background replaces the base one
+    var spv = previews[previews.length - 1]; s.addEventListener('gb-emote', function () { if (spv.pet) spv.pet.react('cheer'); }); // the pet cheers along with an emote
     var body = el('div', 'slotbody');
     var top = el('div', 'slottop');
     if (pl.bot) {
@@ -12236,7 +12492,17 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var left = el('div', 'shopleft');
     // pilot alone by default (full chibi body); the Rig skins tab (or the toggle) shows the rig under them
     var pvc = preview(300, 220, function () { return pl; }, 2.6), pvo = previews[previews.length - 1];
-    pvo.pilot = function () { return shopView === 'pilot' && shopTab !== 'rigskin'; }; pvc.id = 'shopPreview'; left.appendChild(pvc);
+    pvo.pilot = function () { return shopView === 'pilot' && shopTab !== 'rigskin'; }; pvc.id = 'shopPreview';
+    // room backgrounds play live behind the pilot preview: the equipped one on the Room BGs tab, or whichever card you
+    // hover / tap (so you see how it looks in the waiting room before buying)
+    var pvbox = el('div', 'pvbg'), bgcv = null, bgShown = null; pvbox.appendChild(pvc); left.appendChild(pvbox);
+    function shopBg(id) { id = id && id !== 'none' && AG.RoomBG && AG.RoomBG.has(id) ? id : null; if (id === bgShown) return; bgShown = id;
+      if (bgcv) { bgcv.remove(); bgcv = null; } if (id) { bgcv = document.createElement('canvas'); bgcv.className = 'roombg pvbgcv'; pvbox.insertBefore(bgcv, pvc); AG.RoomBG.mount(bgcv, id); }
+      pvbox.classList.toggle('hasbg', !!id); pvbox.dataset.bg = id || ''; drawPreview(pvo, 0); }
+    pvo.noBack = function () { return !!bgShown; };
+    var shopBgDefault = function () { return shopTab === 'roombg' ? pl.avatar.roombg : null; };
+    S._shopBg = shopBg; // (tests)
+    shopBg(shopBgDefault());
     var pvt = btn('ghost small pvtoggle', '', function () { shopView = pvo.pilot() ? 'rig' : 'pilot'; if (shopTab === 'rigskin' && shopView === 'pilot') shopTab = 'hat'; S.showShop(idx); });
     pvt.id = 'pvMode'; pvt.textContent = pvo.pilot() ? '⚙ Show my rig' : '🧍 Pilot only'; left.appendChild(pvt);
     var sname = el('div', 'shopname', pl.name), nmk = AG.Collector && AG.Collector.nameClass(pl); if (nmk) sname.classList.add(nmk); left.appendChild(sname);
@@ -12331,6 +12597,10 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
         '\nTotal bonuses are capped: ' + AG.Perks.capsText();
       var tryOn = JSON.parse(JSON.stringify(pl)); tryOn.avatar[slot] = it.id;
       var pw = el('div', 'pwrap');
+      if (slot === 'roombg') { (function (id) { // hover (mouse) or tap the picture: preview it behind the pilot
+          card.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') shopBg(id); });
+          card.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') shopBg(shopBgDefault()); });
+          pw.addEventListener('click', function () { shopBg(id); }); pw.title = 'Tap to preview behind your pilot'; })(it.id); }
       if (slot === 'roombg') { pw.classList.add('bgprev'); if (it.id === 'none') pw.appendChild(el('div', 'bgnone', 'No background')); else { var bcv = document.createElement('canvas'); bcv.className = 'roombg shopbg'; pw.appendChild(bcv); AG.RoomBG.mount(bcv, it.id); } } // live animated preview
       else pw.appendChild(preview(150, 96, function () { return tryOn; }, 1.5));
       if (slot === 'roombg') {} else if (Cos && Cos.LISTS[slot]) previews[previews.length - 1].pilot = function () { return true; }; // helms / armour / wings / headpieces: try on the standing pilot
@@ -12338,7 +12608,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       if (slot === 'roombg') {}
       else if (slot === 'outfit' || free) isrc = AG.Avatar.riderURL(tryOn.avatar);
       else { var ii = AG.Art.get(slot + '_' + it.id); if (ii) isrc = ii.src; }
-      if (isrc) { var ic2 = document.createElement('img'); ic2.className = 'itemicon' + (slot === 'outfit' || free ? ' face' : ''); ic2.src = isrc; ic2.alt = ''; pw.appendChild(ic2); }
+      if (isrc) { var ic2 = document.createElement('img'); ic2.className = 'itemicon' + (slot === 'outfit' || free ? ' face' : ''); ic2.src = isrc; ic2.alt = ''; if (slot === 'hat' && (A.HAT_SEAT[it.id] || {}).flip) ic2.classList.add('flipx'); pw.appendChild(ic2); }
       else if (Cos && Cos.LISTS[slot] && it.id !== 'none') { var cic = Cos.icon(slot, it.id, 40); cic.className = 'itemicon cosicon'; pw.appendChild(cic); }
       if (slot === 'skin' || (slot === 'hair' && it.color)) { var sw = el('span', 'swatch'); sw.style.background = slot === 'skin' ? it.id : it.color; pw.appendChild(sw); }
       card.appendChild(pw);
@@ -12442,10 +12712,15 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     box.appendChild(head);
     var wrap = el('div', 'shopwrap'), left = el('div', 'shopleft wardleft');
     var showRig = wardTab === 'rigskin' || wardView === 'rig';
+    // hover / tap a Room BG card: preview it live on the waiting-room card (same handlers as the shop's)
+    var shopBg = function () {}, shopBgDefault = function () { return pl.avatar.roombg; };
     if (wardTab === 'roombg') { // waiting-room card preview: the equipped background behind this pilot's card
       var card0 = el('div', 'slot wcard'); card0.id = 'wardRoomCard';
-      var bgid = pl.avatar.roombg;
-      if (bgid && bgid !== 'none' && AG.RoomBG && AG.RoomBG.has(bgid)) { var rcv = document.createElement('canvas'); rcv.className = 'roombg'; card0.classList.add('hasbg'); card0.appendChild(rcv); AG.RoomBG.mount(rcv, bgid); }
+      var bgid = pl.avatar.roombg, rcv = null, wbShown;
+      shopBg = function (id) { id = id && id !== 'none' && AG.RoomBG && AG.RoomBG.has(id) ? id : null; if (id === wbShown) return; wbShown = id;
+        if (rcv) { rcv.remove(); rcv = null; } if (id) { rcv = document.createElement('canvas'); rcv.className = 'roombg'; card0.insertBefore(rcv, card0.firstChild); AG.RoomBG.mount(rcv, id); }
+        card0.classList.toggle('hasbg', !!id); card0.dataset.bg = id || ''; };
+      shopBg(bgid);
       var cin = el('div', 'wcardin'); var face = document.createElement('img'); face.src = AG.Avatar.riderURL(pl.avatar); face.alt = ''; face.className = 'wcface'; cin.appendChild(face);
       cin.appendChild(el('div', 'wcname', pl.name)); cin.appendChild(el('div', 'wcsub', bgid && bgid !== 'none' ? wardName('roombg', bgid) : 'No background'));
       card0.appendChild(cin); left.appendChild(card0);
@@ -12501,14 +12776,18 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
         var on = pl.avatar[slot] === it.id, card = el('div', 'item wcard2' + (on ? ' eq equipped' : '') + (it.candy ? ' hwitem' : ''));
         card.dataset.key = slot + ':' + it.id; card.title = it.name + (on ? '\nWearing it' + (hasNone(slot) ? ' — tap to take off' : '') : '\nTap to wear');
         var pw = el('div', 'pwrap');
-        if (slot === 'roombg') { pw.classList.add('bgprev'); var bcv = document.createElement('canvas'); bcv.className = 'roombg shopbg'; pw.appendChild(bcv); AG.RoomBG.mount(bcv, it.id); }
+        if (slot === 'roombg') { (function (id) { // hover (mouse) or tap the picture: preview it behind the pilot
+          card.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') shopBg(id); });
+          card.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') shopBg(shopBgDefault()); });
+          pw.addEventListener('click', function () { shopBg(id); }); pw.title = 'Tap to preview behind your pilot'; })(it.id); }
+      if (slot === 'roombg') { pw.classList.add('bgprev'); var bcv = document.createElement('canvas'); bcv.className = 'roombg shopbg'; pw.appendChild(bcv); AG.RoomBG.mount(bcv, it.id); }
         else {
           var tryOn = JSON.parse(JSON.stringify(pl)); tryOn.avatar[slot] = it.id;
           pw.appendChild(preview(150, 96, function () { return tryOn; }, 1.5));
           if (AG.Cos && AG.Cos.LISTS[slot]) previews[previews.length - 1].pilot = function () { return true; }; // helms / armour / wings / headpieces on the standing pilot
           var isrc = null;
           if (slot === 'outfit' || WARD_FREE[slot]) isrc = AG.Avatar.riderURL(tryOn.avatar); else { var ii = AG.Art.get(slot + '_' + it.id); if (ii) isrc = ii.src; }
-          if (isrc) { var im = document.createElement('img'); im.className = 'itemicon' + (slot === 'outfit' || WARD_FREE[slot] ? ' face' : ''); im.src = isrc; im.alt = ''; pw.appendChild(im); }
+          if (isrc) { var im = document.createElement('img'); im.className = 'itemicon' + (slot === 'outfit' || WARD_FREE[slot] ? ' face' : ''); im.src = isrc; im.alt = ''; if (slot === 'hat' && (AG.Avatar.HAT_SEAT[it.id] || {}).flip) im.classList.add('flipx'); pw.appendChild(im); }
           else if (AG.Cos && AG.Cos.LISTS[slot]) { var cic = AG.Cos.icon(slot, it.id, 40); cic.className = 'itemicon cosicon'; pw.appendChild(cic); }
         }
         card.appendChild(pw);
@@ -14366,18 +14645,29 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     if (x.owner === 'local' || (R && R.mode === 'local')) return slots.filter(function (s) { return s.dataset.bot !== '1'; })[0] || null;
     return slots.filter(function (s) { return s.dataset.owner === x.owner && s.dataset.bot !== '1'; })[0] || null;
   }
+  // Floats beside the pilot's head, out of the card's layout (absolute, never resizes the rig / READY area): Team A
+  // (left column) gets it on the left of the head, Team B (right column) on the right.
+  function placePop(pop, el) {
+    var side = el.dataset.team === 'B' ? 'r' : 'l', pv = el.querySelector(':scope > canvas.preview');
+    pop.classList.remove('side-l', 'side-r'); pop.classList.add('side-' + side); pop.dataset.side = side;
+    if (!pv) return;
+    var hx = pv.offsetLeft + pv.offsetWidth * 0.5, hy = pv.offsetTop + pv.offsetHeight * 0.34, gap = pv.offsetWidth * 0.13, pw = pop.offsetWidth || 50;
+    var left = side === 'l' ? Math.max(2, hx - gap - pw) : Math.min(el.clientWidth - pw - 2, hx + gap);
+    pop.style.left = Math.round(left) + 'px'; pop.style.top = Math.round(Math.max(2, hy - (pop.offsetHeight || 60) / 2)) + 'px';
+  }
+  E._placePop = placePop; // (tests)
   function roomPop(x) {
     var el = seatOf(x);
     if (!el) return;
     var old = el.querySelector('.emopop'); if (old) old.remove();
     var pop = document.createElement('div'); pop.className = 'emopop'; pop.dataset.emote = x.id;
-    var cv = document.createElement('canvas'), px = 54, d = 2; cv.width = cv.height = px * d; cv.style.width = cv.style.height = px + 'px';
+    var cv = document.createElement('canvas'), px = 46, d = 2; cv.width = cv.height = px * d; cv.style.width = cv.style.height = px + 'px';
     pop.appendChild(cv); var b = document.createElement('span'); b.className = 'emobub'; b.textContent = E.get(x.id).text; pop.appendChild(b);
-    el.appendChild(pop);
+    el.appendChild(pop); placePop(pop, el); try { el.dispatchEvent(new CustomEvent('gb-emote', { detail: x.id })); } catch (e) { /* old browsers */ }
     var c = cv.getContext('2d');
     (function frame() {
       var age = (performance.now() - x.t0) / 1000; if (age * 1000 > E.SHOW_MS || E.context() !== 'room') { pop.remove(); return; }
-      if (!pop.isConnected) { var el2 = seatOf(x); if (el2) el2.appendChild(pop); } // the room re-rendered: follow the seat
+      if (!pop.isConnected) { var el2 = seatOf(x); if (el2) { el2.appendChild(pop); placePop(pop, el2); } } // the room re-rendered: follow the seat
       var an = E.anim(age); c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, px, px); c.translate(px / 2, px / 2 + an.bob * 0.5); c.scale(an.s, an.s); c.globalAlpha = an.alpha; E.drawFace(c, x.id, px * 0.36, age);
       pop.style.opacity = an.alpha; requestAnimationFrame(frame);
     })();
@@ -14904,6 +15194,9 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
 
   Battle.prototype.startTurn = function () {
     var p = this.turns.next();
+    // Glacier slow: a slowed pilot's own turn uses up one slowed turn (the flag lasts exactly this turn)
+    this.players.forEach(function (q) { q.slowNow = false; });
+    if (p.slowTurns > 0) { p.slowTurns--; p.slowNow = true; }
     if (AG.Bot) AG.Bot.turnStarted(this);
     if (p.protect) p.protect = false; // respawn protection lasts until the pilot's own next turn
     AG.Weather.rollWind(this, this.rng);
