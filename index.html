@@ -1130,17 +1130,12 @@ body.inbattle .settings { overflow: hidden; }
 @media (max-width: 700px), (max-height: 480px) { .hwbanner { padding: 5px 10px; gap: 8px; } .hwbanner .hwtxt b { font-size: 14px; } .hwbanner .hwpump { font-size: 22px; } .hwrow .hwparts { display: none; } }
 
 /* waiting-room backgrounds (item 20): animated canvas behind the player's own card */
-.slot.hasbg { position: relative; overflow: hidden; }
-.slot.hasbg > canvas.roombg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; border-radius: inherit; }
-.slot.hasbg > :not(canvas.roombg):not(.emopop) { position: relative; z-index: 1; } /* (the emote bubble stays absolute: it must never take part in the card's layout) */
-.slot.hasbg > canvas.preview { box-shadow: none; } /* their own background replaces the base battlefield picture */
 /* shop: the room background plays behind the pilot preview */
 .pvbg { position: relative; display: block; width: max-content; max-width: 100%; margin: 0 auto; border-radius: 12px; overflow: hidden; }
 .pvbg > canvas.pvbgcv { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 .pvbg > canvas.preview { position: relative; z-index: 1; }
 .pvbg.hasbg > canvas.preview { box-shadow: none; }
 .item .pwrap.bgprev { cursor: pointer; }
-.slot.hasbg .slotbody { background: rgba(12,16,34,0.55); border-radius: 10px; padding: 4px 6px; }
 .pwrap.bgprev { position: relative; width: 150px; height: 96px; border-radius: 10px; overflow: hidden; margin: 0 auto; }
 .pwrap.bgprev canvas.shopbg { width: 100%; height: 100%; display: block; }
 .pwrap.bgprev .bgnone { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); color: #9aa3c0; font-size: 12px; border: 1px dashed rgba(255,255,255,0.2); border-radius: 10px; box-sizing: border-box; }
@@ -1256,6 +1251,24 @@ body.inbattle .settings { overflow: hidden; }
 }
 /* phone portrait results: "TEAM A VICTORY!" ran under the ⚙ gear (mobiletest gearResults) — shrink to fit + keep clear of it */
 @media (max-width: 520px) { .title.wintitle { font-size: min(40px, 7.4vw) !important; letter-spacing: 2px; width: fit-content; max-width: calc(100% - 104px); margin-left: auto; margin-right: auto; } }
+/* batch 7b: waiting-room card thumbnail — a purchased room background lives INSIDE the rig/pilot box (same size, spot,
+   corners as the plain backdrop); cards with and without one are identical in size/layout */
+.slotthumb { position: relative; flex: 0 0 auto; align-self: flex-start; border-radius: 12px; overflow: hidden; line-height: 0; }
+.slotthumb > canvas.preview { position: relative; z-index: 1; }
+.slotthumb > canvas.roombg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; border-radius: inherit; }
+.slotthumb.hasbg > canvas.preview { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14); }
+/* bot row (READY · difficulty · ⇄ · ✕) used to push ✕ past the card edge */
+.slotacts { flex-wrap: nowrap; min-width: 0; }
+.slotacts > * { flex: 0 1 auto; min-width: 0; white-space: nowrap; }
+.slotacts > .readybtn { flex: 1 1 auto; padding-left: 6px; padding-right: 6px; overflow: hidden; text-overflow: ellipsis; }
+.slotacts > .ghost.small { padding-left: 7px; padding-right: 7px; flex-shrink: 0; }
+.slotacts .botdsel { max-width: 84px; padding-left: 4px; padding-right: 2px; }
+.slotacts .rdy { flex-shrink: 0; font-size: 11px; letter-spacing: 0; }
+.slotacts .botdsel { flex-shrink: 1; text-overflow: ellipsis; }
+.slotacts { container-type: inline-size; } .slotbody { min-width: 0; }
+.slotacts > .ghost.small { padding-left: 6px; padding-right: 6px; }
+@container (max-width: 232px) { .slotacts .lbl { display: none; } .slotacts > .readybtn { padding-left: 4px; padding-right: 4px; } }
+.wardbg + .wcsub { text-align: center; margin-top: 4px; }
 
 </style>
 </head>
@@ -12389,8 +12402,11 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       return s;
     }
     var rbg = AG.RoomBG && pl.avatar && pl.avatar.roombg;
-    if (rbg && rbg !== 'none' && AG.RoomBG.has(rbg)) { var rcv = document.createElement('canvas'); rcv.className = 'roombg'; s.classList.add('hasbg'); s.appendChild(rcv); AG.RoomBG.mount(rcv, rbg); } // behind this player's own card
-    s.appendChild(preview(124, 84, function () { return pl; }, 0.82));
+    // the rig/pilot thumbnail box: a purchased room background replaces the base backdrop INSIDE this box (same size,
+    // place and corners), so the rig + pilot sit exactly where they do on a plain card and the card layout never changes
+    var thumb = el('div', 'slotthumb'); s.appendChild(thumb);
+    if (rbg && rbg !== 'none' && AG.RoomBG.has(rbg)) { var rcv = document.createElement('canvas'); rcv.className = 'roombg'; s.classList.add('hasbg'); thumb.classList.add('hasbg'); thumb.appendChild(rcv); AG.RoomBG.mount(rcv, rbg); }
+    thumb.appendChild(preview(124, 84, function () { return pl; }, 0.82));
     if (s.classList.contains('hasbg')) previews[previews.length - 1].noBack = function () { return true; }; // their own background replaces the base one
     var spv = previews[previews.length - 1]; s.addEventListener('gb-emote', function () { if (spv.pet) spv.pet.react('cheer'); }); // the pet cheers along with an emote
     var body = el('div', 'slotbody');
@@ -12416,7 +12432,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     body.appendChild(el('div', 'riginfo', lo.length ? 'Items: ' + lo.join(' · ') : AG.rigById(pl.rigId).shots.map(function (sh) { return sh.name; }).join(' · ')));
     var acts = el('div', 'slotacts');
     if (pl.bot && mine) {
-      acts.appendChild(el('span', 'rdy on', '✔ READY'));
+      var rdy0 = el('span', 'rdy on', ''); rdy0.innerHTML = '✔<span class="lbl"> READY</span>'; rdy0.title = 'Ready'; acts.appendChild(rdy0);
       var ds = el('select', 'botdsel'); ds.title = 'Bot difficulty';
       AG.Bot.DIFFS.forEach(function (d) { var o = el('option', '', AG.Bot.diffName(d)); o.value = d; if (d === AG.Bot.cleanDiff(pl.diff)) o.selected = true; ds.appendChild(o); });
       ds.onchange = function () { AG.audio.click(); O().act(pl, 'diff', ds.value); S.showRoom(); };
@@ -12427,7 +12443,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       var rd = btn(pl.ready ? 'readyon' : 'readyoff', pl.ready ? '✔ READY' : 'READY', function () { O().act(pl, 'ready', !pl.ready); if (R.mode === 'client') pl.ready = !pl.ready; S.showRoom(); });
       rd.className += ' readybtn';
       acts.appendChild(rd);
-      if (R.mode === 'local') acts.appendChild(btn('ghost small', '🛒 Shop', function () { var idx = R.players.indexOf(pl); S.go('shop', function () { S.showShop(idx, function () { S.go('room', S.showRoom); }); }); }));
+      if (R.mode === 'local') { var sb2 = btn('ghost small slotshop', '🛒 Shop', function () { var idx = R.players.indexOf(pl); S.go('shop', function () { S.showShop(idx, function () { S.go('room', S.showRoom); }); }); }); sb2.innerHTML = '🛒<span class="lbl"> Shop</span>'; sb2.title = 'Shop'; acts.appendChild(sb2); }
       acts.appendChild(btn('ghost small', '⇄', function () { var why = O().act(pl, 'team', team === 'A' ? 'B' : 'A'); S.showRoom(); if (why) flash(why); }));
       if ((R.mode === 'local' && R.players.length > 2) || (R.mode === 'host' && pl !== O().myMainSlot())) acts.appendChild(btn('ghost small', '✕', function () { O().remove(pl); S.showRoom(); }));
     } else acts.appendChild(el('span', 'rdy ' + (pl.ready ? 'on' : ''), pl.ready ? '✔ READY' : 'not ready'));
@@ -12715,15 +12731,16 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     // hover / tap a Room BG card: preview it live on the waiting-room card (same handlers as the shop's)
     var shopBg = function () {}, shopBgDefault = function () { return pl.avatar.roombg; };
     if (wardTab === 'roombg') { // waiting-room card preview: the equipped background behind this pilot's card
-      var card0 = el('div', 'slot wcard'); card0.id = 'wardRoomCard';
-      var bgid = pl.avatar.roombg, rcv = null, wbShown;
+      // same as the shop: the background plays INSIDE the pilot preview box; the pilot sits exactly where it does without one
+      var card0 = el('div', 'pvbg wardbg'); card0.id = 'wardRoomCard';
+      var wpc = preview(300, 220, function () { return pl; }, 2.6), wpo = previews[previews.length - 1]; wpc.id = 'wardPreview';
+      wpo.pilot = function () { return true; }; card0.appendChild(wpc); left.appendChild(card0);
+      var bgid = pl.avatar.roombg, rcv = null, wbShown, wsub = el('div', 'wcsub');
       shopBg = function (id) { id = id && id !== 'none' && AG.RoomBG && AG.RoomBG.has(id) ? id : null; if (id === wbShown) return; wbShown = id;
-        if (rcv) { rcv.remove(); rcv = null; } if (id) { rcv = document.createElement('canvas'); rcv.className = 'roombg'; card0.insertBefore(rcv, card0.firstChild); AG.RoomBG.mount(rcv, id); }
-        card0.classList.toggle('hasbg', !!id); card0.dataset.bg = id || ''; };
-      shopBg(bgid);
-      var cin = el('div', 'wcardin'); var face = document.createElement('img'); face.src = AG.Avatar.riderURL(pl.avatar); face.alt = ''; face.className = 'wcface'; cin.appendChild(face);
-      cin.appendChild(el('div', 'wcname', pl.name)); cin.appendChild(el('div', 'wcsub', bgid && bgid !== 'none' ? wardName('roombg', bgid) : 'No background'));
-      card0.appendChild(cin); left.appendChild(card0);
+        if (rcv) { rcv.remove(); rcv = null; } if (id) { rcv = document.createElement('canvas'); rcv.className = 'roombg pvbgcv'; card0.insertBefore(rcv, wpc); AG.RoomBG.mount(rcv, id); }
+        card0.classList.toggle('hasbg', !!id); card0.dataset.bg = id || ''; wsub.textContent = id ? wardName('roombg', id) : 'No background'; drawPreview(wpo, 0); };
+      wpo.noBack = function () { return !!wbShown; };
+      shopBg(bgid); left.appendChild(wsub);
     } else {
       var pvc = preview(300, 220, function () { return pl; }, 2.6), pvo = previews[previews.length - 1];
       pvo.pilot = function () { return !(wardTab === 'rigskin' || wardView === 'rig'); }; pvc.id = 'wardPreview'; left.appendChild(pvc);
@@ -14648,7 +14665,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   // Floats beside the pilot's head, out of the card's layout (absolute, never resizes the rig / READY area): Team A
   // (left column) gets it on the left of the head, Team B (right column) on the right.
   function placePop(pop, el) {
-    var side = el.dataset.team === 'B' ? 'r' : 'l', pv = el.querySelector(':scope > canvas.preview');
+    var side = el.dataset.team === 'B' ? 'r' : 'l', pv = el.querySelector(':scope > .slotthumb, :scope > canvas.preview');
     pop.classList.remove('side-l', 'side-r'); pop.classList.add('side-' + side); pop.dataset.side = side;
     if (!pv) return;
     var hx = pv.offsetLeft + pv.offsetWidth * 0.5, hy = pv.offsetTop + pv.offsetHeight * 0.34, gap = pv.offsetWidth * 0.13, pw = pop.offsetWidth || 50;

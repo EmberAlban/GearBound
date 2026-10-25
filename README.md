@@ -678,3 +678,9 @@ TURN_URL='turn:host:3478?transport=tcp,user,pass' tools/runall.sh
 3. **Accounts (own, no Big Tech):** optional username + PIN or transfer-code sync for cross-device progress.
 4. **Art:** animated rider poses, per-rig firing/recoil frames, more hand-painted terrain sets.
 5. **Tech:** ES modules plus a tiny bundler, unit tests for physics and turns, fixed-point math for cross-browser determinism.
+
+### Batch 7b — room backgrounds stay inside the rig box
+- A purchased room background now replaces the basic backdrop *inside* the rig/pilot thumbnail (`.slotthumb`, 124×84, 12 px radius) instead of filling the whole card. Rig and pilot sit at exactly the same spot and size as on a plain card, and the background still animates inside the box.
+- Cards with and without a background have identical height and layout (desktop, phone portrait, phone landscape). On narrow cards the action row goes compact (`@container (max-width: 232px)`): Shop shows as 🛒 and a bot's READY shows as ✔, so nothing (e.g. ✕) gets clipped.
+- Wardrobe → Backgrounds: the preview is the same pilot preview as the shop (`.pvbg.wardbg`), with the background drawn behind the pilot in the same box, so the pilot doesn't move.
+- `tools/roombgtest.js` section 3b checks basic vs background cards: thumbnail box and rig box within 2 px, equal card heights, no clipped buttons.
