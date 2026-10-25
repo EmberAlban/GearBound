@@ -55,9 +55,9 @@ tap the minimap to jump the camera. Phones in portrait get a "rotate your device
 |---|---|---|---|---|---|---|
 | **Bastion** | Siege | 1100 | 20% | Slug | Twin Slug (near + far) | Quake Mortar (huge crater) |
 | **Skipper** | Scout | 900 | 8% | Hopper (bounces twice) | Scatter (3-shell fan) | Cluster Storm (5 bomblets at apex) |
-| **Lancer** | Precision | 850 | 12% | Pulse Bolt (flat, wind-resistant) | Bore Drill (tunnels) | Sunlance (sky beam) |
+| **Lancer** | Precision | 850 | 12% | Pulse Bolt (flat, wind-resistant) | Bore Drill (tunnels in, bursts at the surface) | Sunlance (sky beam) |
 | **Lodestone** | Control | 1000 | 16% | Mag Slug | Lodestone Pull (yanks enemies 60px toward the blast) | Polarity Storm (drags 110px) |
-| **Carom** | Trickster | 860 | 8% | Carom Shell (2 ricochets, +15%/bounce) | Bank Shot (4 bounces) | Pinball Barrage (3 ricochet shells) |
+| **Carom** | Trickster | 860 | 8% | Carom Shell (one low skip, bursts on the 2nd impact, +15%) | Bank Shot (low skip, bursts on the 2nd impact) | Pinball Barrage (3 skip shells, each bursts on its 2nd impact) |
 | **Beetle** | Ground control | 980 | 14% | Crawler Mine (crawls 260px to a rig) | Lob Shell | Mine Parade (3 mines) |
 | **Hornet** | Hunter | 820 | 6% | Stinger (fast dart, half wind) | Cog Drone (homes within 420px) | Swarm (3 drones) |
 | **Mason** | Builder | 1150 | 22% | Brick Lob | Rampart (ADDS a 44px mound) | Landslide (damage + new rock) |
@@ -234,6 +234,7 @@ The **Friends** button (lobby and waiting room header, with an online-count badg
 Each device has an 8-character friend code. Add by code → the other side gets a request → accept. Presence runs through a small
 PeerJS peer per player on the public broker (no servers, no logins): green dot = online, *in room XYZ* with a **Join** button when
 the room is open, **Invite** while you're in a room. Online friends are listed first. Friends are stored in the profile.
+Offline friends show when they were last online, and 💬 opens a 1:1 chat (see *Round 10/24 fixes*).
 
 ## Gifts and admin mode
 - **Gift** button on every shop item: pick a friend, optional message (filtered). The sender pays the normal price. The gift goes
@@ -386,6 +387,29 @@ It contains no GunBound sprites, names or likenesses. Everything is embedded in 
 - **Parallax:** the mid and near layers are each drawn as a single copy, scaled to cover the full parallax travel.
   The near layer is a flipped, enlarged copy, so there are no mirrored repeats.
 - **Ember Dunes pits:** each map now has one wide sloping basin (about 420–560 px) with a lava chute in the middle, instead of a slot canyon.
+
+### Round 10/24 fixes
+- **Steady menus:** the title and waiting-room backdrop no longer jitter (the demo battle never keeps camera shake, the pan is
+  clock-driven, map cards are still). `tools/bgsteadytest.js`.
+- **Carom:** shells skip once, low (restitution 0.32, capped hop), and explode on the 2nd impact, for all three shots. `tools/caromtest.js`.
+- **Craters open only from the surface** (Lancer's Bore Drill and every other blast): no hidden cavities under the surface.
+  `tools/cavitytest.js` audits every rig.
+- **Pilots** are chibi riders sitting on top of every rig (torso visible, hands on the controls) and they move: breathing, blinking,
+  looking around, small fidgets, and reactions when they fire or get hit.
+- **Bye emote** has a new self-generated voice line.
+- **Toy World is an open toy chest:** smooth, drivable rolling hills of toys, chest-wood planks inside, the chest rims as platforms,
+  the open lid in the background, fair spawns for 8. `tools/toyworldtest.js`. Spawn and respawn checks now accept normal slopes
+  (a wall or overhang beside the spot is still refused).
+- **Friends "last online":** offline friends show *Last online 5 minutes ago / an hour ago / yesterday / 3 days ago*; online friends
+  show *Online now* (or *In match*, *in room ABC123*); no data = *Last online: unknown*. Labels refresh on their own every minute.
+  Logged-in pilots send a heartbeat every 60 s and on closing/hiding the tab (`touch_last_seen`), and friends' times come from
+  `friends_last_seen(codes)` (`supabase/last_seen.sql`: a private `pilot_presence` table, RLS on, no direct access; the RPC returns
+  only friend code, pilot name and last-seen time). Without an account the time the friend was last seen by this device is used.
+- **Friend chat:** 💬 on every friend row opens a mini chat (draggable on desktop, docked compact at the top on phones), with
+  session history, a big ✕ to close and − to minimise into a bubble with an unread badge (also counted on the Friends button).
+  Messages go P2P over the friends presence channel, through the same family-friendly filter and rate limits as room chat on both
+  ends. A message to an offline friend waits (shown as *waiting*) and is delivered once when they come back while your tab is open.
+  `tools/friendstest.js`.
 
 ### Known art limitations
 - The tread links on the Bastion are part of the hull painting. The wheels spin, but the track itself doesn't scroll.
