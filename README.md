@@ -412,6 +412,20 @@ everywhere the pilot is drawn: battle, waiting-room cards, the lobby/profile pre
   nothing extra travels between players. Bots never wear crowns.
 - Database setup: run `supabase/leaderboard.sql` after the other scripts (it backfills from existing pilots).
 
+
+### Batch 8 — worn costumes, GunBound-style pilots, chibi rigs
+- **Worn costumes, not overlays:** Greek-god sets (`js/godgear.js`), Halloween bodies/helms (`js/hallgear.js`) and the base outfits
+  (`js/outfitgear.js`) are drawn as part of the pilot: capes, sleeves, belts and helms follow the pilot's own shape with bold ink outlines
+  and 2–3 cel tones (see `STYLE-REFS.md`). Athena's helm sits snug at head width with a smaller crest.
+- **Mounted pilots:** legs bend over the seat with chunky boots; short, chunky sleeved arms reach forward to a steering wheel in front of
+  the chest with round mitten hands gripping the rim (no more hands in pockets). Idle fidgets are small (a short wave beside the shoulder,
+  a short fist pump). The shop/standing pose keeps the same chunky proportions.
+- **Shop/wardrobe icons** show a mini pilot wearing the item.
+- **Rigs:** a toy-chibi cel/ink pass over all 17 rigs (`tools/chibi_rigs.py`, run by `tools/build_assets.py`); same sprite boxes, so seats,
+  pivots, hitboxes, skins and thumbnails are unchanged. Wheels and treads roll with the distance driven (reverse when backing, still when
+  parked apart from the idle rev). Hover rigs never spin anything; each has its own float and effect (lancer field, hornet jets, orrery
+  ripples, phoenix ember thrusters, leviathan water jets, aurora stardust wake), with a shadow that shrinks as it rises. Test: `tools/wheeltest.js`.
+
 ## Music (original, procedurally sequenced)
 All music is original and composed for this project. It is written as note data in `js/music.js` and played live by a small
 WebAudio step sequencer (lead, bass, chord stabs/arpeggios, pads, and synthesized kick/snare/hat/"clank" drums), so it works
