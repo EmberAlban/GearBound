@@ -1134,6 +1134,49 @@ body.inbattle .settings { overflow: hidden; }
 .pwrap.bgprev { position: relative; width: 150px; height: 96px; border-radius: 10px; overflow: hidden; margin: 0 auto; }
 .pwrap.bgprev canvas.shopbg { width: 100%; height: 100%; display: block; }
 .pwrap.bgprev .bgnone { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); color: #9aa3c0; font-size: 12px; border: 1px dashed rgba(255,255,255,0.2); border-radius: 10px; box-sizing: border-box; }
+/* ---- Global Leaderboard tab + Serpent Crowns (js/leaderboard.js) ---- */
+.rktabs { display: flex; gap: 6px; margin: 0 0 8px; }
+.rktab { flex: 1; background: rgba(8,12,28,.5); color: #b9c3e6; border: 1px solid rgba(255,211,107,.22); border-radius: 10px; padding: 6px 8px; font: 700 13px inherit; font-family: inherit; letter-spacing: .04em; cursor: pointer; }
+.rktab.on { color: #1a1206; background: linear-gradient(180deg, #ffe58a, #ffb347); border-color: #ffd36b; box-shadow: 0 0 10px rgba(255,200,90,.45); }
+.rkpane { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.lbpane { gap: 6px; }
+.lblist { overflow-y: auto; flex: 1; padding-right: 4px; min-height: 120px; transition: opacity .2s; }
+.lblist.loading { opacity: .55; }
+.lblist::-webkit-scrollbar { width: 6px; } .lblist::-webkit-scrollbar-thumb { background: rgba(255,211,107,.35); border-radius: 4px; }
+.lbrow { display: grid; grid-template-columns: 30px 30px 1fr auto; align-items: center; gap: 6px; padding: 3px 6px; border-radius: 10px; font-size: 12.5px; color: #c8d0ee; }
+.lbrow.lbhead { color: #7b86ad; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; padding-bottom: 0; }
+.lbrow .lbn { color: #9aa4c8; font-weight: 800; text-align: right; font-variant-numeric: tabular-nums; }
+.lbrow .lbic img { width: 28px; height: 28px; display: block; }
+.lbrow .lbname { display: flex; align-items: center; flex-wrap: wrap; column-gap: 4px; min-width: 0; }
+.lbrow .lbname b { color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 9em; }
+.lbrow .lbname small { flex-basis: 100%; color: #7b86ad; font-size: 10.5px; }
+.lbrow .lbxp { font-variant-numeric: tabular-nums; color: #ffd36b; font-weight: 700; }
+.lbrow.top1 { background: linear-gradient(90deg, rgba(255,205,70,.28), rgba(255,205,70,.04)); }
+.lbrow.top2 { background: linear-gradient(90deg, rgba(210,222,236,.22), rgba(210,222,236,.03)); }
+.lbrow.top3 { background: linear-gradient(90deg, rgba(214,140,76,.24), rgba(214,140,76,.03)); }
+.lbrow.top1 .lbn { color: #ffd36b; } .lbrow.top2 .lbn { color: #e6edf6; } .lbrow.top3 .lbn { color: #f0a868; }
+.lbrow.me { box-shadow: inset 0 0 0 2px #5ee0ff, 0 0 12px rgba(94,224,255,.35); background: linear-gradient(90deg, rgba(94,224,255,.26), rgba(94,224,255,.06)); }
+.lbrow.me.flash { animation: lbflash 1.2s ease-out 2; }
+@keyframes lbflash { 0%, 100% { background-color: transparent; } 40% { background-color: rgba(94,224,255,.45); } }
+.lbyou { font-style: normal; font-size: 10px; font-weight: 800; color: #062030; background: #5ee0ff; border-radius: 6px; padding: 0 5px; }
+.lbbar { display: flex; align-items: center; gap: 6px; }
+.lbbar .lbpage { color: #b9c3e6; font-size: 12px; min-width: 52px; text-align: center; }
+.lbbar .lbme { margin-left: auto; }
+.lbmsg { color: #ffd36b; font-size: 11.5px; min-height: 14px; }
+.crownw { position: relative; display: inline-block; vertical-align: -3px; width: 22px; height: 20px; margin-right: 3px; line-height: 0; flex: none; }
+.crownw img.crown { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 3px rgba(255,230,140,.55)); }
+.crownw.c-silver img.crown { filter: drop-shadow(0 0 3px rgba(220,235,255,.6)); }
+.crownw.c-bronze img.crown { filter: drop-shadow(0 0 3px rgba(255,170,100,.5)); }
+.crownw.big { width: 34px; height: 31px; vertical-align: -6px; }
+.crownw.lb { width: 24px; height: 22px; }
+.crownw.hud { width: 18px; height: 16px; vertical-align: -2px; }
+.crownw::before, .crownw::after { content: '✦'; position: absolute; color: #fff; font-size: 9px; line-height: 1; text-shadow: 0 0 4px #fff8c0; pointer-events: none; animation: crownspark 1.9s ease-in-out infinite; }
+.crownw::before { left: -3px; top: -4px; }
+.crownw::after { right: -3px; top: 30%; font-size: 7px; animation-delay: .95s; }
+.crownw.c-silver::before, .crownw.c-silver::after { text-shadow: 0 0 4px #dff0ff; }
+.crownw.c-bronze::before, .crownw.c-bronze::after { text-shadow: 0 0 4px #ffd2a8; }
+@keyframes crownspark { 0%, 100% { opacity: 0; transform: scale(.3) rotate(0deg); } 45% { opacity: 1; transform: scale(1.1) rotate(45deg); } 70% { opacity: 0; transform: scale(.4) rotate(90deg); } }
+@media (prefers-reduced-motion: reduce) { .crownw::before, .crownw::after { animation: none; opacity: .8; } }
 
 </style>
 </head>
@@ -4842,6 +4885,261 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
 
 </script>
 <script>
+/* js/leaderboard.js */
+// leaderboard.js — Global Leaderboard (main-lobby tab) + Serpent Crowns for the top 3 pilots.
+// * Data: the public view leaderboard_ranked (supabase/leaderboard.sql) via the anon/publishable key. It exposes ONLY
+//   rank (board position), pilot_name, xp and level (rank tier 1-40); every value is clamped again here.
+// * Order: level, then XP, then name. Pages of 20; your own row is highlighted; "Jump to me" finds your page
+//   (needs your pilot account, so the row really is you).
+// * Serpent Crowns: the top 3 get an original, procedurally drawn crown (gold / silver / bronze) with a scale pattern,
+//   two coiled serpents with gem eyes, and sparkles. Shown on the board and next to the pilot's name everywhere
+//   (lobby, room cards, battle tags, HUD, chat, friends, results). Every client fetches the top 3 itself and caches
+//   it, so nothing extra is sent between players. Bots never wear crowns.
+(function (AG) {
+  'use strict';
+  var PAGE = 20, MAX_XP = 10000000, CK = 'gearbound.crowns', REFRESH_MS = 5 * 60 * 1000;
+
+  // ---------------------------------------------------------------- data
+  function clampRow(r) {
+    if (!r || typeof r !== 'object') return null;
+    var name = String(r.pilot_name == null ? '' : r.pilot_name).replace(/[\u0000-\u001f]/g, '').slice(0, 14).trim();
+    if (!name) return null;
+    var xp = Math.max(0, Math.min(MAX_XP, Math.floor(+r.xp || 0)));
+    var lv = Math.max(1, Math.min(40, Math.floor(+r.level || 1)));
+    var rank = Math.max(1, Math.min(1e7, Math.floor(+r.rank || 1)));
+    return { rank: rank, name: name, xp: xp, level: lv };
+  }
+  function get(q) {
+    var C = AG.Cloud; if (!C || typeof fetch !== 'function') return Promise.resolve({ ok: false, offline: true, rows: [] });
+    var ctl = typeof AbortController === 'function' ? new AbortController() : null, to = setTimeout(function () { if (ctl) ctl.abort(); }, 8000);
+    return fetch(C.URL + '/rest/v1/leaderboard_ranked?select=rank,pilot_name,xp,level&' + q, { headers: { apikey: C.KEY, Accept: 'application/json' }, signal: ctl ? ctl.signal : undefined })
+      .then(function (r) { return r.ok ? r.json().then(function (d) { return { ok: true, rows: Array.isArray(d) ? d : [] }; }) : { ok: false, status: r.status, rows: [] }; })
+      .catch(function () { return { ok: false, offline: true, rows: [] }; })
+      .then(function (res) { clearTimeout(to); res.rows = res.rows.map(clampRow).filter(Boolean); return res; });
+  }
+  var L = AG.Leaderboard = { PAGE: PAGE };
+  L._get = get; // tests replace this with a mock
+  // one page (0-based): {ok, rows[≤20], more}
+  L.page = function (p) {
+    p = Math.max(0, Math.floor(+p || 0));
+    return L._get('order=rank.asc&offset=' + (p * PAGE) + '&limit=' + (PAGE + 1)).then(function (res) {
+      var rows = res.rows.slice(0, PAGE + 1), more = rows.length > PAGE; rows = rows.slice(0, PAGE);
+      if (res.ok && p === 0) Crowns.set(rows.slice(0, 3).map(function (r) { return r.name; }));
+      return { ok: res.ok, offline: !!res.offline, rows: rows, more: more, page: p };
+    });
+  };
+  L.myName = function () { var C = AG.Cloud; return C && C.loggedIn() && C.session.name ? String(C.session.name) : ''; };
+  L.isMe = function (name) { var m = L.myName(); return !!m && m.toLowerCase() === String(name || '').toLowerCase(); };
+  // my own row → {ok, row|null}
+  L.me = function () {
+    var n = L.myName(); if (!n) return Promise.resolve({ ok: false, needLogin: true, row: null });
+    return L._get('pilot_name=eq.' + encodeURIComponent(n) + '&limit=1').then(function (res) {
+      return { ok: res.ok, offline: !!res.offline, row: res.rows.filter(function (r) { return r.name.toLowerCase() === n.toLowerCase(); })[0] || null };
+    });
+  };
+
+  // ---------------------------------------------------------------- crowns
+  var PAL = [null,
+    { key: 'gold', label: 'Gold', base: '#f7c843', hi: '#fff4b0', mid: '#e0a526', dark: '#8a5a12', gem: '#ff2d55', gem2: '#ffb3c4', snake: '#d99a1f', snakeHi: '#ffe58a' },
+    { key: 'silver', label: 'Silver', base: '#d5dde8', hi: '#ffffff', mid: '#a9b6c6', dark: '#56637a', gem: '#2fa8ff', gem2: '#bfe6ff', snake: '#9aa8bb', snakeHi: '#f2f6fb' },
+    { key: 'bronze', label: 'Bronze', base: '#d68c4c', hi: '#ffd0a0', mid: '#b5692f', dark: '#62341a', gem: '#21d07a', gem2: '#b8ffd9', snake: '#a85d28', snakeHi: '#f5b47a' }];
+  var Crowns = AG.Crowns = { top: [], PAL: PAL };
+  function loadCache() { try { var c = JSON.parse(localStorage.getItem(CK)); if (c && Array.isArray(c.top)) Crowns.top = c.top.slice(0, 3).map(String); } catch (e) {} }
+  Crowns.set = function (names) {
+    names = (names || []).slice(0, 3).map(function (n) { return String(n).slice(0, 14); });
+    var changed = names.join('\n') !== Crowns.top.join('\n');
+    Crowns.top = names;
+    try { localStorage.setItem(CK, JSON.stringify({ t: Date.now(), top: names })); } catch (e) {}
+    if (changed) Crowns.listeners.forEach(function (f) { try { f(names); } catch (e) {} });
+  };
+  Crowns.listeners = [];
+  Crowns.on = function (f) { Crowns.listeners.push(f); };
+  // 1/2/3 for a top-3 pilot name, else 0. Pass the player object to skip bots.
+  Crowns.place = function (name, p) {
+    if (p && p.bot) return 0;
+    var n = String(name || '').toLowerCase(); if (!n) return 0;
+    for (var i = 0; i < Crowns.top.length; i++) if (Crowns.top[i].toLowerCase() === n) return i + 1;
+    return 0;
+  };
+  Crowns.title = function (pl) { return pl ? 'Global #' + pl + ' · ' + PAL[pl].label + ' Serpent Crown' : ''; };
+
+  function star(c, x, y, r) {
+    c.beginPath();
+    for (var i = 0; i < 8; i++) { var a = i * Math.PI / 4, rr = i % 2 ? r * 0.28 : r; c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+    c.closePath(); c.fill();
+  }
+  // Draw a crown centred at (cx, cy), w px wide (height ≈ 0.86 w). t = time in frames (sparkles); t < 0 = no sparkles.
+  Crowns.draw = function (c, cx, cy, w, place, t) {
+    var P = PAL[place]; if (!P) return;
+    var s = w, x0 = cx - s / 2, y0 = cy - s * 0.43;
+    function X(u) { return x0 + u * s; } function Y(v) { return y0 + v * s; }
+    c.save();
+    c.lineJoin = 'round'; c.lineCap = 'round';
+    // silhouette: band + five points (the outer two are the serpents' raised heads, drawn later)
+    function body() {
+      c.beginPath();
+      c.moveTo(X(0.1), Y(0.8)); c.lineTo(X(0.08), Y(0.42));
+      c.quadraticCurveTo(X(0.2), Y(0.5), X(0.27), Y(0.3));
+      c.quadraticCurveTo(X(0.34), Y(0.47), X(0.4), Y(0.38));
+      c.lineTo(X(0.5), Y(0.06));
+      c.lineTo(X(0.6), Y(0.38));
+      c.quadraticCurveTo(X(0.66), Y(0.47), X(0.73), Y(0.3));
+      c.quadraticCurveTo(X(0.8), Y(0.5), X(0.92), Y(0.42));
+      c.lineTo(X(0.9), Y(0.8)); c.closePath();
+    }
+    c.shadowColor = 'rgba(0,0,0,0.45)'; c.shadowBlur = s * 0.06; c.shadowOffsetY = s * 0.02;
+    body(); var gr = c.createLinearGradient(0, Y(0.05), 0, Y(0.82));
+    gr.addColorStop(0, P.hi); gr.addColorStop(0.35, P.base); gr.addColorStop(0.75, P.mid); gr.addColorStop(1, P.dark);
+    c.fillStyle = gr; c.fill(); c.shadowColor = 'transparent';
+    // scale pattern (overlapping half-rings), clipped to the crown
+    c.save(); body(); c.clip();
+    c.strokeStyle = P.dark; c.globalAlpha = 0.45; c.lineWidth = Math.max(0.6, s * 0.018);
+    var sr = s * 0.065;
+    for (var row = 0, yy = Y(0.12); yy < Y(0.84); row++, yy += sr * 1.05) {
+      for (var xx = X(0.04) + (row % 2 ? sr : 0); xx < X(0.98); xx += sr * 2) { c.beginPath(); c.arc(xx, yy, sr, 0.15 * Math.PI, 0.85 * Math.PI); c.stroke(); }
+    }
+    c.globalAlpha = 0.35; c.strokeStyle = P.hi;
+    for (row = 0, yy = Y(0.12); yy < Y(0.84); row++, yy += sr * 1.05) {
+      for (xx = X(0.04) + (row % 2 ? sr : 0); xx < X(0.98); xx += sr * 2) { c.beginPath(); c.arc(xx, yy - sr * 0.25, sr * 0.7, 1.15 * Math.PI, 1.6 * Math.PI); c.stroke(); }
+    }
+    c.restore();
+    // band
+    var bg = c.createLinearGradient(0, Y(0.62), 0, Y(0.82)); bg.addColorStop(0, P.hi); bg.addColorStop(0.5, P.base); bg.addColorStop(1, P.dark);
+    c.fillStyle = bg; c.beginPath(); c.rect(X(0.09), Y(0.63), s * 0.82, s * 0.17); c.fill();
+    c.strokeStyle = P.dark; c.lineWidth = Math.max(0.8, s * 0.025); body(); c.stroke();
+    c.beginPath(); c.moveTo(X(0.09), Y(0.63)); c.lineTo(X(0.91), Y(0.63)); c.stroke();
+    // two coiled serpents: bodies wind along the band (over-under), tails meet at the centre, heads rear up at the sides
+    function serpent(dir) {
+      var cxs = X(0.5), pts = [];
+      for (var i = 0; i <= 24; i++) { var u = i / 24; pts.push([cxs + dir * u * s * 0.4, Y(0.715) + Math.sin(u * Math.PI * 3) * s * 0.06]); }
+      // rise to the head at the outer point
+      pts.push([cxs + dir * s * 0.44, Y(0.52)], [cxs + dir * s * 0.42, Y(0.36)]);
+      c.lineWidth = s * 0.075; c.strokeStyle = P.dark; c.beginPath(); pts.forEach(function (q, k) { if (k) c.lineTo(q[0], q[1]); else c.moveTo(q[0], q[1]); }); c.stroke();
+      c.lineWidth = s * 0.05; c.strokeStyle = P.snake; c.stroke();
+      c.lineWidth = s * 0.018; c.strokeStyle = P.snakeHi; c.setLineDash([s * 0.025, s * 0.03]); c.stroke(); c.setLineDash([]);
+      // head
+      var hx = cxs + dir * s * 0.41, hy = Y(0.3);
+      c.fillStyle = P.snake; c.strokeStyle = P.dark; c.lineWidth = Math.max(0.8, s * 0.02);
+      c.beginPath(); c.ellipse(hx, hy, s * 0.075, s * 0.058, dir * -0.35, 0, Math.PI * 2); c.fill(); c.stroke();
+      c.fillStyle = P.snakeHi; c.globalAlpha = 0.6; c.beginPath(); c.ellipse(hx - dir * s * 0.015, hy - s * 0.02, s * 0.035, s * 0.016, dir * -0.35, 0, Math.PI * 2); c.fill(); c.globalAlpha = 1;
+      // gem eye (faces the centre)
+      var ex = hx - dir * s * 0.025, ey = hy - s * 0.005;
+      c.fillStyle = P.gem; c.beginPath(); c.arc(ex, ey, s * 0.022, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#fff'; c.beginPath(); c.arc(ex - s * 0.007, ey - s * 0.008, s * 0.008, 0, Math.PI * 2); c.fill();
+    }
+    serpent(-1); serpent(1);
+    // centre gem on the tall point + small gems on the band
+    function gem(gx, gy, r) {
+      c.fillStyle = P.gem; c.strokeStyle = P.dark; c.lineWidth = Math.max(0.6, s * 0.015);
+      c.beginPath(); c.moveTo(gx, gy - r); c.lineTo(gx + r * 0.8, gy); c.lineTo(gx, gy + r); c.lineTo(gx - r * 0.8, gy); c.closePath(); c.fill(); c.stroke();
+      c.fillStyle = P.gem2; c.globalAlpha = 0.85; c.beginPath(); c.moveTo(gx, gy - r * 0.7); c.lineTo(gx + r * 0.35, gy - r * 0.1); c.lineTo(gx - r * 0.2, gy - r * 0.1); c.closePath(); c.fill(); c.globalAlpha = 1;
+    }
+    gem(X(0.5), Y(0.4), s * 0.075);
+    gem(X(0.5), Y(0.715), s * 0.045);
+    // sparkles
+    if (t >= 0) {
+      var sp = [[0.5, 0.02, 0], [0.18, 0.2, 1.7], [0.86, 0.18, 3.1], [0.3, 0.86, 4.4], [0.74, 0.88, 5.6]];
+      c.fillStyle = '#fff'; c.shadowColor = P.hi; c.shadowBlur = s * 0.08;
+      sp.forEach(function (q) { var a = Math.sin(t * 0.09 + q[2]); if (a > 0.15) { c.globalAlpha = a; star(c, X(q[0]), Y(q[1]), s * 0.09 * a); } });
+    }
+    c.restore();
+  };
+  // cached static images (for HTML <img> and fast canvas drawing)
+  var imgCache = {};
+  Crowns.canvas = function (place, px) {
+    var k = place + ':' + px; if (imgCache[k]) return imgCache[k];
+    var cv = document.createElement('canvas'); cv.width = px; cv.height = Math.ceil(px * 0.92);
+    Crowns.draw(cv.getContext('2d'), px / 2, cv.height / 2 + px * 0.02, px * 0.94, place, -1);
+    return (imgCache[k] = cv);
+  };
+  var urlCache = {};
+  Crowns.url = function (place) { if (!urlCache[place]) { try { urlCache[place] = Crowns.canvas(place, 96).toDataURL('image/png'); } catch (e) { urlCache[place] = ''; } } return urlCache[place]; };
+  // HTML badge (empty string when the pilot isn't top 3). cls: '' | 'big' | 'hud'
+  Crowns.html = function (name, p, cls) {
+    var pl = Crowns.place(name, p); if (!pl) return '';
+    var u = Crowns.url(pl); if (!u) return '';
+    return '<span class="crownw c-' + PAL[pl].key + (cls ? ' ' + cls : '') + '" title="' + Crowns.title(pl) + '" data-crown="' + pl + '"><img class="crown" src="' + u + '" alt="' + PAL[pl].label + ' crown"></span>';
+  };
+  // canvas: crown with live sparkles (battle name tags)
+  Crowns.drawTag = function (c, x, y, w, place, t) {
+    var img = Crowns.canvas(place, 64);
+    c.drawImage(img, x - w / 2, y - w * 0.46, w, w * img.height / img.width);
+    var sp = [[0.05, -0.38, 0], [0.42, -0.25, 2.1], [-0.4, 0.3, 4.2]];
+    c.save(); c.fillStyle = '#fff'; c.shadowColor = PAL[place].hi; c.shadowBlur = 4;
+    sp.forEach(function (q) { var a = Math.sin(t * 0.1 + q[2]); if (a > 0.2) { c.globalAlpha = a; star(c, x + q[0] * w, y + q[1] * w, w * 0.16 * a); } });
+    c.restore();
+  };
+  Crowns.refresh = function () { return L.page(0).then(function (r) { return r.ok; }); };
+  Crowns.init = function () {
+    loadCache();
+    if (window.__GB_NO_LEADERBOARD) return;
+    var go = function () { if (!document.hidden) Crowns.refresh(); };
+    setTimeout(go, 1500); setInterval(go, REFRESH_MS);
+  };
+
+  // ---------------------------------------------------------------- lobby tab UI
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]; }); }
+  function click() { try { AG.audio.init(); AG.audio.click(); } catch (e) {} }
+  // Build the Global tab body inside `host` (a container element). Returns a controller {load(page), jumpToMe()}.
+  L.mount = function (host) {
+    host.innerHTML = '';
+    var ctl = { page: 0, busy: false };
+    var list = el('div', 'lblist'); list.id = 'lbList';
+    var bar = el('div', 'lbbar');
+    var prev = el('button', 'btn ghost small', '◀'); prev.id = 'lbPrev'; prev.title = 'Previous 20';
+    var pg = el('span', 'lbpage'); pg.id = 'lbPage';
+    var next = el('button', 'btn ghost small', '▶'); next.id = 'lbNext'; next.title = 'Next 20';
+    var me = el('button', 'btn small lbme', '📍 Jump to me'); me.id = 'lbMe';
+    var ref = el('button', 'btn ghost small', '⟳'); ref.id = 'lbRefresh'; ref.title = 'Refresh';
+    [prev, pg, next, me, ref].forEach(function (b) { bar.appendChild(b); });
+    var msg = el('div', 'lbmsg'); msg.id = 'lbMsg';
+    host.appendChild(list); host.appendChild(bar); host.appendChild(msg);
+    if (!L.myName()) { me.disabled = true; me.title = 'Log in to your pilot account to find yourself on the board'; }
+    function render(res, focus) {
+      list.innerHTML = '';
+      if (!res.ok) { list.innerHTML = '<div class="rlempty">' + (res.offline ? 'The leaderboard needs an internet connection.' : 'The leaderboard is unavailable right now.') + '</div>'; }
+      else if (!res.rows.length) list.innerHTML = '<div class="rlempty">' + (res.page ? 'No pilots on this page.' : 'No pilots yet. Finish a match to get on the board!') + '</div>';
+      var hd = el('div', 'lbrow lbhead'); hd.innerHTML = '<span>#</span><span></span><span>Pilot</span><span>XP</span>'; if (res.rows.length) list.appendChild(hd);
+      res.rows.forEach(function (r) {
+        var mine = L.isMe(r.name), R = AG.Ranks.LIST[r.level - 1] || AG.Ranks.LIST[0];
+        var row = el('div', 'lbrow' + (mine ? ' me' : '') + (r.rank <= 3 ? ' top top' + r.rank : '')); row.dataset.rank = r.rank;
+        var cr = r.rank <= 3 && Crowns.url(r.rank) ? '<span class="crownw lb c-' + PAL[r.rank].key + '" title="' + Crowns.title(r.rank) + '" data-crown="' + r.rank + '"><img class="crown" src="' + Crowns.url(r.rank) + '" alt=""></span>' : '';
+        row.innerHTML = '<span class="lbn">' + r.rank + '</span><span class="lbic">' + (R.icon ? '<img src="' + R.icon + '" alt="" title="Rank ' + R.n + ' · ' + esc(R.name) + '">' : '') + '</span>' +
+          '<span class="lbname">' + cr + '<b>' + esc(r.name) + '</b>' + (mine ? ' <i class="lbyou">you</i>' : '') + '<small>Lv ' + r.level + ' · ' + esc(R.name) + '</small></span><span class="lbxp">' + r.xp.toLocaleString() + '</span>';
+        list.appendChild(row);
+      });
+      pg.textContent = 'Page ' + (res.page + 1);
+      prev.disabled = res.page <= 0; next.disabled = !res.more;
+      var f = focus && list.querySelector('.lbrow.me'); if (!f) list.scrollTop = 0;
+      if (f) setTimeout(function () { list.scrollTop += f.getBoundingClientRect().top - list.getBoundingClientRect().top - list.clientHeight / 2 + f.clientHeight / 2; f.classList.add('flash'); }, 30);
+    }
+    ctl.load = function (p, focus) {
+      ctl.page = Math.max(0, p | 0); list.classList.add('loading'); if (!list.children.length) list.innerHTML = '<div class="rlempty">Loading the leaderboard…</div>';
+      return L.page(ctl.page).then(function (res) { list.classList.remove('loading'); if (res.page === ctl.page) render(res, focus); ctl.last = res; return res; });
+    };
+    ctl.jumpToMe = function () {
+      msg.textContent = '';
+      return L.me().then(function (r) {
+        if (r.needLogin) { msg.textContent = 'Log in to your pilot account to find yourself.'; return null; }
+        if (!r.ok) { msg.textContent = 'Could not reach the leaderboard.'; return null; }
+        if (!r.row) { msg.textContent = 'You\'re not on the board yet. Finish an online or practice match to earn XP!'; return null; }
+        return ctl.load(Math.floor((r.row.rank - 1) / PAGE), true).then(function () { return r.row; });
+      });
+    };
+    prev.onclick = function () { click(); ctl.load(ctl.page - 1); };
+    next.onclick = function () { click(); ctl.load(ctl.page + 1); };
+    ref.onclick = function () { click(); ctl.load(ctl.page); };
+    me.onclick = function () { click(); ctl.jumpToMe(); };
+    L.ctl = ctl;
+    ctl.load(0);
+    return ctl;
+  };
+  Crowns.init();
+})(window.AG);
+
+</script>
+<script>
 /* js/mobiles.js */
 // mobiles.js — the rig roster (stats, shots, procedural art) and the Mobile
 // entity (gravity, slope tilt, movement with fuel, aiming within a range).
@@ -8318,7 +8616,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var A = AG.Art;
     // pilot card
     if (AG.Avatar.hasArt(p.avatar)) set('portrait', $.portrait, 'src', AG.Avatar.riderURL(p.avatar));
-    set('pname', $.pname, 'html', (AG.Ranks ? AG.Ranks.img(p.xp, 'hud') : '') + (p.bot ? '<span class="boticon">🤖</span>' : '') + (AG.Collector ? AG.Collector.nameSpan(p, esc(p.name)) : esc(p.name)));
+    set('pname', $.pname, 'html', (AG.Ranks ? AG.Ranks.img(p.xp, 'hud') : '') + (p.bot ? '<span class="boticon">🤖</span>' : '') + (AG.Crowns ? AG.Crowns.html(p.name, p, 'hud') : '') + (AG.Collector ? AG.Collector.nameSpan(p, esc(p.name)) : esc(p.name)));
     set('pcol', $.pname, 'color', p.teamColor);
     set('psub', $.psub, 'text', m.rig.name + ' · Team ' + p.team + ' · Turn ' + g.turns.turn);
     var Hw = AG.Halloween, hwOn = Hw && Hw.active() && !g.demo; cls('candy', $.candy, 'on', hwOn);
@@ -8661,6 +8959,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       c.font = '600 12px ' + F; c.textAlign = 'center'; c.textBaseline = 'middle';
       var ric = AG.Ranks && AG.Ranks.image(m.player.xp), ri = ric ? 18 : 0;
       var tw = c.measureText((m.player.bot ? '🤖 ' : '') + m.player.name).width + 16 + ri;
+      var crn = AG.Crowns ? AG.Crowns.place(m.player.name, m.player) : 0;
       if (occ.length) { // tag hidden behind a HUD panel? flip it below the rig instead
         var hw = Math.max(tw, bw + 8) / 2, above = overlapArea(occ, x - hw, y - 40, x + hw, y + 8);
         if (above > 0) { var yb = m.y + 44, below = overlapArea(occ, x - hw, yb - 40, x + hw, yb + 8); if (below < above) { y = yb; m._tagBelow = true; } }
@@ -8672,6 +8971,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       if (nf) { c.save(); c.shadowColor = AG.Collector.nameGlow(m.player); c.shadowBlur = 6; c.fillStyle = nf; c.font = '700 12px ' + F; c.fillText((m.player.bot ? '🤖 ' : '') + m.player.name, x + ri / 2, y - 12); c.restore(); }
       else { c.fillStyle = '#fff'; c.fillText((m.player.bot ? '🤖 ' : '') + m.player.name, x + ri / 2, y - 12); }
       if (ric) c.drawImage(ric, x - tw / 2 + 5, y - 21, 18, 18);
+      if (crn) AG.Crowns.drawTag(c, x, y - 34, 26, crn, g.frame || 0); // Serpent Crown (global top 3) above the tag
       if (AG.Respawn && AG.Respawn.hasToken(g, m.player)) { // respawn token
         var hx = x + Math.max(tw, bw + 8) / 2 - 2, hy = y - 20; c.fillStyle = 'rgba(8,12,28,0.85)'; c.beginPath(); c.arc(hx, hy, 8, 0, Math.PI * 2); c.fill();
         c.fillStyle = '#ff7a8a'; c.font = '600 11px ' + F; c.fillText('♥', hx, hy + 1); c.font = '600 12px ' + F;
@@ -10698,6 +10998,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   }
 
   // ---------------------------------------------------------------- main lobby
+  var rankTab = 'ranks';
   S.showMain = function () {
     S.current = 'main';
     AG.music.play('lobby');
@@ -10721,6 +11022,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var myRank = AG.Ranks.progress(me.xp);
     var rb = el('span', 'mlrank'); rb.innerHTML = AG.Ranks.img(me.xp, 'big'); who.appendChild(rb);
     who.appendChild(nm);
+    if (AG.Crowns) nm.insertAdjacentHTML('beforebegin', AG.Crowns.html(me.name, null, 'big'));
     if (AG.Admin && AG.Admin.active) { var adb = el('span', 'admbadge', '★ Admin'); adb.id = 'myAdminBadge'; who.appendChild(adb); }
     who.appendChild(el('span', 'gold big', '◈ ' + me.gold));
     if (AG.Halloween && (AG.Halloween.active() || me.candy)) { var mc = el('span', 'hwcandy big', '🍬 ' + (me.candy || 0)); mc.id = 'myCandy'; mc.title = 'Halloween candy'; who.appendChild(mc); }
@@ -10787,7 +11089,19 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     wrap.appendChild(right);
     // rankings: all 40 ranks, current one highlighted and scrolled into view
     var rk = el('div', 'mlranks'); rk.id = 'rankPanel';
-    rk.appendChild(el('h3', '', 'Pilot Ranks'));
+    var tabs = el('div', 'rktabs');
+    var tR = el('button', 'rktab' + (rankTab === 'ranks' ? ' on' : ''), 'Pilot Ranks'); tR.id = 'tabRanks';
+    var tG = el('button', 'rktab' + (rankTab === 'global' ? ' on' : ''), '🏆 Global'); tG.id = 'tabGlobal';
+    tabs.appendChild(tR); tabs.appendChild(tG); rk.appendChild(tabs);
+    var rpane = el('div', 'rkpane'), gpane = el('div', 'rkpane lbpane'); gpane.id = 'globalPane';
+    function setRankTab(t) {
+      rankTab = t; tR.classList.toggle('on', t === 'ranks'); tG.classList.toggle('on', t === 'global');
+      rpane.style.display = t === 'ranks' ? '' : 'none'; gpane.style.display = t === 'global' ? '' : 'none';
+      if (t === 'global' && AG.Leaderboard && !gpane.firstChild) AG.Leaderboard.mount(gpane);
+    }
+    tR.onclick = function () { AG.audio.init(); AG.audio.click(); setRankTab('ranks'); };
+    tG.onclick = function () { AG.audio.init(); AG.audio.click(); setRankTab('global'); };
+    S.setRankTab = setRankTab;
     var rl = el('div', 'ranklist');
     AG.Ranks.LIST.forEach(function (r) {
       var cur = r.n === myRank.rank.n, done = r.n < myRank.rank.n;
@@ -10796,9 +11110,11 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
         (cur && myRank.next ? '<i class="xpbar"><i style="width:' + (myRank.frac * 100).toFixed(1) + '%"></i></i>' : '') + '</span><span class="rkxp">' + r.xp.toLocaleString() + '</span>';
       rl.appendChild(row);
     });
-    rk.appendChild(rl);
-    rk.appendChild(el('p', 'note', 'Earn XP every match: win 120 / loss 50, plus damage, kills, shots and surviving (≈100–250 per match).'));
+    rpane.appendChild(rl);
+    rpane.appendChild(el('p', 'note', 'Earn XP every match: win 120 / loss 50, plus damage, kills, shots and surviving (≈100–250 per match).'));
+    rk.appendChild(rpane); rk.appendChild(gpane);
     wrap.appendChild(rk);
+    setRankTab(rankTab);
     box.appendChild(wrap);
     var msg = el('div', 'flashmsg'); msg.id = 'lobbyMsg'; box.appendChild(msg);
     show(box);
@@ -10831,7 +11147,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var hd = el('div', 'rrow rhead'); hd.innerHTML = '<span></span><span>Room</span><span>Map</span><span>Mode</span><span>Pilots</span><span>Status</span><span></span>'; list.appendChild(hd);
     lastRooms.forEach(function (r) {
       var row = el('div', 'rrow' + (r.status !== 'waiting' ? ' busy' : ''));
-      row.innerHTML = '<span>' + (r.locked ? '🔒' : '') + '</span><span><b>' + esc(r.name) + '</b><em>' + esc(r.code) + ' · host ' + AG.Ranks.img(r.hostXp) + esc(r.host) + '</em></span><span>' + AG.Terrain.themeName(r.map) + '</span><span>' + esc(r.mode) +
+      row.innerHTML = '<span>' + (r.locked ? '🔒' : '') + '</span><span><b>' + esc(r.name) + '</b><em>' + esc(r.code) + ' · host ' + AG.Ranks.img(r.hostXp) + (AG.Crowns ? AG.Crowns.html(r.host) : '') + esc(r.host) + '</em></span><span>' + AG.Terrain.themeName(r.map) + '</span><span>' + esc(r.mode) +
         '</span><span>' + r.players + '/' + r.max + '</span><span class="rst ' + r.status + '">' + (r.status === 'waiting' ? 'Waiting' : 'In battle') + '</span>';
       var j = btn('small', 'Join', function () { joinCode(r.code, r.locked); }); j.dataset.code = r.code;
       if (r.status !== 'waiting' || r.players >= r.max) j.disabled = true;
@@ -11025,10 +11341,10 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     } else if (R.mode === 'local') {
       var name = el('input'); name.value = pl.name; name.maxLength = 14;
       name.oninput = function () { var why = O().act(pl, 'name', name.value || 'Pilot'); name.classList.toggle('bad', !!why); name.title = why || ''; };
-      top.insertAdjacentHTML('afterbegin', AG.Ranks.img(pl.xp));
+      top.insertAdjacentHTML('afterbegin', AG.Ranks.img(pl.xp) + (AG.Crowns ? AG.Crowns.html(pl.name, pl) : ''));
       top.appendChild(name);
     } else {
-      var pn = el('span', 'pname' + (AG.Collector && AG.Collector.nameClass(pl) ? ' ' + AG.Collector.nameClass(pl) : ''), pl.name + (mine ? ' (you)' : '')); pn.insertAdjacentHTML('afterbegin', AG.Ranks.img(pl.xp)); top.appendChild(pn);
+      var pn = el('span', 'pname' + (AG.Collector && AG.Collector.nameClass(pl) ? ' ' + AG.Collector.nameClass(pl) : ''), pl.name + (mine ? ' (you)' : '')); pn.insertAdjacentHTML('afterbegin', AG.Ranks.img(pl.xp) + (AG.Crowns ? AG.Crowns.html(pl.name, pl) : '')); top.appendChild(pn);
       if (!mine && pl.owner !== R.me) { var af = S.addFriendChip(pl.fc, pl.name, pl.xp); if (af) top.appendChild(af);
         if (AG.VoteUI && !pl.bot && new Set(R.players.map(function (q) { return q.owner; })).size >= 3) { var vkb = el('button', 'vkslot', '🗳'); vkb.title = 'Vote to kick ' + pl.name; vkb.dataset.owner = pl.owner; vkb.onclick = function () { AG.audio.click(); AG.VoteUI.confirm(pl.owner); }; top.appendChild(vkb); } }
       var pi = el('span', 'ping'); pi.dataset.ping = pl.sid; top.appendChild(pi);
@@ -11580,7 +11896,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var podium = el('div', 'podium');
     g.players.filter(function (p) { return !win || p.team === win; }).forEach(function (p) {
       var setup = { name: p.name, team: p.team, rigId: p.rigId, avatar: p.avatar };
-      var c = el('div', 'pod'); c.appendChild(preview(170, 120, function () { return setup; }, 1.8)); c.appendChild(el('div', 'iname', p.name)); podium.appendChild(c);
+      var c = el('div', 'pod'); c.appendChild(preview(170, 120, function () { return setup; }, 1.8)); var inm = el('div', 'iname', p.name); if (AG.Crowns) inm.insertAdjacentHTML('afterbegin', AG.Crowns.html(p.name, p)); c.appendChild(inm); podium.appendChild(c);
     });
     box.appendChild(podium);
     var tbl = el('table', 'stats'); tbl.id = 'statsTable';
@@ -11588,7 +11904,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       g.players.map(function (p) {
         var rp = online && R && p.owner !== g.net.me ? R.players.filter(function (q) { return q.owner === p.owner && q.fc; })[0] : null;
         var chip = rp && AG.Friends && rp.fc !== AG.Friends.myCode() ? ' <button class="addfr' + (AG.Friends.isFriend(rp.fc) ? ' done" disabled>✔' : '" data-fc="' + rp.fc + '" data-xp="' + (rp.xp || 0) + '" data-name="' + esc(p.name) + '" title="Add as a friend">＋👥') + '</button>' : '';
-        return '<tr><td style="color:' + p.teamColor + '">' + (AG.Collector ? AG.Collector.nameSpan(p, esc(p.name)) : esc(p.name)) + chip + '</td><td>' + p.mobile.rig.name + '</td><td class="opt" style="color:' + p.teamColor + '">' + p.team + '</td><td>' + p.stats.damage +
+        return '<tr><td style="color:' + p.teamColor + '">' + (AG.Crowns ? AG.Crowns.html(p.name, p) : '') + (AG.Collector ? AG.Collector.nameSpan(p, esc(p.name)) : esc(p.name)) + chip + '</td><td>' + p.mobile.rig.name + '</td><td class="opt" style="color:' + p.teamColor + '">' + p.team + '</td><td>' + p.stats.damage +
           '</td><td>' + p.stats.kills + '</td><td class="opt">' + p.stats.shots + '</td><td class="opt">' + p.itemsUsed.filter(Boolean).length + '</td><td class="opt">' + (p.alive() ? 'Standing' : p.mobile.retreated ? 'Left (forfeit)' : (p.mobile.fellOff ? 'Fell' : 'Destroyed')) + '</td>' + (p.mobile.retreated ? '<td class="xpc">—</td><td class="goldc">—</td></tr>' : '<td class="xpc">+' + p.xpGain.total + '</td><td class="goldc">+' + p.earned + '</td></tr>');
       }).join('');
     tbl.onclick = function (e) {
@@ -11884,7 +12200,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     // requests
     Fr.reqs.forEach(function (r) {
       var row = el('div', 'frreq');
-      row.innerHTML = AG.Ranks.img(r.xp) + '<span class="frname"></span><small>added you</small>'; row.querySelector('.frname').textContent = r.name;
+      row.innerHTML = AG.Ranks.img(r.xp) + (AG.Crowns ? AG.Crowns.html(r.name) : '') + '<span class="frname"></span><small>added you</small>'; row.querySelector('.frname').textContent = r.name;
       row.appendChild(b('primary small', 'Accept', function () { Fr.add(r.code, r.name, r.xp); }, 'frAccept-' + r.code));
       row.appendChild(b('ghost small', 'Ignore', function () { Fr.ignore(r.code); }));
       panel.appendChild(row);
@@ -11895,7 +12211,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     if (!v.length) list.appendChild(el('div', 'frempty', 'No friends yet. Share your code, or add theirs above.'));
     v.forEach(function (f) {
       var row = el('div', 'frrow' + (f.online ? ' online' : '')); row.dataset.code = f.code;
-      row.innerHTML = '<i class="frdot' + (f.online ? ' on' : '') + '"></i>' + AG.Ranks.img(f.xp) + '<span class="frtxt"><span class="frname"></span><small class="frst"></small></span>';
+      row.innerHTML = '<i class="frdot' + (f.online ? ' on' : '') + '"></i>' + AG.Ranks.img(f.xp) + (AG.Crowns ? AG.Crowns.html(f.name) : '') + '<span class="frtxt"><span class="frname"></span><small class="frst"></small></span>';
       row.querySelector('.frname').textContent = f.name; row.querySelector('.frst').textContent = f.status;
       if (f.admin) { var ab = el('span', 'admbadge', '★'); ab.title = 'GearBound admin (verified signature)'; row.querySelector('.frname').appendChild(ab); }
       var acts = el('span', 'fracts');
@@ -12556,7 +12872,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   function line(e) {
     var d = document.createElement('div'); d.className = 'cl' + (e.sys ? ' sys' : '') + (e.team ? ' team' : '');
     if (e.sys) d.textContent = e.text;
-    else d.innerHTML = (e.team ? '<i class="cteam">[TEAM]</i> ' : '') + (e.bot ? '<span class="boticon" title="Bot">🤖</span>' : AG.Ranks.img(e.xp)) + '<b></b>: <span></span>';
+    else d.innerHTML = (e.team ? '<i class="cteam">[TEAM]</i> ' : '') + (e.bot ? '<span class="boticon" title="Bot">🤖</span>' : AG.Ranks.img(e.xp) + (AG.Crowns ? AG.Crowns.html(e.from) : '')) + '<b></b>: <span></span>';
     if (!e.sys) { d.querySelector('b').textContent = e.from; d.querySelector('span').textContent = e.text; }
     return d;
   }
@@ -13284,7 +13600,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     r.players.forEach(function (p) {
       if (p.bot || seen[p.owner]) return; seen[p.owner] = 1; // bots are never vote-kick targets
       var row = el('div', 'vkrow', m);
-      var nm = el('span', 'vkname', row); nm.innerHTML = AG.Ranks.img(p.xp); nm.appendChild(document.createTextNode(r.players.filter(function (q) { return q.owner === p.owner && !q.bot; }).map(function (q) { return q.name; }).join(' & ') + (p.owner === r.me ? ' (you)' : '')));
+      var nm = el('span', 'vkname', row); nm.innerHTML = AG.Ranks.img(p.xp) + (AG.Crowns ? AG.Crowns.html(p.name, p) : ''); nm.appendChild(document.createTextNode(r.players.filter(function (q) { return q.owner === p.owner && !q.bot; }).map(function (q) { return q.name; }).join(' & ') + (p.owner === r.me ? ' (you)' : '')));
       if (p.owner === r.me) return;
       var why = VK.check(r.me, p.owner), b = el('button', 'vkbtn', row, '🗳 Vote kick'); b.type = 'button';
       b.dataset.owner = p.owner; b.className += ' vk-' + r.players.indexOf(p);

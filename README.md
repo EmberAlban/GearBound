@@ -158,7 +158,7 @@ How it works (js/cloud.js, a tiny `fetch` client, no SDK):
   `gifts` table, addressed by friend code. The recipient picks it up after logging in (and every minute) with the same checks
   as P2P gifts; duplicates are ignored by gift id. RLS: you can only send gifts "from" your own friend code and only read or
   delete gifts addressed to yours.
-- Database setup, in order: `supabase/setup.sql`, `supabase/accounts.sql`, `supabase/gifts_by_code.sql`. Deploy the function
+- Database setup, in order: `supabase/setup.sql`, `supabase/accounts.sql`, `supabase/gifts_by_code.sql`, `supabase/last_seen.sql`, `supabase/leaderboard.sql`. Deploy the function
   with `supabase functions deploy signup --no-verify-jwt`; it reads `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` from its env.
 
 Limits (honest list):
@@ -346,6 +346,24 @@ everywhere the pilot is drawn: battle, waiting-room cards, the lobby/profile pre
 - **Reactions:** startle "!" (a blast nearby, or woken by the owner moving or aiming), hurt (sweat drop when the owner
   takes damage), cheer (hearts when the owner lands a hit or wins), and sad (after a loss).
 - They work in battle (host, solo and clients) and in menu previews, which use the wall clock.
+
+### Global Leaderboard and Serpent Crowns (`js/leaderboard.js`, `supabase/leaderboard.sql`)
+- **Global tab:** the lobby rank panel has two tabs, *Pilot Ranks* and *🏆 Global*. The board is ranked by rank tier
+  (Lv 1–40, from `js/ranks.js`), then XP, then name. It shows 20 per page with ◀ ▶ and refresh, highlights your own row
+  ("you"), and **📍 Jump to me** opens the page with your row and scrolls to it. Jump to me needs a pilot account,
+  because it looks up only your own account name. Loading, empty and offline states are friendly messages.
+- **Data:** a narrow `public.leaderboard` table (pilot id, name, clamped XP 0–10,000,000, level 1–40, with CHECK
+  constraints). A `security definer` trigger on `pilots` keeps it in sync with each save or rename; nobody can call the
+  trigger function directly. Clients read only the `leaderboard_ranked` view (`security_invoker`), which returns
+  exactly `rank, pilot_name, xp, level`. Anon can't read the table itself (ids), `pilots` or saves. The client clamps
+  and escapes every value again. Supabase `get_advisors` (security) showed no new findings after the migration.
+- **Serpent Crowns:** the top 3 wear procedurally drawn crowns: **gold**, **silver** and **bronze**. Each has a
+  scale-pattern body, two coiled serpents rearing at the sides with gem eyes, a centre gem, and twinkling sparkles
+  (shown still with `prefers-reduced-motion`). They show on the board and next to names everywhere: your lobby name, room
+  list hosts, waiting-room cards, the HUD turn panel, battle name tags (canvas, with live sparkles), chat, friends,
+  vote-kick, podium and results. Each client fetches the top 3 itself (on boot, then every 5 min) and caches them, so
+  nothing extra travels between players. Bots never wear crowns.
+- Database setup: run `supabase/leaderboard.sql` after the other scripts (it backfills from existing pilots).
 
 ## Music (original, procedurally sequenced)
 All music is original and composed for this project. It is written as note data in `js/music.js` and played live by a small
@@ -559,6 +577,9 @@ TURN_URL='turn:host:3478?transport=tcp,user,pass' tools/runall.sh
 - Bots: the 1 XP + 1 gold bot rule is keyed on the `bot` flag. Easy bots hit about 25% of shots (measured 24.85% over 12 easy matches; bottest allows 17-30%).
 - Emote 8 is now **Aww, come on!** (pout face; `COMEON!`, `GRR!`, `AWW!` all work) with its own recorded "come on" clip. It still travels as `grr` on the wire, so older builds show their Grr for it.
 - **Emote voices (v5):** two recorded sets, `fem` and `masc`, 11 clips each, embedded in `js/emote_audio.js` (built by `node tools/emotevoices5.js [dir]` from `fem_<id>.mp3` / `masc_<id>.mp3`; trimmed, mono 24 kHz 40 kbps, about 178 KB; it replaces the old espeak `tools/emotevoices.sh`). Each pilot face picks a set: fem = Wren, Juno, Ivy, Tam; masc = Kit, Rook, Milo, Pax (unknown face = masc). Online, the sender's set travels with the emote (`{t:'emote', id, v}`, relayed as `e.v`), so everyone hears the sender's voice; an emote from an older build (no `v`) uses the sender's pilot face. Older builds ignore `v` and play their own old clips. Mute and the SFX volume apply. There is no manual voice override yet.
+- Leaderboard: saves are client-authoritative, so XP can be inflated by editing a save (capped at 10,000,000; the server
+  never lets XP go down). The board publicly lists every account pilot name with XP > 0. Crowns match by name, so a
+  local (non-account) player who picks a top-3 pilot's name sees a crown on their own device.
 - If the host is voted out (or quits), the match ends for everyone: there is no host migration.
 - Presence/friends and room directory rely on the public PeerJS broker (`0.peerjs.com`); if it's down or rate-limits, friends show
   offline and rooms can only be joined by code. Presence updates take a few seconds.
