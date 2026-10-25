@@ -226,8 +226,25 @@ streams snapshots (positions, HP, projectiles, effects, sounds, terrain carves) 
   eligible voters (everyone but the target, starter counts Yes) **and** at least 2 Yes, so ties fail; 30 s timeout (no vote = No),
   one vote at a time, 60 s cooldown per starter. The kicked pilot forfeits (turns skipped), sees "You were voted out" and can't rejoin
   that room this session. If the host is voted out the match ends for everyone with a notice (no host migration).
-- **Bot matches** (any pilot flagged `bot`) pay only **1 XP + 1 gold for a win** and nothing otherwise. The current build has no bots,
-  so this only matters once they exist.
+- **Bot matches** (any seat flagged `bot`) pay only **1 XP + 1 gold for a win** and nothing otherwise, and only to the viewer's own
+  human seat (a bot's win never pays the host).
+
+### Bot Arena (`js/arena.js`, arena parts of `js/online.js`)
+- An always-listed **🤖 Bot Arena** card sits at the top of the lobby room list (even when no rooms are open). **Watch** joins it.
+- It is a normal host-authoritative PeerJS room on the fixed id `gearbound-v1-room-ARENA1`: the first pilot to arrive *claims* the id
+  and becomes the arena host; everyone else joins as a **spectator** (up to 12 per arena, host included). Spectators are not seats.
+- **Endless rounds:** 2v2 on a random map (sudden death at turn 20, no power-ups/items). Empty seats are filled with bots of random
+  difficulty; an 8 s countdown between rounds, results shown for 9 s, then the next round starts by itself.
+- **Watch or jump in:** a pilot who joins mid-round gets the round setup plus every terrain carve so far and watches live. *Jump in*
+  (arena screen, battle chip or results) queues them for the **next** round; up to 4 humans are seated (longest-queued first,
+  alternating teams) and bots fill the rest. *Watch only* gives the seat back.
+- **Rewards:** arena rounds are bot matches: a win pays **1 XP + 1 gold** to each human on the winning team, nothing otherwise;
+  spectators and the host (unless seated) earn nothing.
+- **Host migration:** when the arena host leaves on purpose (Leave, closing the tab) they hand the arena to the longest-watching
+  pilot, who claims the id; the others reconnect to them. If the host just vanishes, everyone retries join/claim with jitter for up to
+  45 s, so one of them becomes the new host. If that fails, they return to the lobby with a message (graceful end).
+- Testing hook: `localStorage['gearbound.arenaCode']` picks a private arena id (4–8 A–Z/0–9) and `gearbound.arenaFast='1'` shortens
+  the timers (used by `tools/arenatest.js`).
 
 ## Friends and presence
 The **Friends** button (lobby and waiting room header, with an online-count badge) opens a corner panel (a bottom sheet on phones).
@@ -477,6 +494,27 @@ It contains no GunBound sprites, names or likenesses. Everything is embedded in 
 - **Toy World is an open toy chest:** smooth, drivable rolling hills of toys, chest-wood planks inside, the chest rims as platforms,
   the open lid in the background, fair spawns for 8. `tools/toyworldtest.js`. Spawn and respawn checks now accept normal slopes
   (a wall or overhang beside the spot is still refused).
+- **Toy World redo (`js/toyart.js`):** the map is painted as a cheerful open toy chest in a kid's bedroom. The chest is a red front
+  panel with blue and yellow inset panels, star, heart and target decals, a polished wood trim rail and a brass latch. The blue
+  end walls have wood caps and brass corners. Inside is a quilted plum lining. The open lid shows a painted rainbow sky with a
+  smiling sun, clouds, stars and hearts, brass hinges and a hasp. The backdrop is a static bedroom with striped wallpaper, a
+  pennant garland, a window with clouds, curtains, a shelf, a clock, a picture and a striped rug, all in warm light.
+  The drivable hills are made of crisp, ink-outlined toys: lettered alphabet blocks, a rainbow ring tower, a beach ball, a teddy,
+  a train on a track, plush pillows, a drum, studded bricks and a rocking horse. Each toy's top sits on the skyline, tilted to
+  the slope. Craters show soft cream stuffing with a torn-seam edge. The art is cosmetic only: the solidity mask is still pure
+  math (deterministic online), and the slope, spike, roughness, overhang, spawn and drive checks in `tools/toyworldtest.js`
+  still pass over 10 seeds. The gap in the floor is kept on purpose. It is a framed hatch with wood posts and brass hinges.
+  Cost: the full-resolution art adds about 250-300 ms to building a Toy World map in headless software rendering
+  (old about 150-450 ms, new about 400-1300 ms), once per match at load. The lid is a 0.8 Mpx cache and blits in under 0.01 ms.
+  Before and after shots are in `screenshots/toyredo/` (overview, desktop battle, phone, and rim views).
+- **Wardrobe / My Stuff:** open it from the lobby (**My Stuff**), from the shop header and from the online waiting room. It lists
+  only items you own, with a tab per slot (Halloween items sit in their own slot, marked 🎃). Tap to wear, tap again to take
+  off (an outfit always stays on). It has a live pilot preview with a **Show my rig** toggle (the Rig skins tab shows the rig),
+  animated background thumbnails plus a waiting-room card preview, an **Equipped** summary, search and a filter (All / Gold / Halloween / Starter),
+  an empty state with **Visit the shop** (it opens the shop on the same slot), and 3 saved outfits (Save current / Wear; wearing
+  skips items you no longer own). Changes save locally and mark the cloud copy changed. Saved outfits merge across devices (newest
+  per slot), and in a room the back button re-syncs your look. Works on phone and desktop. `tools/wardrobetest.js`, with
+  screenshots in `screenshots/wardrobe/`.
 - **Friends "last online":** offline friends show *Last online 5 minutes ago / an hour ago / yesterday / 3 days ago*; online friends
   show *Online now* (or *In match*, *in room ABC123*); no data = *Last online: unknown*. Labels refresh on their own every minute.
   Logged-in pilots send a heartbeat every 60 s and on closing/hiding the tab (`touch_last_seen`), and friends' times come from
@@ -580,7 +618,13 @@ TURN_URL='turn:host:3478?transport=tcp,user,pass' tools/runall.sh
 - Leaderboard: saves are client-authoritative, so XP can be inflated by editing a save (capped at 10,000,000; the server
   never lets XP go down). The board publicly lists every account pilot name with XP > 0. Crowns match by name, so a
   local (non-account) player who picks a top-3 pilot's name sees a crown on their own device.
-- If the host is voted out (or quits), the match ends for everyone: there is no host migration.
+- If the host is voted out (or quits), the match ends for everyone: there is no host migration in normal rooms (only the Bot Arena
+  migrates).
+- Bot Arena: migration restarts the arena on the new host, so the round in progress is lost (nobody is paid for it) and the round
+  counter starts again from 1. There is one public arena id (`ARENA1`) on the public broker, so anyone can claim it; a malicious
+  host could run a bad arena (it is P2P, like every room). Arena rounds have no power-ups. Each arena holds 12 spectators.
+- Bot Arena host migration was tested headless with 4 pages on a local TURN relay, not on real networks; an abrupt loss can take
+  up to ~45 s to recover.
 - Presence/friends and room directory rely on the public PeerJS broker (`0.peerjs.com`); if it's down or rate-limits, friends show
   offline and rooms can only be joined by code. Presence updates take a few seconds.
 - The online/lag tests use simulated latency, jitter, spikes and bandwidth limits plus a hidden (backgrounded) host on a local TURN
@@ -597,7 +641,7 @@ TURN_URL='turn:host:3478?transport=tcp,user,pass' tools/runall.sh
 
 ## Roadmap
 1. **Gameplay:** bots, fall damage, more handcrafted maps, caves and moving islands.
-2. **Online:** host migration, spectators, a small relay/server for strict networks, server-checked XP and gold.
+2. **Online:** host migration for normal rooms, more arena modes, a small relay/server for strict networks, server-checked XP and gold.
 3. **Accounts (own, no Big Tech):** optional username + PIN or transfer-code sync for cross-device progress.
 4. **Art:** animated rider poses, per-rig firing/recoil frames, more hand-painted terrain sets.
 5. **Tech:** ES modules plus a tiny bundler, unit tests for physics and turns, fixed-point math for cross-browser determinism.
