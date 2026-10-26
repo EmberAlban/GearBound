@@ -55,17 +55,17 @@ tap the minimap to jump the camera. Phones in portrait get a "rotate your device
 |---|---|---|---|---|---|---|
 | **Bastion** | Siege | 1100 | 20% | Slug | Twin Slug (near + far) | Quake Mortar (huge crater) |
 | **Skipper** | Scout | 900 | 8% | Hopper (bounces twice) | Scatter (3-shell fan) | Cluster Storm (5 bomblets at apex) |
-| **Lancer** | Precision | 850 | 12% | Pulse Bolt (flat, wind-resistant) | Bore Drill (tunnels in, bursts at the surface) | Sunlance (sky beam) |
+| **Lancer** | Precision | 850 | 12% | Prism Ray (fast light bolt, normal arc, half wind) | Bore Drill (tunnels in, bursts at the surface) | Sunlance (sky beam) |
 | **Lodestone** | Control | 1000 | 16% | Mag Slug | Lodestone Pull (yanks enemies 60px toward the blast) | Polarity Storm (drags 110px) |
 | **Carom** | Trickster | 860 | 8% | Carom Shell (one low skip, bursts on the 2nd impact, +15%) | Bank Shot (low skip, bursts on the 2nd impact) | Pinball Barrage (3 skip shells, each bursts on its 2nd impact) |
-| **Beetle** | Ground control | 980 | 14% | Crawler Mine (crawls 260px to a rig) | Lob Shell | Mine Parade (3 mines) |
-| **Hornet** | Hunter | 820 | 6% | Stinger (fast dart, half wind) | Cog Drone (homes within 420px) | Swarm (3 drones) |
+| **Beetle** | Ground control | 980 | 14% | Crawler Mine (scuttles up to 260px, bursts on touching a rig) | Lob Shell | Mine Parade (3 mines) |
+| **Hornet** | Hunter | 820 | 6% | Stinger Dart (fast dart, half wind, bursts on the first rig it touches) | Cog Drone (homes within 420px) | Swarm (3 drones) |
 | **Mason** | Builder | 1150 | 22% | Brick Lob | Rampart (ADDS a 44px mound) | Landslide (damage + new rock) |
 | **Glacier** | Disruptor | 940 | 12% | Frost Shell (+80 delay to targets) | Cold Snap (+160 delay, SLOWED: half move speed for their next 2 turns) | Deep Freeze (+500 delay to every player hit) |
 | **Volt** | Sniper | 880 | 10% | Rail Spike (flat, fast; bursts on contact with a dotted cut) | Chain Bolt (jumps to 3 enemies) | Thunderhead (chains to 5) |
 | **Flak** | Area denial | 1000 | 15% | Flak Burst (airburst, 6 shards) | Oil Bomb (burning oil, 3 turns) | Shrapnel Rain (12 shards) |
 | **Gyro** | Skirmisher | 900 | 10% | Boomerang (curves back) | Twin Rang | Gyre Wheel |
-| **Orrery** | Field control | 900 | 10% | Pulse Orb | Gravity Well (bends every shell for 2 turns) | Singularity |
+| **Orrery** | Field control | 900 | 10% | Moonshot (ringed planet + moon burst) | Gravity Well (bends every shell for 2 turns) | Phase Swap (hit + swap places with the nearest enemy; replaced Singularity) |
 | **Spindle** | Tunneler | 920 | 12% | Auger Shell (skims under the surface, then erupts) | Spiderlings (3 small skimmers, staggered eruptions) | Deep Eruption (skims deeper, steers under the nearest enemy and erupts) |
 
 **Spindle** is a brass spider walker with the pilot riding in an open hatch on top and its drill cannon mounted on the
@@ -355,7 +355,7 @@ everywhere the pilot is drawn: battle, waiting-room cards, the lobby/profile pre
 - They sync online (unknown ids are dropped), save locally and to the cloud, and gold ones can be gifted (candy ones can't).
 - **Performance:** each background caches its static layer (LRU of 24) and caps its particles at 40, and all of them
   share one animation loop. Only visible backgrounds animate. With more than 4 on screen they drop to 20 fps with half
-  the particles, and on low quality they draw lighter variants. `prefers-reduced-motion` shows a still frame,
+  the particles, and on low quality they draw lighter variants. The in-game **Reduce motion** setting shows a still frame,
   animation pauses when the tab is hidden, and DPR is capped at 1.5.
 
 ### Waiting room and shop (batch 7)
@@ -371,7 +371,7 @@ everywhere the pilot is drawn: battle, waiting-room cards, the lobby/profile pre
   suspension bounce, rocking, squash, a periodic "rev" with wheel spin or a rig-specific kick, and a small particle
   stream such as exhaust, steam, sparks, frost or embers). It is drawn by `Mobile.draw`, so the waiting room and an idle
   rig in a match look the same; it stops while driving, airborne, knocked back or dead, and is off with
-  `prefers-reduced-motion`. It is cosmetic only (wall clock + per-pilot seed, no network traffic).
+  the in-game **Reduce motion** setting. It is cosmetic only (wall clock + per-pilot seed, no network traffic).
 - Waiting-room pets use the in-game behaviour (follow/perch/bob, yawn → doze mood clock), survive room re-renders, and
   cheer when their pilot hits READY or emotes.
 
@@ -406,7 +406,7 @@ everywhere the pilot is drawn: battle, waiting-room cards, the lobby/profile pre
   and escapes every value again. Supabase `get_advisors` (security) showed no new findings after the migration.
 - **Serpent Crowns:** the top 3 wear procedurally drawn crowns: **gold**, **silver** and **bronze**. Each has a
   scale-pattern body, two coiled serpents rearing at the sides with gem eyes, a centre gem, and twinkling sparkles
-  (shown still with `prefers-reduced-motion`). They show on the board and next to names everywhere: your lobby name, room
+  (shown still with the **Reduce motion** setting). They show on the board and next to names everywhere: your lobby name, room
   list hosts, waiting-room cards, the HUD turn panel, battle name tags (canvas, with live sparkles), chat, friends,
   vote-kick, podium and results. Each client fetches the top 3 itself (on boot, then every 5 min) and caches them, so
   nothing extra travels between players. Bots never wear crowns.
@@ -525,6 +525,25 @@ It contains no GunBound sprites, names or likenesses. Everything is embedded in 
 - **Parallax:** the mid and near layers are each drawn as a single copy, scaled to cover the full parallax travel.
   The near layer is a flipped, enlarged copy, so there are no mirrored repeats.
 - **Ember Dunes pits:** each map now has one wide sloping basin (about 420–560 px) with a lava chute in the middle, instead of a slot canyon.
+
+### Batch 11 fixes
+- **Reduce motion is a game setting now** (Settings > Graphics > "Reduce motion", saved with your settings, **off by default**).
+  Before, the game followed the operating system's `prefers-reduced-motion` (for example macOS "Reduce motion"), which froze
+  rigs, pets, worn gear and lobby effects in the lobby, waiting room, Wardrobe and shop (pets still moved in matches because
+  they run on game ticks). The OS setting no longer freezes anything; tick the box to get still menus (rigs, pets, lobby
+  effects, room backgrounds and crowns stay still). Menu previews also play a slightly bigger idle (bounce, rock, wheel roll)
+  and perched pets bob. `tools/idlemotiontest.js` (per-rig and per-pet frame-diff strips in `screenshots/batch11/idle/`).
+- **Orrery:** shot 1 is now **Moonshot** (a ringed planet with a moon burst). The place swap moved to the Overdrive as
+  **Phase Swap** (hit + swap places with the nearest enemy), which **replaces Singularity**. Shot 2 is still Gravity Well.
+- **Contact rule:** every shot explodes when it touches a rig (Skipper/Carom don't bounce off enemies; they can still skip on
+  terrain). Nothing pierces through a rig any more (Hornet's Stinger Dart included). Beetle's shot 1 rolls fast (4.6 px/frame),
+  stays on the ground and explodes on touch.
+- **No more tunnelling:** shells move in sub-steps of at most 2 px, so fast shots stop at the surface instead of sinking into terrain.
+- **Tornado:** shots are swirled only inside the visible funnel, from its ground base up; shooting underneath a tornado on a ledge does nothing.
+- **Lancer:** Prism Ray and Sunlance have normal gravity and arc down to the target (no more shots flying up forever).
+- **Pilot previews fit:** lobby, waiting room (with and without a room background), Wardrobe, shop, profile and results fit the
+  measured rig + rider + headgear + pet, so heads, hats and pets are never cut off. Slot sizes are unchanged. `tools/uifittest.js`.
+- Physics checks: `tools/b11physics.js`.
 
 ### Round 10/24 fixes
 - **Steady menus:** the title and waiting-room backdrop no longer jitter (the demo battle never keeps camera shake, the pan is

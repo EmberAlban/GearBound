@@ -1126,7 +1126,7 @@ body.inbattle .settings { overflow: hidden; }
 .hwrow { display: flex; align-items: center; gap: 10px; padding: 6px 12px; border-radius: 12px; background: linear-gradient(100deg, rgba(58,29,92,0.85), rgba(200,87,26,0.55)); border: 1px solid rgba(255,170,80,0.45); }
 .hwrow em { font: 800 18px var(--display); font-style: normal; color: #ffb347; }
 .hwrow .hwparts { font-size: 12px; color: #f3e4ff; flex: 1; text-align: right; }
-@media (prefers-reduced-motion: reduce) { .hwbanner .hwpump, .hwbanner::after { animation: none; } }
+body.reducemo .hwbanner .hwpump, body.reducemo .hwbanner::after { animation: none; }
 @media (max-width: 700px), (max-height: 480px) { .hwbanner { padding: 5px 10px; gap: 8px; } .hwbanner .hwtxt b { font-size: 14px; } .hwbanner .hwpump { font-size: 22px; } .hwrow .hwparts { display: none; } }
 
 /* waiting-room backgrounds (item 20): animated canvas behind the player's own card */
@@ -1181,7 +1181,7 @@ body.inbattle .settings { overflow: hidden; }
 .crownw.c-silver::before, .crownw.c-silver::after { text-shadow: 0 0 4px #dff0ff; }
 .crownw.c-bronze::before, .crownw.c-bronze::after { text-shadow: 0 0 4px #ffd2a8; }
 @keyframes crownspark { 0%, 100% { opacity: 0; transform: scale(.3) rotate(0deg); } 45% { opacity: 1; transform: scale(1.1) rotate(45deg); } 70% { opacity: 0; transform: scale(.4) rotate(90deg); } }
-@media (prefers-reduced-motion: reduce) { .crownw::before, .crownw::after { animation: none; opacity: .8; } }
+body.reducemo .crownw::before, body.reducemo .crownw::after { animation: none; opacity: .8; }
 
 /* ---- Bot Arena ---- */
 .rrow.arenarow { background: linear-gradient(90deg, rgba(120,200,255,0.16), rgba(255,210,90,0.10)); border: 1px solid rgba(140,210,255,0.35); margin-bottom: 6px; }
@@ -1639,7 +1639,7 @@ window.AG = window.AG || {};
 
   // ---------------- Settings (persisted) ----------------
   var SETTINGS_KEY = 'gearbound.settings.v1';
-  AG.settings = { music: 0.55, sfx: 0.8, muted: false };
+  AG.settings = { music: 0.55, sfx: 0.8, muted: false, reduceMotion: false };
   try { var saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null'); if (saved) for (var k in saved) AG.settings[k] = saved[k]; } catch (e) {}
   AG.saveSettings = function () { try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(AG.settings)); } catch (e) {} if (AG.Cloud) AG.Cloud.changed(); };
 
@@ -3781,6 +3781,7 @@ AG.ADMIN_PUBLIC_KEYS = Object.freeze([
     if (this.def.perch && m.grounded) target = m.localToWorld(pr.x, pr.y);
     else target = m.localToWorld(pr.x - 6, pr.y - 16 + Math.sin(this.t * 0.07) * 4);
     if (m._idlDy) target.y += m._idlDy;
+    if (this.def.perch && m.grounded) target.y += Math.sin(this.t * 0.06) * 1.2; // menus: a perched pet breathes / bobs visibly
     if (this._fresh || this._rx == null) { this.x = target.x; this.y = target.y; this._fresh = false; this._rx = 1; }
     var a = 1 - Math.pow(0.88, k); this.x += (target.x - this.x) * a; this.y += (target.y - this.y) * a;
   };
@@ -5632,7 +5633,8 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var evs = g.events; if (!evs || !evs.length || p.teleport) return;
     for (var i = 0; i < evs.length; i++) {
       var e = evs[i], T = W.TYPES[e.type];
-      if (Math.abs(p.x - e.x) > W.halfOf(e)) { if (p.inTorn === e.id) spunOut(g, p, e); continue; }
+      var inside = p.inTorn === e.id && p.tornHx ? Math.abs(p.x - e.x) <= W.halfOf(e) : W.inColumn(g, e, p);
+      if (!inside) { if (p.inTorn === e.id) spunOut(g, p, e); continue; }
       if (!p.hit) p.hit = {};
       if (e.type === 'tornado' && p.hit[e.id] === 1 && !p.burrowing && !p.rolling) { inFunnel(g, p, e, T); continue; }
       if (p.hit[e.id]) continue;
@@ -5655,6 +5657,22 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     }
   };
 
+  // The column's real volume (shared by the drawing and the physics, deterministic: g.frame + terrain only).
+  // A column stands on the ground under its centre (surfaceBelow(e.x, 0)) and reaches up past the sky; nothing
+  // below that base (a shot flying under a tornado on a hilltop, or through the ground/caves) is touched.
+  // Tornado: funnel width wAt(k) around the swaying centre line x + sway(k), k = height above ground / hRef.
+  W.colBase = function (g, e) { if (e._cbF !== g.frame) { e._cb = g.terrain.surfaceBelow(e.x, 0); e._cbF = g.frame; } return e._cb; };
+  W.colRef = function (ground) { return Math.max(ground + 120, 400); };
+  W.colSway = function (e, k, t) { var H = W.sizeOf(e).half; return Math.sin(t * 0.03 + k * 3) * 16 * k * (H / 80) + Math.sin(t * 0.07 + k * 9) * 5 * k; };
+  W.colW = function (e, k) { var H = W.sizeOf(e).half; return H * (0.3 + 0.7 * Math.pow(Math.min(1, Math.max(0, k) * 2.2), 0.6)); };
+  W.inColumn = function (g, e, p) {
+    var ground = W.colBase(g, e), x = p.x, y = p.y;
+    if (y > ground + 6 || (g.terrain.solid(x, y) && !p.inTorn)) return false; // under the column's base / inside the ground
+    if (p.burrowing || p.rolling || p.still) return false;
+    if (e.type !== 'tornado') return Math.abs(x - e.x) <= W.halfOf(e);
+    var k = Math.max(0, ground - y) / W.colRef(ground);
+    return Math.abs(x - (e.x + W.colSway(e, k, g.frame))) <= W.colW(e, k);
+  };
   // every sub-step inside a tornado funnel (authority only, deterministic): updraft + swirl + push/drag
   // pull share by height above the funnel's ground: 1 near the ground, tapering to TAPER_MIN way up high
   function taper(g, e, p) {
@@ -5789,8 +5807,10 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   function drawTornado(c, e, T, top, ground, t, z, pale) {
     var S = W.sizeOf(e), H = S.half, lw = Math.max(1, Math.min(2.4, 1 / (z || 1))), spin = e.spin || 1;
     var hTot = Math.max(ground - Math.min(top, 0) + 120, 400), steps = 48; // ground to beyond the top of the screen/map
-    var sway0 = function (k) { return Math.sin(t * 0.03 + k * 3) * 16 * k * (H / 80) + Math.sin(t * 0.07 + k * 9) * 5 * k; };
-    var wAt = function (k) { return H * (0.3 + 0.7 * Math.pow(Math.min(1, k * 2.2), 0.6)); }; // full effect width from low up
+    // the profile is measured in the same units as the physics (W.inColumn): k = height above ground / hRef
+    var q = hTot / W.colRef(ground);
+    var sway0 = function (k) { return W.colSway(e, k * q, t); };
+    var wAt = function (k) { return W.colW(e, k * q); }; // full effect width from low up
     var capY = ground - hTot;
     // storm cloud cap
     for (var cl = 0; cl < 8; cl++) { var cx = e.x + sway0(1) + (cl - 3.5) * H * 0.5, cr = H * (0.9 + 0.25 * Math.sin(cl * 2.1 + t * 0.02));
@@ -6545,7 +6565,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       mount: { x: -7.2, y: -13.4 }, barrel: { x: 12.9, y: -14.6, len: 26.9, w: 4.5 }, radius: 14,
       sprite: { w: 51.5, ax: 0.5, lift: 2, barrelW: 32.5, centerY: -13.4, perch: { x: -19.0, y: -19.0 }, crystal: { x: -16.5, y: -26.9 } },
       shots: [
-        { name: 'Prism Ray', kind: 'laser', delay: 600, damage: 180, radius: 20, gravityScale: 0, windScale: 0, fixedSpeed: 15, laserLen: 1300, trail: '#d4f5ff', size: 3, desc: 'Perfectly straight light bolt: no gravity, no wind, power does not matter. Range 1300px.' },
+        { name: 'Prism Ray', kind: 'laser', delay: 600, damage: 180, radius: 20, windScale: 0.5, trail: '#d4f5ff', size: 3, desc: 'Fast light bolt that flies a normal arc (half wind) and bursts on contact.' },
         { name: 'Bore Drill', kind: 'drill', delay: 740, damage: 230, radius: 30, drillLen: 120, trail: '#ffd166', desc: 'Bores hidden through the ground, then bursts up through the surface above it.' },
         { name: 'Sunlance', kind: 'lance', delay: 1020, damage: 380, radius: 26, beamWidth: 34, special: true, trail: '#fff3b0', desc: 'Calls down a sky beam on impact: hits every rig in the column. Overdrive.' }
       ]
@@ -6569,13 +6589,13 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     R2({ id: 'beetle', name: 'Beetle', tagline: 'Minelayer. Rolling mines crawl to their target.', role: 'Ground control', color: '#2e7d32', accent: '#d9c27a',
       hp: 980, armor: 0.14, angleMin: 30, angleMax: 75, fuel: 110, speed: 0.65, moveDelay: 1.2, sprite: { w: 50 },
       shots: [
-        { name: 'Crawler Mine', kind: 'roller', delay: 620, damage: 230, radius: 30, rollLen: 260, trail: '#c8e6a0', desc: 'Lands, then crawls up to 260px along the ground until it bumps a rig.' },
+        { name: 'Crawler Mine', kind: 'roller', delay: 620, damage: 230, radius: 30, rollLen: 260, trail: '#c8e6a0', desc: 'Lands, then scuttles fast up to 260px along the ground and blows the moment it touches a rig.' },
         { name: 'Sticky Mine', kind: 'mine', delay: 700, damage: 240, radius: 40, fuse: 170, trigger: 70, trail: '#ff8070', desc: 'Sticks where it lands and arms; blows when an enemy is within 70px or after ~3s.' },
         { name: 'Mine Parade', kind: 'roller', delay: 1000, damage: 200, radius: 32, rollLen: 300, count: 3, powerSpread: 0.08, special: true, trail: '#f0ff9a', desc: 'Three crawler mines, near to far. Overdrive.' }] }),
     R2({ id: 'hornet', name: 'Hornet', tagline: 'Hover hive. Launches homing cog drones.', role: 'Hunter', color: '#f1c40f', accent: '#2b2b2b', hover: true,
       hp: 820, armor: 0.06, angleMin: 0, angleMax: 70, fuel: 130, speed: 0.85, moveDelay: 1.0, sprite: { w: 50, lift: -3 },
       shots: [
-        { name: 'Stinger Dart', kind: 'pierce', delay: 600, damage: 160, radius: 22, pierceK: 0.9, groundK: 0.6, gravityScale: 0.7, windScale: 0.5, size: 3, trail: '#ffe066', desc: 'Flat dart that passes THROUGH rigs (144 to each), then pops on the ground.' },
+        { name: 'Stinger Dart', kind: 'pierce', delay: 600, damage: 160, radius: 22, pierceK: 0.9, groundK: 0.6, gravityScale: 0.7, windScale: 0.5, size: 3, trail: '#ffe066', desc: 'Fast, flat dart (light gravity, half wind) that bursts on the first rig or ground it touches.' },
         { name: 'Cog Drone', kind: 'homing', delay: 760, damage: 210, radius: 28, seek: 420, trail: '#ffd36b', desc: 'After launch it steers toward the nearest enemy within 420px.' },
         { name: 'Swarm', kind: 'homing', delay: 1000, damage: 170, radius: 26, count: 3, angleSpread: 8, seek: 480, special: true, trail: '#fff3a0', desc: 'Three homing drones. Overdrive.' }] }),
     R2({ id: 'mason', name: 'Mason', tagline: 'Builder walker. Raises walls and buries foes.', role: 'Builder', color: '#c8a165', accent: '#b03a2e',
@@ -6608,12 +6628,12 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
         { name: 'Boomerang', kind: 'boomerang', delay: 620, damage: 220, radius: 30, returnAccel: 0.07, trail: '#ffb347', desc: 'Flies out, then curves back toward you (never hits its owner). Hit enemies behind cover.' },
         { name: 'Twin Rang', kind: 'boomerang', delay: 760, damage: 150, radius: 26, count: 2, powerSpread: 0.08, returnAccel: 0.07, trail: '#ffd08a', desc: 'Two boomerangs, near and far.' },
         { name: 'Gyre Wheel', kind: 'boomerang', delay: 1000, damage: 360, radius: 52, size: 7, returnAccel: 0.05, special: true, trail: '#ffe066', desc: 'Giant spinning boomerang. Overdrive.' }] }),
-    R2({ id: 'orrery', name: 'Orrery', tagline: 'Gravity hover-vessel. Wells that bend every shot.', role: 'Field control', color: '#8e44ad', accent: '#f0c46a', hover: true,
+    R2({ id: 'orrery', name: 'Orrery', tagline: 'Gravity hover-vessel. Planets, wells and a phase swap.', role: 'Field control', color: '#8e44ad', accent: '#f0c46a', hover: true,
       hp: 900, armor: 0.1, angleMin: 10, angleMax: 70, fuel: 110, speed: 0.7, moveDelay: 1.1, sprite: { w: 52, lift: -2 }, seatDY: 1,
       shots: [
-        { name: 'Phase Orb', kind: 'swap', delay: 650, damage: 150, radius: 26, swapR: 140, trail: '#d9a8ff', desc: 'After the blast you SWAP places with the nearest enemy within 140px of it.' },
+        { name: 'Moonshot', kind: 'shell', delay: 620, damage: 190, radius: 28, moonDamage: 60, moonRadius: 16, moonGap: 34, trail: '#ffd9a0', size: 5, desc: 'A tiny ringed planet: solid blast, then its moon pops a small burst just past the impact.' },
         { name: 'Gravity Well', kind: 'well', delay: 780, damage: 100, radius: 24, wellR: 260, pull: 0.45, turns: 2, trail: '#c39bff', desc: 'Leaves a gravity well for 2 turns that bends EVERY shell flying near it.' },
-        { name: 'Singularity', kind: 'well', delay: 1050, damage: 320, radius: 56, wellR: 340, pull: 0.7, turns: 2, special: true, size: 7, trail: '#e3ccff', desc: 'Big blast + strong well. Overdrive.' }] }),
+        { name: 'Phase Swap', kind: 'swap', delay: 1000, damage: 200, radius: 32, swapR: 160, special: true, size: 6, trail: '#d9a8ff', desc: 'A hit, then you SWAP places with the nearest enemy within 160px of the blast. Overdrive.' }] }),
     R2({ id: 'spindle', name: 'Spindle', tagline: 'Spider walker. Drill shells that skim under the ground and erupt beneath you.', role: 'Tunneler', color: '#b5652d', accent: '#d8dde3',
       hp: 920, armor: 0.12, angleMin: 15, angleMax: 70, fuel: 120, speed: 0.72, moveDelay: 1.05, sprite: { w: 54 },
       rearGun: [0.266, 0.33], // drill cannon mounted on the back of the abdomen, behind the pilot (art + firing origin)
@@ -7406,79 +7426,104 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       AG.audio.bounce();
       p.dead = true; return;
     }
+    // Swept collision: each of the 4 weather sub-steps (tornado helix / pillars run per sub-step) is split into
+    // micro-steps of <= MICRO px, and every micro-step checks rigs + terrain, so fast shots never skip thin ground
+    // or a rig. Contact rule: touching a rig ALWAYS explodes (every kind); touching the ground explodes too, except
+    // designed bouncers/skippers/diggers that have their own ground behaviour.
     for (var s = 0; s < sub; s++) {
-      var tsx = p.inTorn ? AG.Weather.SLOW : 1;
-      p.x += p.vx / sub * tsx; p.y += p.vy / sub * tsx;
-      if (p.x < -200 || p.x > t.w + 200 || p.y > t.h + 50 || p.y < Physics.CEILING) { p.dead = true; g.lastImpact = { x: p.x, y: Math.min(p.y, t.h) }; return; }
+      var tsx = p.inTorn ? AG.Weather.SLOW : 1, spd = Math.sqrt(p.vx * p.vx + p.vy * p.vy) * tsx / sub;
+      var n = Math.min(Physics.MICRO_MAX, Math.max(1, Math.ceil(spd / Physics.MICRO)));
+      for (var j = 0; j < n; j++) {
+        p.x += p.vx / sub * tsx / n; p.y += p.vy / sub * tsx / n;
+        if (p.x < -200 || p.x > t.w + 200 || p.y > t.h + 50 || p.y < Physics.CEILING) { p.dead = true; g.lastImpact = { x: p.x, y: Math.min(p.y, t.h) }; return; }
+        if (j < n - 1 && contact(g, p, t, spd / n, s)) return;
+      }
       AG.Weather.affect(g, p);
-      if (p.kind === 'laser') { p.lased = (p.lased || 0) + Math.sqrt(p.vx * p.vx + p.vy * p.vy) / sub; if (p.lased > (p.shot.laserLen || 1300)) { detonate(g, p, false); return; } }
-      // Mobile hit (skip owner briefly after launch; boomerangs never hit their owner)
-      for (var m = 0; m < g.mobiles.length; m++) {
-        var mob = g.mobiles[m];
-        if (!mob.alive || (mob === p.owner && (p.age < 12 || p.kind === 'boomerang'))) continue;
-        var c = mob.center();
-        if (AG.dist(p.x, p.y, c.x, c.y) < mob.hitR()) {
-          if (p.kind === 'pierce') { // stinger dart: punches through every rig in its path, then bursts on the ground
-            if (p.hitSet.indexOf(mob) < 0) { p.hitSet.push(mob); Physics.damage(g, mob, Math.round(p.damage * (p.shot.pierceK || 0.9) * (1 - mob.rig.armor)), p.owner); spawnSparks(g, p.x, p.y, '#fff2a0', 18);
-              g.effects.push({ type: 'text', x: c.x, y: c.y - 70, text: 'PIERCE!', color: '#fff2a0', big: true, life: 70, max: 70 }); }
-            continue;
-          }
-          detonate(g, p, true); return;
-        }
-      }
-      var solid = t.solid(p.x, p.y);
-      if (solid && p.kind === 'rail') { detonate(g, p, false); return; } // contact fuse: no pass-through
-      if (solid && p.kind === 'mine') { armMine(g, p); return; }
-      if (solid && p.kind === 'skip' && (p.skips || 0) < (p.shot.skips || 2)) { skipHop(g, p); return; }
-      if (solid && p.kind === 'roller') { startRoll(g, p); return; }
-      if (solid && p.kind === 'burrow' && !p.burrowDone) { startBurrow(g, p); return; }
-      if (solid && p.kind === 'spider' && !p.burrowDone) { spiderSplit(g, p); return; }
-      if (p.kind === 'drill') {
-        if (solid) {
-          p.inGround = true;
-          var stepLen = Math.sqrt(p.vx * p.vx + p.vy * p.vy) / sub;
-          p.drilled += stepLen;
-          // (no tunnel: the drill bores hidden through the ground and leaves one round crater where it bursts)
-          if ((p.age + s) % 6 === 0) dirt(g, p.x, groundTop(t, p.x, p.y), p.vx >= 0 ? 1 : -1, 1);
-          if (p.drilled >= p.shot.drillLen) { // burst up through the SURFACE above the drill head (no buried crater)
-            var sy = p.y; while (sy > 0 && t.solid(p.x, sy - 1)) sy--; p.y = sy; detonate(g, p, false); return; }
-        } else if (p.inGround) { // exited terrain: detonate on surface
-          detonate(g, p, false); return;
-        }
-        continue;
-      }
-      if (solid) {
-        if (p.kind === 'ricochet') p.impacts = (p.impacts || 0) + 1; // impact 1 may bounce; impact 2 always explodes
-        if ((p.kind === 'bouncer' || p.kind === 'ricochet') && p.bounces > 0 && !(p.kind === 'ricochet' && p.impacts > 1)) {
-          var nrm = t.normal(p.x, p.y);
-          var dot = p.vx * nrm.x + p.vy * nrm.y;
-          if (p.kind === 'ricochet') {
-            // Carom: a short, low skip. Normal restitution 0.32 + tangential grip 0.75 (was a full mirror at 0.9, which
-            // sent shells back up almost as high as they came in), and the hop is capped so it never towers.
-            var vnx = dot * nrm.x, vny = dot * nrm.y, tx2 = p.vx - vnx, ty2 = p.vy - vny;
-            var kt = p.shot.ricoT || Physics.RICO_T, kn = p.shot.ricoN || Physics.RICO_N;
-            var vin = Math.max(0, p.vy); // incoming downward speed
-            p.vx = tx2 * kt - vnx * kn; p.vy = ty2 * kt - vny * kn;
-            // never hop higher than ~a quarter of the fall it came in with (rise ~ v^2), nor above the absolute cap
-            var upCap = Math.min(Physics.RICO_MAXUP, Math.max(2.5, 0.5 * vin));
-            if (p.vy < -upCap) p.vy = -upCap;
-          } else { p.vx = (p.vx - 2 * dot * nrm.x) * 0.62; p.vy = (p.vy - 2 * dot * nrm.y) * 0.62; }
-          if (p.kind === 'ricochet') { p.damage = Math.round(p.damage * 1.15); g.effects.push({ type: 'text', x: p.x, y: p.y - 30, text: '+15%', color: '#7df9ff', big: false, life: 40, max: 40 }); }
-          // step out of terrain
-          for (var e = 0; e < 10 && t.solid(p.x, p.y); e++) { p.x += nrm.x; p.y += nrm.y; }
-          p.bounces--;
-          spawnSparks(g, p.x, p.y, '#fff', 6);
-          AG.audio.bounce();
-          return;
-        }
-        detonate(g, p, false); return;
-      }
+      if (p.kind === 'laser' && p.shot.laserLen) { p.lased = (p.lased || 0) + spd; if (p.lased > p.shot.laserLen) { detonate(g, p, false); return; } }
+      if (contact(g, p, t, spd / n, s)) return;
     }
-    p.trailPts.push(p.x, p.y);
-    if (p.trailPts.length > 60) p.trailPts.splice(0, 2);
+    if (t.solid(p.x, p.y)) p.trailPts.length = 0; // a drill boring hidden underground: no trail drawn through the ground
+    else { p.trailPts.push(p.x, p.y); if (p.trailPts.length > 60) p.trailPts.splice(0, 2); }
+  }
+  Physics.MICRO = 2; Physics.MICRO_MAX = 12;
+  // the rig a point touches: a capsule from the rig's feet up to its body centre (radius hitR) -- so shots rolling,
+  // skimming or crawling along the ground hit the wheels/hull, not only the body circle high above the ground
+  function touchRig(mob, x, y, pad) {
+    var c = mob.center(), f = mob.localToWorld(0, -3), r = mob.hitR() + (pad || 0);
+    var dx = c.x - f.x, dy = c.y - f.y, L2 = dx * dx + dy * dy, u = L2 ? AG.clamp(((x - f.x) * dx + (y - f.y) * dy) / L2, 0, 1) : 0;
+    var qx = f.x + dx * u - x, qy = f.y + dy * u - y;
+    return qx * qx + qy * qy < r * r;
+  }
+  Physics.touchRig = touchRig;
+  function rigHit(g, p, pad) { // first rig the shell touches (owner skipped briefly after launch; boomerangs never hit their owner)
+    for (var m = 0; m < g.mobiles.length; m++) {
+      var mob = g.mobiles[m];
+      if (!mob.alive || (mob === p.owner && (p.age < 12 || p.kind === 'boomerang' || p.rolling || p.still || p.burrowing))) continue;
+      if (touchRig(mob, p.x, p.y, pad)) return mob;
+    }
+    return null;
+  }
+  Physics.rigHit = rigHit;
+  // back a shell that just entered the ground up to the surface along its path (the blast sits ON the ground)
+  function toSurface(t, p, step) {
+    var sp = Math.sqrt(p.vx * p.vx + p.vy * p.vy) || 1, ux = p.vx / sp, uy = p.vy / sp;
+    for (var e = 0; e < Math.ceil(step) + 2 && t.solid(p.x, p.y); e++) { p.x -= ux; p.y -= uy; }
+  }
+  // one collision check at the shell's current point; returns true when the shell is done for this frame
+  function contact(g, p, t, step, s) {
+    var hm = rigHit(g, p, 0); if (hm) { if (p.kind === 'drill' && p.inGround) p.inGround = false; detonate(g, p, hm); return true; }
+    var solid = t.solid(p.x, p.y);
+    if (solid && p.kind === 'mine') { armMine(g, p); return true; }
+    if (solid && p.kind === 'skip' && (p.skips || 0) < (p.shot.skips || 2)) { skipHop(g, p); return true; }
+    if (solid && p.kind === 'roller') { startRoll(g, p); return true; }
+    if (solid && p.kind === 'burrow' && !p.burrowDone) { startBurrow(g, p); return true; }
+    if (solid && p.kind === 'spider' && !p.burrowDone) { spiderSplit(g, p); return true; }
+    if (p.kind === 'drill') {
+      if (solid) {
+        p.inGround = true;
+        p.drilled += step;
+        // (no tunnel: the drill bores hidden through the ground and leaves one round crater where it bursts)
+        if (((p.drilled / 6) | 0) !== (((p.drilled - step) / 6) | 0)) dirt(g, p.x, groundTop(t, p.x, p.y), p.vx >= 0 ? 1 : -1, 1);
+        if (p.drilled >= p.shot.drillLen) { // burst up through the SURFACE above the drill head (no buried crater)
+          var sy = p.y; while (sy > 0 && t.solid(p.x, sy - 1)) sy--; p.y = sy; detonate(g, p, false); return true; }
+      } else if (p.inGround) { // exited terrain: detonate on surface
+        detonate(g, p, false); return true;
+      }
+      return false;
+    }
+    if (!solid) return false;
+    if (p.kind === 'ricochet') p.impacts = (p.impacts || 0) + 1; // impact 1 may bounce; impact 2 always explodes
+    if ((p.kind === 'bouncer' || p.kind === 'ricochet') && p.bounces > 0 && !(p.kind === 'ricochet' && p.impacts > 1)) {
+      var nrm = t.normal(p.x, p.y);
+      var dot = p.vx * nrm.x + p.vy * nrm.y;
+      if (p.kind === 'ricochet') {
+        // Carom: a short, low skip. Normal restitution 0.32 + tangential grip 0.75 (was a full mirror at 0.9, which
+        // sent shells back up almost as high as they came in), and the hop is capped so it never towers.
+        var vnx = dot * nrm.x, vny = dot * nrm.y, tx2 = p.vx - vnx, ty2 = p.vy - vny;
+        var kt = p.shot.ricoT || Physics.RICO_T, kn = p.shot.ricoN || Physics.RICO_N;
+        var vin = Math.max(0, p.vy); // incoming downward speed
+        p.vx = tx2 * kt - vnx * kn; p.vy = ty2 * kt - vny * kn;
+        // never hop higher than ~a quarter of the fall it came in with (rise ~ v^2), nor above the absolute cap
+        var upCap = Math.min(Physics.RICO_MAXUP, Math.max(2.5, 0.5 * vin));
+        if (p.vy < -upCap) p.vy = -upCap;
+      } else { p.vx = (p.vx - 2 * dot * nrm.x) * 0.62; p.vy = (p.vy - 2 * dot * nrm.y) * 0.62; }
+      if (p.kind === 'ricochet') { p.damage = Math.round(p.damage * 1.15); g.effects.push({ type: 'text', x: p.x, y: p.y - 30, text: '+15%', color: '#7df9ff', big: false, life: 40, max: 40 }); }
+      // step out of terrain (along the normal) so the bouncing shell never sits in the ground
+      for (var e = 0; e < 14 && t.solid(p.x, p.y); e++) { p.x += nrm.x; p.y += nrm.y; }
+      p.bounces--;
+      spawnSparks(g, p.x, p.y, '#fff', 6);
+      AG.audio.bounce();
+      return true;
+    }
+    toSurface(t, p, step);
+    detonate(g, p, false); return true;
   }
 
   function detonate(g, p, direct) {
+    g._directMob = direct && direct.center ? direct : null; // the rig it touched: full damage even when its centre is far (tall rigs)
+    try { detonate0(g, p, direct); } finally { g._directMob = null; }
+  }
+  function detonate0(g, p, direct) {
     p.dead = true;
     g.lastImpact = { x: p.x, y: p.y };
     if (p.teleport) { warp(g, p); return; }
@@ -7490,12 +7535,13 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var sh = p.shot;
     if (p.kind === 'rail') Physics.explode(g, p.x, p.y, p.radius, p.damage * (direct ? 1.15 : 1), p.owner, sh.special, p.look, Physics.RAIL_CRATER);
     else if (p.kind === 'airburst') flakBurst(g, p, direct);
-    else if (p.kind === 'pierce') Physics.explode(g, p.x, p.y, p.radius, p.damage * (sh.groundK || 0.6), p.owner, sh.special, p.look);
+    else if (p.kind === 'pierce' && !direct) Physics.explode(g, p.x, p.y, p.radius, p.damage * (sh.groundK || 0.6), p.owner, sh.special, p.look);
     else Physics.explode(g, p.x, p.y, p.radius, p.damage * (direct ? 1.15 : 1), p.owner, sh.special, p.look);
     if (p.kind === 'airstrike') callStrike(g, p);
     if (p.kind === 'quake') aftershocks(g, p);
     if (p.kind === 'knock') knockback(g, p);
     if (p.kind === 'swap') swapPlaces(g, p);
+    if (sh.moonDamage) moonPop(g, p);
     if (p.kind === 'magnet') magnetPull(g, p);
     if (p.kind === 'freeze') freezeArea(g, p);
     if (p.kind === 'chain') chainBolt(g, p);
@@ -7540,7 +7586,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     });
     g.effects.push({ type: 'ring', x: p.x, y: p.y, r: R * 0.6, life: 22, max: 22 });
   }
-  // Orrery · Phase Orb: after the blast the shooter trades places with the nearest enemy near the impact
+  // Orrery · Phase Swap (Overdrive): after the blast the shooter trades places with the nearest enemy near the impact
   function swapPlaces(g, p) {
     var o = p.owner; if (!o || !o.alive) return;
     var best = null, bd = p.shot.swapR || 140;
@@ -7550,6 +7596,13 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     [o, best].forEach(function (m) { var c = m.center(); spawnSparks(g, c.x, c.y, '#e0c8ff', 22); g.effects.push({ type: 'ring', x: c.x, y: c.y, r: 40, life: 22, max: 22 }); });
     g.effects.push({ type: 'text', x: o.x, y: o.y - 90, text: 'PHASE SWAP!', color: '#e0c8ff', big: true, life: 90, max: 90 });
     AG.audio.laser();
+  }
+  // Orrery · Moonshot: the little moon orbiting the planet shell pops a small burst just past the impact point
+  function moonPop(g, p) {
+    var sh = p.shot, dir = p.vx >= 0 ? 1 : -1, x = AG.clamp(p.x + dir * (sh.moonGap || 34), 0, g.terrain.w);
+    var y = g.terrain.surfaceBelow(x, Math.max(0, p.y - 50)); if (y > p.y + 60 || y >= g.terrain.h - 2) y = p.y;
+    Physics.explode(g, x, y - 2, sh.moonRadius || 16, sh.moonDamage || 60, p.owner, false, p.look);
+    spawnSparks(g, x, y - 4, '#d8dce8', 10);
   }
   // Skipper · Skip Stone: skims off the ground with a small burst on each skip, then a full blast
   function skipHop(g, p) {
@@ -7565,13 +7618,20 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   function armMine(g, p) {
     var t = g.terrain, sp = Math.sqrt(p.vx * p.vx + p.vy * p.vy) || 1;
     for (var e = 0; e < 30 && t.solid(p.x, p.y); e++) { p.x -= p.vx / sp; p.y -= p.vy / sp; }
+    var nrm = t.normal(p.x + p.vx / sp * 2, p.y + p.vy / sp * 2), off = Math.max(2, (p.size || 4.5) * 0.8); // sit ON the surface, not half inside it
+    if (nrm.x * p.vx + nrm.y * p.vy > 0) nrm = { x: -nrm.x, y: -nrm.y }; // thin slabs: the normal must face the way we came from
+    for (var e2 = 0; e2 < off && t.solid(p.x - nrm.x * off, p.y - nrm.y * off); e2++) { p.x += nrm.x; p.y += nrm.y; }
+    for (var e3 = 0; e3 < 12 && t.solid(p.x, p.y); e3++) { p.x -= p.vx / sp; p.y -= p.vy / sp; }
     p.still = true; p.vx = 0; p.vy = 0; p.fuse = p.shot.fuse || 170;
     g.effects.push({ type: 'text', x: p.x, y: p.y - 40, text: 'ARMED', color: '#ff8070', big: false, life: 50, max: 50 });
     AG.audio.bounce();
   }
   function mineStep(g, p) {
     var t = g.terrain;
-    if (!t.solid(p.x, p.y + 3)) { p.y += 2; if (p.y > t.h + 20) { p.dead = true; return; } } // ground blown away: drop
+    var off = Math.max(2, (p.size || 4.5) * 0.8);
+    var below = false; for (var by = 1; by <= off + 3 && !below; by++) below = t.solid(p.x, p.y + by); // (thin slabs too)
+    if (!below && !t.solid(p.x - off - 2, p.y) && !t.solid(p.x + off + 2, p.y) && !t.solid(p.x, p.y - off - 3)) { p.y += 2; if (p.y > t.h + 20) { p.dead = true; return; } } // ground blown away: drop
+    var hm2 = rigHit(g, p, 2); if (hm2) { detonate(g, p, hm2); return; } // a rig drove into it
     p.fuse--;
     var trig = p.shot.trigger || 70;
     var near = enemiesOf(g, p.owner).some(function (m) { var c = m.center(); return AG.dist(c.x, c.y, p.x, p.y) < trig + m.hitR() * 0.5; });
@@ -7619,22 +7679,32 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     Physics.explode(g, p.x, p.y, Math.round((sh.shardRadius || 18) * 1.6), Math.round((sh.shardDamage || 70) * k * (direct ? 1.15 : 1)), p.owner, sh.special, p.look);
     if (!g.demo) g.effects.push({ type: 'text', x: p.x, y: p.y - 56, text: 'FLAK!', color: '#ffd9a0', big: true, life: 70, max: 70 });
   }
+  // Beetle crawler: lands, sits ON the ground (never sunk into it) and crawls quickly toward where it was fired.
+  // It explodes the moment it touches a rig, on a steep wall, or when it runs out of crawl (rollLen px / ROLL_MAX_T).
+  function rollOff(p) { return Math.max(2, (p.size || 4.5) * 0.85); } // centre height above the ground line
   function startRoll(g, p) {
     var t = g.terrain;
+    toSurface(t, p, 6);
     for (var e = 0; e < 30 && t.solid(p.x, p.y); e++) p.y -= 1;
-    p.rolling = true; p.rolled = 0; p.vx = p.dir0; p.vy = 0;
+    var gy = t.surfaceBelow(p.x, p.y - 4); if (gy < p.y + 30) p.y = gy - rollOff(p);
+    p.rolling = true; p.rolled = p.rolled || 0; p.rollT = p.rollT || 0; p.vx = p.dir0; p.vy = 0;
+    var hm3 = rigHit(g, p, 4); if (hm3) { detonate(g, p, hm3); return; }
     AG.audio.bounce();
   }
+  Physics.ROLL_SPEED = 4.6; Physics.ROLL_MAX_T = 110;
   function rollStep(g, p) { // rolling mine: crawls along the ground toward where it was fired, climbing small bumps
-    var t = g.terrain, speed = p.shot.rollSpeed || 1.8;
-    var nx = p.x + p.dir0 * speed, sy = t.surfaceBelow(nx, p.y - 12);
-    if (nx < 0 || nx > t.w || sy >= t.h - 2) { p.rolling = false; p.vx = p.dir0; p.vy = 0; p.x = nx; return; } // rolled off a ledge into the void
-    if (sy < p.y - 11) { detonate(g, p, false); return; } // wall too steep
-    if (sy > p.y + 14) { p.rolling = false; p.x = nx; p.vx = p.dir0 * 1.2; p.vy = 0.5; return; } // drop: fall, then roll again on landing
-    p.x = nx; p.y = sy - 1; p.rolled += speed;
+    var t = g.terrain, speed = p.shot.rollSpeed || Physics.ROLL_SPEED, off = rollOff(p), n = Math.ceil(speed / Physics.MICRO);
+    p.rollT = (p.rollT || 0) + 1;
+    for (var k = 0; k < n; k++) {
+      var st = speed / n, nx = p.x + p.dir0 * st, gy0 = p.y + off, sy = t.surfaceBelow(nx, gy0 - 12);
+      if (nx < 0 || nx > t.w || sy >= t.h - 2) { p.rolling = false; p.vx = p.dir0 * 1.2; p.vy = 0; p.x = nx; return; } // rolled off a ledge into the void
+      if (sy < gy0 - 11) { detonate(g, p, false); return; } // wall too steep
+      if (sy > gy0 + 14) { p.rolling = false; p.x = nx; p.vx = p.dir0 * 1.2; p.vy = 0.5; return; } // drop: fall, then roll again on landing
+      p.x = nx; p.y = sy - off; p.rolled += st; p.vx = p.dir0 * speed; p.vy = 0;
+      var hm3 = rigHit(g, p, 4); if (hm3) { detonate(g, p, hm3); return; } // touching any rig: boom, right there
+    }
     p.trailPts.push(p.x, p.y); if (p.trailPts.length > 30) p.trailPts.splice(0, 2);
-    var hitM = g.mobiles.some(function (m) { if (!m.alive || m === p.owner) return false; var c = m.center(); return AG.dist(p.x, p.y, c.x, c.y) < m.hitR() + 6; });
-    if (hitM || p.rolled > (p.shot.rollLen || 240)) detonate(g, p, hitM);
+    if (p.rolled > (p.shot.rollLen || 240) || p.rollT > Physics.ROLL_MAX_T) detonate(g, p, false);
   }
   // ---------------- Spindle: burrowing shells (deterministic: fixed speed and turn rates, no randomness) ----------------
   // On terrain contact the shell dives to a shallow depth (skimDepth) and SKIMS along under the surface in its
@@ -7700,12 +7770,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       p.x += p.bdx * step; p.y += p.bdy * step; p.burrowed += step;
       p.vx = p.bdx * step * sub; p.vy = p.bdy * step * sub; // for drawing + client extrapolation
       if (p.x < 0 || p.x > t.w || p.y > t.h - 2 || p.y < 0) { p.dead = true; g.lastImpact = { x: AG.clamp(p.x, 0, t.w), y: Math.min(p.y, t.h) }; return; }
-      for (var m = 0; m < g.mobiles.length; m++) {
-        var mob = g.mobiles[m];
-        if (!mob.alive || mob === p.owner) continue;
-        var mc = mob.center();
-        if (AG.dist(p.x, p.y, mc.x, mc.y) < mob.hitR()) { p.burrowing = false; p.inGround = false; erupted(g, p, true); detonate(g, p, true); return; }
-      }
+      var hm5 = rigHit(g, p, 0); if (hm5) { p.burrowing = false; p.inGround = false; erupted(g, p, true); detonate(g, p, hm5); return; }
       if (t.solid(p.x, p.y) || inTunnel(t, p.x, p.y, tr) || (p.spiderling && !p.rising && p.burrowed < 5 * tr + 10)) { // a spiderling's first few px run through the shared entry crater its siblings carve
         // no tunnel is carved (a long linear cut traps rigs): the shell travels hidden underground, kicking up dirt
         if (!p.rising && ((p.burrowed / step) | 0) % 24 === 0) dirt(g, p.x, groundTop(t, p.x, p.y), p.dir, 2); // dirt kicked up along the skim line
@@ -7721,7 +7786,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
         return;
       }
     }
-    p.trailPts.push(p.x, p.y); if (p.trailPts.length > 60) p.trailPts.splice(0, 2);
+    p.trailPts.length = 0; // hidden underground: no trail drawn through the ground
   }
   // an empty pixel with ground close above AND below is the inside of a tunnel (another drill's, e.g. a sibling
   // spiderling), not open air: keep drilling instead of treating it as surfacing. Pure terrain test = deterministic.
@@ -7873,6 +7938,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       var m = g.mobiles[i];
       if (!m.alive) continue;
       var c = m.center(), d = AG.dist(x, y, c.x, c.y);
+      if (m === g._directMob) { d = 0; g._directMob = null; } // only the main blast of a direct hit
       var reach = radius + m.hitR();
       if (d >= reach) continue;
       var falloff = 1 - Math.max(0, d - m.hitR() * 0.5) / reach;
@@ -8013,9 +8079,21 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   }
 
   Physics.updateEffects = function (g) { updateEffects(g); };
+  // a shell travelling inside the ground (drill, burrower) is hidden: only a small rumbling dust tuft shows on the
+  // surface right above it, so it reads as "under there" instead of a glowing orb painted over the dirt
+  function drawBuried(c, g, p) {
+    var t = g.terrain, top = groundTop(t, p.x, p.y); if (top > p.y + 400) return;
+    var f = g.frame || 0, w = 7 + Math.sin(f * 0.6 + p.x) * 1.5;
+    c.save();
+    c.fillStyle = 'rgba(150,120,82,0.75)';
+    for (var k = -1; k <= 1; k++) { c.beginPath(); c.arc(p.x + k * 5, top - 2 - Math.abs(Math.sin(f * 0.5 + k * 2)) * 3, w * (k ? 0.45 : 0.6), 0, Math.PI * 2); c.fill(); }
+    c.fillStyle = 'rgba(90,70,48,0.8)'; c.fillRect(p.x - 1.5 + Math.sin(f * 0.9) * 4, top - 8 - (f % 6), 2.5, 2.5);
+    c.restore();
+  }
   Physics.drawProjectiles = function (c, g) {
     var A = AG.Art, soft = A && A.soft.white;
     g.projectiles.forEach(function (p) {
+      if (g.terrain && g.terrain.solid(p.x, p.y)) { drawBuried(c, g, p); return; } // never draw a shell over the ground it is inside
       if (AG.Collector) AG.Collector.drawTrail(c, g, p); // equipped Collector trail, behind the shot
       if (AG.ShotFX && AG.ShotFX.drawProjectile(c, p, g.frame || 0)) { AG.Weather.drawFlare(c, p, g.frame); return; } // per-shot art
       var tp = p.trailPts, n = tp.length / 2;
@@ -8252,9 +8330,9 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     gyro1: ['rang', '#f2a33a', '#ffd080', 'twin', 'petals', 'whoosh', 600],
     gyro2: ['rang', '#3ac8f2', '#a0e8ff', 'twin', 'petals', 'whoosh', 800],
     gyro3: ['gear', '#f2d23a', '#fff0a0', 'ribbon', 'star', 'whoosh', 300],
-    orrery1: ['orb', '#b080ff', '#e0c8ff', 'sparkle', 'rings', 'hum', 900],
+    orrery1: ['planet', '#e0a050', '#ffd9a0', 'sparkle', 'rings', 'hum', 700],
     orrery2: ['orb', '#302050', '#9070ff', 'twin', 'rings', 'hum', 120],
-    orrery3: ['orb', '#100820', '#c060ff', 'zigzag', 'rings', 'rumble', 60],
+    orrery3: ['orb', '#b080ff', '#e0c8ff', 'zigzag', 'rings', 'rumble', 300],
     spindle1: ['drill', '#c0a070', '#ffd28a', 'dust', 'shards', 'crunch', 380],
     spindle2: ['spider', '#3a3a44', '#ff6060', 'dots', 'shards', 'pop', 500],
     spindle3: ['drill', '#d06030', '#ffb060', 'dust', 'flames', 'rumble', 100],
@@ -8344,6 +8422,9 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       ball(c, s * 0.9, L.body, '#777'); c.fillStyle = L.glow; c.fillRect(s * 0.2, -s * 0.3, 1.5, 1.5); c.fillRect(s * 0.5, -s * 0.3, 1.5, 1.5); },
     flame: function (c, s, L, t) { for (var k = 0; k < 3; k++) { var f = 1 - k * 0.28; c.fillStyle = k === 0 ? L.body : k === 1 ? L.glow : '#fff'; c.beginPath(); c.moveTo(s * 1.4 * f, 0); c.quadraticCurveTo(0, -s * 1.1 * f, -s * (2.4 + Math.sin(t * 0.7 + k)) * f, 0); c.quadraticCurveTo(0, s * 1.1 * f, s * 1.4 * f, 0); c.fill(); } },
     feather: function (c, s, L) { c.fillStyle = L.body; c.beginPath(); c.moveTo(s * 1.8, 0); c.quadraticCurveTo(0, -s * 1.0, -s * 1.8, -s * 0.2); c.quadraticCurveTo(0, s * 1.0, s * 1.8, 0); c.fill(); c.strokeStyle = '#fff'; c.lineWidth = 1; c.beginPath(); c.moveTo(s * 1.8, 0); c.lineTo(-s * 2.2, 0); c.stroke(); },
+    planet: function (c, s, L, t) { c.strokeStyle = hexA(L.glow, 0.9); c.lineWidth = 1.4; c.beginPath(); c.ellipse(0, 0, s * 1.75, s * 0.5, -0.35, Math.PI, Math.PI * 2); c.stroke();
+      ball(c, s, L.body, '#fff6dc'); c.beginPath(); c.ellipse(0, 0, s * 1.75, s * 0.5, -0.35, 0, Math.PI); c.stroke();
+      var a = t * 0.25; c.save(); c.translate(Math.cos(a) * s * 1.9, Math.sin(a) * s * 0.8); ball(c, s * 0.36, '#d8dce8', '#ffffff'); c.restore(); },
     pearl: function (c, s, L, t) { ball(c, s * 1.1, L.body, '#ffffff'); c.strokeStyle = hexA(L.glow, 0.8); c.lineWidth = 1.2; c.beginPath(); c.arc(0, 0, s * (1.5 + 0.2 * Math.sin(t * 0.3)), 0, Math.PI * 2); c.stroke(); }
   };
   FX.SHAPES = Object.keys(SH);
@@ -8847,6 +8928,11 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       var want = S.tgt.mobile.x + (m.x < S.tgt.mobile.x ? -1 : 1) * 380;
       sc = { s: ok ? 500 - Math.abs(e.x - want) / 3 : -5000, en: 0, tg: 0, al: 0, self: 0, end: e };
     } else sc = score(g, p, S.tgt, res);
+    if (sh.kind === 'swap' && res.selfAt && Math.abs(res.selfAt.x - m.x) > 20) { // Orrery's Phase Swap Overdrive: we trade places --
+      var tt = g.terrain, sx = res.selfAt.x;                                       // never swap onto an edge or over the void
+      sc.swapped = true;
+      if (sx < 60 || sx > tt.w - 60 || tt.surfaceBelow(sx, Math.max(0, res.selfAt.y - 40)) >= tt.h - 6) sc.s -= 400;
+    }
     var b = S.best[c[0]];
     sc.c = c;
     if (!b || sc.s > b.s) S.best[c[0]] = sc;
@@ -9725,6 +9811,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     });
     AG.Weather.lights(g, add);
     g.projectiles.forEach(function (p) {
+      if (g.terrain && g.terrain.solid(p.x, p.y)) return; // buried shells give no glow through the ground
       var col = p.trail === '#ffffff' ? [1.0, 0.85, 0.6] : hexRgb(p.trail);
       add(p.x, p.y, 90, 0.55, col);
     });
@@ -11446,7 +11533,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       }),
       pr: g.projectiles.map(function (pr) {
         if (!pr._id) pr._id = ++g._pid;
-        return [pr._id, r1(pr.x), r1(pr.y), r3(pr.vx), r3(pr.vy), pr.size, pr.trail, pr.shot && pr.shot.special ? 1 : 0, pr.charged || 0, pr.burrowing ? 1 : 0, pr.kind === 'burrow' || pr.kind === 'spider' ? pr.kind : 0, pr.look || 0, pr.burrowing || pr.still || (pr.shot && pr.shot.gravityScale === 0) ? 1 : 0, AG.Collector ? AG.Collector.ownerIndex(g, pr) : -1];
+        return [pr._id, r1(pr.x), r1(pr.y), r3(pr.vx), r3(pr.vy), pr.size, pr.trail, pr.shot && pr.shot.special ? 1 : 0, pr.charged || 0, pr.burrowing ? 1 : 0, pr.kind === 'burrow' || pr.kind === 'spider' ? pr.kind : 0, pr.look || 0, pr.burrowing || pr.still || pr.rolling || (pr.shot && pr.shot.gravityScale === 0) ? 1 : 0, AG.Collector ? AG.Collector.ownerIndex(g, pr) : -1];
       })
     };
   };
@@ -11511,7 +11598,8 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   O.clientFrame = function (g) {
     g.projectiles.forEach(function (pr) {
       if (!pr.burrowing && !pr.nograv) pr.vy += AG.CONFIG.GRAVITY; pr.x += pr.vx; pr.y += pr.vy;
-      pr.trailPts.push(pr.x, pr.y); if (pr.trailPts.length > 60) pr.trailPts.splice(0, 2);
+      if (g.terrain && g.terrain.solid(pr.x, pr.y)) pr.trailPts.length = 0; // underground: no trail through the dirt
+      else { pr.trailPts.push(pr.x, pr.y); if (pr.trailPts.length > 60) pr.trailPts.splice(0, 2); }
     });
     g.mobiles.forEach(function (mb) {
       if (mb.tx == null) return;
@@ -11924,7 +12012,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   var SHOW = [
     { img: 'load_rig_bastion', rig: 'bastion', title: 'Rig Spotlight: Bastion', sub: 'Thickest armor in the hangar. Its Quake Mortar Overdrive digs craters that swallow rigs.', tags: ['match', 'lobby'] },
     { img: 'load_rig_skipper', rig: 'skipper', title: 'Rig Spotlight: Skipper', sub: 'Spring-wheeled and nimble. Hopper shells bounce twice — bank them off slopes.', tags: ['match', 'lobby'] },
-    { img: 'load_rig_lancer', rig: 'lancer', title: 'Rig Spotlight: Lancer', sub: 'Prism Ray flies dead straight — no gravity, no wind. Sunlance calls down a beam from the sky.', tags: ['match', 'lobby'] },
+    { img: 'load_rig_lancer', rig: 'lancer', title: 'Rig Spotlight: Lancer', sub: 'Prism Ray is a fast light bolt that arcs like a shell. Sunlance calls down a beam from the sky.', tags: ['match', 'lobby'] },
     { img: 'load_vista_verdant', title: 'Verdant Ridge', sub: 'Rolling hills, windmills and floating isles. Watch for drop-offs at the cliff edges.', theme: 0, tags: ['vista'] },
     { img: 'load_vista_ember', title: 'Ember Dunes', sub: 'A lava basin splits the dunes. Knock a rival in and the desert does the rest.', theme: 1, tags: ['vista'] },
     { img: 'load_vista_frost', title: 'Frostmere', sub: 'Icy spires over a frozen lake. Gusts here run strong — read the wind dial.', theme: 2, tags: ['vista'] },
@@ -12156,12 +12244,17 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
 //  • Map cards: a looping ambient layer per battlefield (steady map, drifting clouds, liquid shimmer and the
 //    map's own motes: leaves, embers, snow, toy blocks + confetti, sugar sparkles, fireflies + bats).
 //  • Rig previews: idle life on top of the in-battle sprite code (barrel sway, rider bob + blink, occasional flourish).
-//  • Budget: ~30 fps, nothing while the tab is hidden, static under prefers-reduced-motion.
+//  • Budget: ~30 fps, nothing while the tab is hidden, static only with the game's own "Reduce motion" setting (default off).
 (function (AG) {
   'use strict';
   var L = {}, maps = [], last = 0;
+  // Batch 11 root-cause fix: this used to follow the OS "prefers-reduced-motion" query. macOS "Reduce motion" (common on
+  // Macs, and also switched on by some accessibility / battery setups) therefore froze ALL idle life outside a match --
+  // rig engines, wheels, hover bob, pets, worn gear -- while the match itself (driven by game ticks) kept moving.
+  // Idle motion now follows only the game's own Settings > Graphics > "Reduce motion" toggle, which defaults to OFF.
   var mq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
-  L.reduced = function () { return !!(AG.forceReducedMotion || (mq && mq.matches)); };
+  L.osPrefersReduced = function () { return !!(mq && mq.matches); }; // (reported in Settings only)
+  L.reduced = function () { return !!(AG.forceReducedMotion || (AG.settings && AG.settings.reduceMotion === true)); };
   L.FPS = 30;
   // One shared throttle for the room: returns how many 60 Hz "ticks" passed since the last drawn frame (0 = skip).
   L.frame = function (now) {
@@ -12355,17 +12448,19 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var o = { dx: 0, dy: 0, rot: 0, sy: 1, wheel: 0, rev: 0, t: t, p: p, kick: p.kick };
     if (reduced()) return o;
     // periodic rev (own phase per pilot) or a kicked one
-    var per = p.rev * (0.85 + sd * 0.4), ph = (t % per) / per, rl = p.revLen / per, rev = ph < rl ? Math.sin(ph / rl * Math.PI) : 0;
+    var B = m.idleBoost || 1; // menus (lobby / waiting room / Wardrobe / shop) show the rig bigger-than-life: clearly visible motion
+    var per = p.rev * (0.85 + sd * 0.4) / Math.sqrt(B), ph = (t % per) / per, rl = p.revLen / per, rev = ph < rl ? Math.sin(ph / rl * Math.PI) : 0;
     if (m._revAt != null) { var ka = (ms - m._revAt) / 1000; if (ka >= 0 && ka < p.revLen) rev = Math.max(rev, Math.sin(ka / p.revLen * Math.PI)); }
     o.rev = rev;
-    var sh = p.shake * (1 + rev * 2.2);
+    var sh = p.shake * (1 + rev * 2.2) * B;
     o.dx = Math.sin(t * TAU * p.shz) * sh * 0.6; o.dy = Math.sin(t * TAU * p.shz * 1.37 + 1) * sh;
-    var b = Math.sin(t * TAU * p.bhz); o.dy += b * p.bounce * (p.sq ? 0.5 : 1); o.sy = 1 + (p.sq ? -b * p.sq : 0);
-    o.rot = Math.sin(t * TAU * p.rhz + sd * 6) * p.rock;
+    var b = Math.sin(t * TAU * p.bhz); o.dy += b * p.bounce * (p.sq ? 0.5 : 1) * B; o.sy = 1 + (p.sq ? -b * p.sq * B : 0);
+    o.rot = Math.sin(t * TAU * p.rhz + sd * 6) * p.rock * B;
     var dt = m._iwl != null ? Math.min(0.1, Math.max(0, (ms - m._iwl) / 1000)) : 0; m._iwl = ms;
     m._iwa = ((m._iwa || 0) + rev * p.wheel * 9 * dt) % (TAU * 100); // wheels / treads spin up on a rev
-    o.wheel = m._iwa + Math.sin(t * TAU * 0.4) * 0.05 * p.wheel; // ...and rock a hair on the brakes
-    var k = p.kick, r = rev;
+    o.wheel = m._iwa + Math.sin(t * TAU * 0.4) * 0.05 * p.wheel * B; // ...and rock a hair on the brakes
+    if (B > 1) o.wheel += Math.sin(t * TAU * 0.25) * 0.35 * p.wheel; // menus: wheels / treads visibly rock back and forth
+    var k = p.kick, r = rev * Math.min(B, 1.6);
     if (k === 'boing') { o.dy -= r * 3.2; o.sy -= r * 0.05 * Math.cos(r * Math.PI); }
     else if (k === 'wheelie') o.rot -= r * 0.09;
     else if (k === 'zoom') o.dy -= r * 3;
@@ -12706,6 +12801,57 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     return cv;
   }
   var roomPets = {}; S._roomPets = function () { return roomPets; }; // (tests)
+  // Measured fit for a rig preview: draws the rig + rider (neutral pose) and the pet at its rest spot ± its bob into a
+  // scratch canvas once per look, takes the alpha bounding box, pads it for idle motion, and picks the biggest scale
+  // (≤ the slot's own scale) that keeps all of it inside the canvas with the rig standing on the ground line.
+  var fitCache = {}, fitN = 0, fitCv = null; S._fitStats = function () { return { n: fitN, size: Object.keys(fitCache).length }; };
+  function measureLook(m, petId) {
+    var W = 520, H = 520, OX = 260, OY = 380;
+    if (!fitCv) { fitCv = document.createElement('canvas'); fitCv.width = W; fitCv.height = H; }
+    var c = fitCv.getContext('2d'); c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, W, H); c.save(); c.translate(OX, OY);
+    var sv = { x: m.x, y: m.y, ni: m.noIdle, ic: m.idleClock, ang: m.angle, iwl: m._iwl, iwa: m._iwa, ra: m._revAt, idy: m._idlDy }; m.x = 0; m.y = 0; m.noIdle = false;
+    // union over the real menu idle envelope (boosted bounce / rock / rev kick, barrel sweep), not just the rest pose
+    for (var i = 0; i < 18; i++) { m.idleClock = 1000 + i * 731; m.angle = [15, 45, 75][i % 3]; m._iwl = null; try { m.draw(c, false); } catch (e) {} }
+    m.idleClock = sv.ic; m.angle = sv.ang; m._iwl = sv.iwl; m._iwa = sv.iwa; m._revAt = sv.ra; m._idlDy = sv.idy;
+    if (petId && petId !== 'none') { var pt = new AG.Avatar.Pet(m); pt._fresh = true; pt.roomUpdate(0); var y0 = pt.y;
+      [-7, 0, 6].forEach(function (o) { pt.y = y0 + o; try { pt.drawBody(c); } catch (e) {} }); }
+    c.restore(); m.x = sv.x; m.y = sv.y; m.noIdle = sv.ni;
+    var d = c.getImageData(0, 0, W, H).data, x0 = W, x1 = -1, y0b = H, y1 = -1;
+    for (var y = 0; y < H; y += 2) for (var x = 0; x < W; x += 2) if (d[(y * W + x) * 4 + 3] > 24) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0b) y0b = y; if (y > y1) y1 = y; }
+    fitN++;
+    if (x1 < 0) return { l: -40, r: 40, t: -100, b: 0 };
+    return { l: x0 - OX - 2, r: x1 - OX + 2, t: y0b - OY - 2, b: Math.max(0, y1 - OY + 2) };
+  }
+  function pilotFit(pv, av, hasPet, w, h, gy) {
+    var k = JSON.stringify(av) + '|' + (!AG.Art ? 0 : AG.Art.ready ? 'R' : 'L' + (Object.keys(AG.Art.img).length >> 4));
+    if (pv.pfit && pv.pfit.k === k && pv.pfit.w === w) return pv.pfit;
+    var bb = fitCache['P' + k];
+    if (!bb) { var W = 520, H = 520, OX = 220, OY = 420, R0 = 100;
+      if (!fitCv) { fitCv = document.createElement('canvas'); fitCv.width = W; fitCv.height = H; }
+      var c = fitCv.getContext('2d'); c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, W, H);
+      try { AG.Avatar.drawStanding(c, av, OX, OY, R0, { teamColor: AG.TEAM_COLORS.A }, { breath: 0.001 }); } catch (e) {}
+      if (hasPet) { var fm = { player: { avatar: av }, facing: 1, alive: true, localToWorld: function (a, b) { return { x: a, y: b }; } }, pt = new AG.Avatar.Pet(fm);
+        [-4, 4].forEach(function (o) { pt.x = OX + R0 * 0.62; pt.y = OY - R0 * 1.05 + o; try { pt.drawBody(c); } catch (e) {} }); }
+      var d = c.getImageData(0, 0, W, H).data, x0 = W, x1 = -1, y0 = H, y1 = -1;
+      for (var yy = 0; yy < H; yy += 2) for (var xx = 0; xx < W; xx += 2) if (d[(yy * W + xx) * 4 + 3] > 24) { if (xx < x0) x0 = xx; if (xx > x1) x1 = xx; if (yy < y0) y0 = yy; if (yy > y1) y1 = yy; }
+      fitN++; bb = x1 < 0 ? { l: -0.6, r: 0.6, t: -1.75, b: 0 } : { l: (x0 - OX - 2) / R0, r: (x1 - OX + 2) / R0, t: (y0 - OY - 2) / R0, b: Math.max(0, (y1 - OY + 2) / R0) };
+      fitCache['P' + k] = bb; }
+    var PAD = Math.max(3, Math.round(h * 0.035)), hop = h * 0.035 + 2, bw = (bb.r - bb.l) + 0.08;
+    var RH = Math.min((h - 26) / 1.75, w / 1.9, (gy - PAD - hop) / (-bb.t + 0.04), (w - PAD * 2) / bw, bb.b > 0 ? (h - gy - 1) / bb.b : 999);
+    pv.pfit = { k: k, w: w, RH: RH, x: w / 2 - ((bb.l + bb.r) / 2) * RH, bb: bb, pad: PAD };
+    return pv.pfit;
+  }
+  function previewFit(pv, m, pl, w, h, gy) {
+    var petId = (pl.avatar && pl.avatar.pet) || 'none', k = pv.key + '|' + m.rig.id + '|' + m.facing + '|' + (!AG.Art ? 0 : AG.Art.ready ? 'R' : 'L' + (Object.keys(AG.Art.img).length >> 4)); // re-measure as art streams in
+    if (pv.fit && pv.fit.k === k && pv.fit.w === w) return pv.fit;
+    var bb = fitCache[k]; if (!bb) { bb = fitCache[k] = measureLook(m, petId); var ks = Object.keys(fitCache); if (ks.length > 200) delete fitCache[ks[0]]; }
+    // idle-motion headroom (menu boost: bounce / squash / rock / rev kick) in rig units
+    var MT = 14, MS = 5, PAD = Math.max(3, Math.round(h * 0.035)), bw = (bb.r - bb.l) * 1.04 + MS * 2, top = -bb.t * 1.05 + MT; // + hop (7) and the hop squash (sy 1.04)
+    var sc = Math.min(pv.scale, (gy - PAD) / top, (w - PAD * 2) / bw, bb.b > 0 ? (h - gy - 1) / bb.b : 99);
+    var tx = w / 2 - ((bb.l + bb.r) / 2) * sc;
+    pv.fit = { k: k, w: w, sc: sc, tx: tx, bb: bb, pad: PAD, mt: MT, ms: MS };
+    return pv.fit;
+  }
   function drawPreview(pv, k) {
     var pl = pv.getPl(); if (!pl) return; k = k || 0;
     var c = pv.cv.getContext('2d'), w = pv.w, h = pv.h;
@@ -12749,11 +12895,13 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     }
     var t0 = pv.t; pv.t += k;
     if (pv.random && Math.floor(pv.t / 75) !== Math.floor(t0 / 75)) { var nr = AG.RIGS[(pv.t / 75 | 0) % AG.RIGS.length]; pv.m.rig = nr; } // Random: shuffle through the roster
-    var m = pv.m; m.anim = pv.t; m.moving = false; m.grounded = true;
+    var m = pv.m; m.anim = pv.t; m.moving = false; m.grounded = true; m.alive = true; m.idleBoost = 2.2; // menus: clearly visible idle life
     var io = AG.LobbyFX ? AG.LobbyFX.idle(pv, m, k) : { dy: 0, rot: 0, sx: 1, sy: 1, petDy: 0 }; // idle life: sway, bob, blink, flourishes
     m.player.blink = m.blink;
-    var sc = Math.min(pv.scale, (h - 22) / 100, w / 78); // keep hat + pet + the raised chibi pilot in frame
-    c.save(); c.translate(w / 2 + (pv.pet.def.id !== 'none' ? 8 * sc : 0), gy); c.scale(sc, sc);
+    // batch 11: fit the MEASURED bounding box (rig + pilot + head gear + pet + idle-motion headroom) with padding, so no
+    // head, hat, wing or pet is cut off; the slot / canvas keeps its size and position, the rig still stands on gy.
+    var fit = previewFit(pv, m, pl, w, h, gy), sc = fit.sc;
+    c.save(); c.translate(fit.tx, gy); c.scale(sc, sc);
     c.translate(0, io.dy); c.rotate(io.rot); c.scale(io.sx, io.sy);
     m.x = 0; m.y = 0; m.drawShadowless = true; m.draw(c, false);
     if (io.puff) AG.LobbyFX.puff(c, m, io.puff);
@@ -12774,8 +12922,9 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     st.nh -= k; if (st.nh <= 0 && st.hop < 0) { st.hop = 0; st.nh = 300 + ((t * 3571) % 300); }
     var dy = 0; if (st.hop >= 0) { st.hop += k; var hp = Math.min(1, st.hop / 26); dy = -Math.sin(hp * Math.PI) * h * 0.035; if (hp >= 1) st.hop = -1; }
     var P = still ? { breath: 0.001 } : { breath: Math.sin(t * 0.055), tilt: Math.sin(t * 0.019) * 0.05, look: Math.sin(t * 0.011) * 1.2, shift: Math.sin(t * 0.013), sway: Math.sin(t * 0.017) * 0.6, blink: blink };
-    var RH = Math.min((h - 26) / 1.75, w / 1.9), av = pl.avatar, pet = AG.Avatar.PETS.filter(function (p) { return p.id === av.pet; })[0];
-    var hasPet = pet && pet.id !== 'none', x = w / 2 - (hasPet ? RH * 0.16 : 0);
+    var av = pl.avatar, pet = AG.Avatar.PETS.filter(function (p) { return p.id === av.pet; })[0], hasPet = pet && pet.id !== 'none';
+    // batch 11: measured fit (headpiece / hat / wings / pet included, + hop and sway headroom) — nothing is cut off
+    var pf = pilotFit(pv, av, hasPet, w, h, gy), RH = pf.RH, x = pf.x;
     c.save(); if (pl.team === 'B') { c.translate(w, 0); c.scale(-1, 1); x = w - x; }
     AG.Avatar.drawStanding(c, av, x, gy + dy, RH, { teamColor: AG.TEAM_COLORS[pl.team], name: pl.name }, P);
     if (hasPet) {
@@ -12785,6 +12934,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     c.restore();
   }
   S._previews = function () { return previews; }; // (tests)
+  S._drawPreview = drawPreview; // (tests)
   // Waiting-room life runs at ~30 fps, stops while the tab is hidden and stays still under reduced motion.
   S.tick = function (now) {
     var LF = AG.LobbyFX, k = LF ? LF.frame(now || performance.now()) : 1; if (!k) return;
@@ -14193,6 +14343,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       '<label class="txt">Quality <select id="quality"><option value="auto">Auto (' + (AG.lowFx ? 'low' : 'high') + ')</option><option value="high">High</option><option value="low">Low (phones)</option></select></label>' +
       '<label class="txt">UI size <select id="uiSize"><option value="auto">Auto (' + (Math.min(innerWidth, innerHeight) < 500 ? 'Small' : 'Medium') + ')</option><option value="s">Small (compact)</option><option value="m">Medium</option><option value="l">Large</option></select></label>' +
       '<label class="chk"><input type="checkbox" id="touchCtl"> On-screen touch controls</label>' +
+      '<label class="chk"><input type="checkbox" id="reduceMo"> Reduce motion (still rigs, pets and lobby effects)</label>' +
       '<h4>Online</h4>' +
       '<label class="txt">TURN server <input id="turnUrl" placeholder="turn:host:3478"></label>' +
       '<label class="txt">TURN user <input id="turnUser"></label>' +
@@ -14224,6 +14375,9 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var st = AG.settings;
     panel.querySelector('#volMusic').oninput = function (e) { st.music = e.target.value / 100; AG.saveSettings(); AG.audio.applySettings(); };
     panel.querySelector('#volSfx').oninput = function (e) { st.sfx = e.target.value / 100; AG.saveSettings(); AG.audio.applySettings(); AG.audio.tick(); };
+    var rmo = panel.querySelector('#reduceMo'); rmo.checked = st.reduceMotion === true;
+    rmo.onchange = function () { st.reduceMotion = rmo.checked; AG.saveSettings(); document.body.classList.toggle('reducemo', rmo.checked); };
+    document.body.classList.toggle('reducemo', st.reduceMotion === true);
     panel.querySelector('#emoMuteSet').onchange = function (e) { st.emoteMute = e.target.checked; AG.saveSettings(); };
     panel.querySelector('#volMute').onchange = function (e) { st.muted = e.target.checked; AG.saveSettings(); AG.audio.applySettings(); };
     ['turnUrl', 'turnUser', 'turnPass', 'broker'].forEach(function (k) {
@@ -14260,7 +14414,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var st = AG.settings, $ = function (id) { return document.getElementById(id); };
     if (!$('volMusic')) return;
     if ($('setName') && document.activeElement !== $('setName')) { $('setName').value = S.profile.players[0].name; $('setNameMsg').textContent = ''; }
-    $('volMusic').value = Math.round(st.music * 100); $('volSfx').value = Math.round(st.sfx * 100); $('volMute').checked = st.muted; $('emoMuteSet').checked = !!st.emoteMute;
+    $('volMusic').value = Math.round(st.music * 100); $('volSfx').value = Math.round(st.sfx * 100); $('volMute').checked = st.muted; $('emoMuteSet').checked = !!st.emoteMute; if ($('reduceMo')) $('reduceMo').checked = st.reduceMotion === true;
     $('gearBtn').textContent = st.muted ? '🔇' : '⚙';
   };
   AG.UI = AG.UI || {}; AG.UI.syncSettings = S.syncSettings;
