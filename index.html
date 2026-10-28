@@ -300,6 +300,8 @@ body.inbattle .settings { top: auto; bottom: 232px; }
 .orow.dead.pick b { color: #6dff9e; }
 .orow.dead.out span { text-decoration: line-through; }
 .orow .rtok { font-style: normal; color: #ff7a8a; font-size: 11px; text-shadow: 0 0 4px rgba(255,90,110,0.6); }
+/* privacy: another pilot's turn hides their item list and shot cards (teammates too) */
+.hud.private .hud-items, .hud.private .shots { visibility: hidden; pointer-events: none; }
 .hud-items { right: 64px; bottom: 160px; display: flex; align-items: center; gap: 6px; padding: 7px 9px; border-radius: 16px; }
 .hud-items.none { opacity: 0.55; }
 .hud-items .cap { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 10px; letter-spacing: 2px; }
@@ -773,6 +775,15 @@ body.touch.inbattle .settings { max-height: calc(100vh - 80px); max-height: calc
 .addfr { margin-left: 6px; padding: 1px 6px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); background: rgba(47,191,91,0.25); color: #fff; font-size: 11px; cursor: pointer; vertical-align: middle; }
 .addfr.done { background: transparent; opacity: .6; cursor: default; }
 body.inbattle .friendspanel, body.inbattle .frtoast { display: none; }
+/* friend came online (batch 12): small top-centre toast, shown in menus and matches, never blocks taps elsewhere */
+.frontoast { position: fixed; z-index: 75; left: 50%; top: calc(12px + env(safe-area-inset-top)); transform: translateX(-50%); display: flex; gap: 8px; align-items: center;
+  padding: 7px 12px; border-radius: 999px; background: rgba(14,20,38,.92); border: 1px solid rgba(110,230,150,.55); color: #eaf6ff; font-size: 14px; box-shadow: 0 6px 18px rgba(0,0,0,.35);
+  animation: frOnIn .35s ease-out; max-width: calc(100vw - 24px); }
+.frontoast .frondot { width: 9px; height: 9px; border-radius: 50%; background: #4fe08a; box-shadow: 0 0 8px #4fe08a; flex: none; }
+.frontoast .btn.small { padding: 3px 9px; font-size: 12px; }
+body.inbattle .frontoast { top: calc(64px + env(safe-area-inset-top)); font-size: 13px; }
+@keyframes frOnIn { from { opacity: 0; transform: translate(-50%, -8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+body.reducemo .frontoast { animation: none; }
 /* friend mini chat (js/friendchat.js): a draggable window on desktop, docked compact on phones; − → bubble w/ unread badge */
 .fracts .btn.frchat { position: relative; padding: 4px 7px; }
 .frchatbadge, .fcbadge { position: absolute; top: -6px; right: -6px; min-width: 16px; height: 16px; padding: 0 4px; box-sizing: border-box; border-radius: 8px; background: #ff4d6d; color: #fff; font: 700 10px/16px sans-serif; text-align: center; box-shadow: 0 0 0 2px rgba(16,20,44,0.95); }
@@ -1213,7 +1224,7 @@ body.reducemo .crownw::before, body.reducemo .crownw::after { animation: none; o
 .arenachip .btn.small { padding: 3px 10px; font-size: 12px; }
 @media (max-width: 640px) { .arenaseats { grid-template-columns: 1fr; } .arenachip .acl { display: none; } }
 
-/* ---------------------------------------------------------------- wardrobe ("My Stuff") */
+/* ---------------------------------------------------------------- wardrobe ("Inventory") */
 .wardhb { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-left: auto; }
 .btn.wardbig { width: 100%; margin-top: 8px; font-weight: 800; }
 .wardleft .pvtoggle { margin: 4px auto 8px; }
@@ -1269,6 +1280,22 @@ body.reducemo .crownw::before, body.reducemo .crownw::after { animation: none; o
 .slotacts > .ghost.small { padding-left: 6px; padding-right: 6px; }
 @container (max-width: 232px) { .slotacts .lbl { display: none; } .slotacts > .readybtn { padding-left: 4px; padding-right: 4px; } }
 .wardbg + .wcsub { text-align: center; margin-top: 4px; }
+
+/* respawn (batch 12 #7): the one "Change spot (1 left)" bubble while a dead pilot waits to drop in */
+.rspbubble { position: fixed; z-index: 40; left: 50%; transform: translateX(-50%); top: calc(118px + env(safe-area-inset-top)); display: flex; flex-direction: column; align-items: center; gap: 1px;
+  padding: 8px 16px; min-height: 44px; border-radius: 22px; border: 2px solid #6dff9e; background: rgba(10,26,22,.9); color: #eafff2; font: inherit; font-size: 15px; cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0,0,0,.35); touch-action: manipulation; }
+.rspbubble small { font-size: 11px; opacity: .8; }
+.rspbubble[data-mode="keep"] { border-color: #ffd36b; }
+.rspbubble[hidden], body:not(.inbattle) .rspbubble { display: none; }
+/* batch 12 #9: shop try-on */
+.shop .item .pwrap.trytap { cursor: pointer; }
+.shop .item.trying { outline: 3px solid #7fe3ff; outline-offset: -3px; box-shadow: 0 0 14px rgba(127,227,255,.45); }
+.shop .item.trying::after { content: '👀 Trying'; position: absolute; top: 6px; left: 50%; transform: translateX(-50%); z-index: 2; font-weight: 800; font-size: 11px; line-height: 1; white-space: nowrap; background: #1d6f8c; color: #fff; padding: 3px 7px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.4); pointer-events: none; }
+.trybar { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 2px auto 8px; padding: 6px 10px; max-width: 320px; border-radius: 10px; background: rgba(29,111,140,.35); font-weight: 700; font-size: 13px; }
+.trybar[hidden] { display: none; }
+.trybar .trylbl { flex: 1 1 auto; text-align: center; }
+.trybar button { min-height: 36px; }
 
 </style>
 </head>
@@ -1639,7 +1666,7 @@ window.AG = window.AG || {};
 
   // ---------------- Settings (persisted) ----------------
   var SETTINGS_KEY = 'gearbound.settings.v1';
-  AG.settings = { music: 0.55, sfx: 0.8, muted: false, reduceMotion: false };
+  AG.settings = { music: 0.55, sfx: 0.8, muted: false, reduceMotion: false, friendToasts: true, friendNotify: false };
   try { var saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null'); if (saved) for (var k in saved) AG.settings[k] = saved[k]; } catch (e) {}
   AG.saveSettings = function () { try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(AG.settings)); } catch (e) {} if (AG.Cloud) AG.Cloud.changed(); };
 
@@ -3378,7 +3405,8 @@ AG.ADMIN_PUBLIC_KEYS = Object.freeze([
     return [h * 60, mx ? d / mx : 0, mx / 255]; }
   function dressed(av) {
     var base = riderCanvas(av), Cos = AG.Cos, k = Cos && Cos.costume ? Cos.costume(av) : null, helm = !!(Cos && Cos.tucksHair && Cos.tucksHair(av));
-    var key = base._key + '|' + (k ? av.body : '') + '|' + (helm ? av.head : '');
+    var mkid = Cos && Cos.maskOf ? Cos.maskOf(av) : null; // batch 12: Halloween masks are painted into the face (js/masks.js)
+    var key = base._key + '|' + (k ? av.body : '') + '|' + (helm ? av.head : '') + '|' + (mkid || '');
     if (dressCache[key]) return dressCache[key];
     var W = base.width, H = base.height, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
     var c = cv.getContext('2d'); c.drawImage(base, 0, 0);
@@ -3426,7 +3454,8 @@ AG.ADMIN_PUBLIC_KEYS = Object.freeze([
           c.save(); c.globalCompositeOperation = 'soft-light'; c.globalAlpha = 0.8; c.drawImage(sh2, 0, 0); c.restore(); }
       }
     } catch (er) { /* tainted canvas: keep the plain rider */ }
-    sampleColours(cv, c, face);
+    sampleColours(cv, c, face); // (skin / sleeve sampled before the mask, so lids, hands and arms keep the pilot's own colours)
+    if (mkid && base._m) { try { Cos.paintMask(c, W, H, mkid, base._m, E, rm); } catch (er2) { /* tainted: no mask */ } }
     var sil = document.createElement('canvas'); sil.width = W; sil.height = H; var sc = sil.getContext('2d');
     sc.drawImage(cv, 0, 0); sc.globalCompositeOperation = 'source-in'; sc.fillStyle = '#1e130c'; sc.fillRect(0, 0, W, H); cv._sil = sil; cv._key = key;
     return (dressCache[key] = cv);
@@ -4854,6 +4883,292 @@ AG.ADMIN_PUBLIC_KEYS = Object.freeze([
 
 </script>
 <script>
+/* js/masks.js */
+// masks.js — batch 12 #10: Halloween masks (a new "mask" slot, candy-only during the Candy Hunt, owned forever).
+// Original, family-friendly designs. A mask is PAINTED INTO the pilot's face (avatar.js dressed()), not pasted on top:
+//   1) the face area is measured from the rider's skin mask (holes for eyes / brows / mouth filled, ears left out),
+//   2) the design is drawn in a face frame (origin between the eyes, 1 unit = eye spacing) and clipped to that area,
+//      so it follows the cheeks / chin / jaw contour and slips UNDER the fringe, side hair and any hood or helm,
+//   3) the painted face shading is carried over the design, eye holes are cut (the pilot's own eyes and blinks show),
+//   4) a thin 1-1.5 px outline in a dark tone of the local colour runs round every edge (STYLE-REFS.md).
+// Because it lives in the sprite, it follows the head's tilt / look / breathing and both facings automatically.
+(function (AG) {
+  'use strict';
+  var Cos = AG.Cos; if (!Cos) return;
+  var TAU = Math.PI * 2;
+  var MASKS = [{ id: 'none', name: 'No Mask' }], D = {};
+  // kind: full (whole face, eye holes) · half (eye mask, eye holes) · lower (nose / mouth / jaw, no holes)
+  function def(id, name, candy, kind, draw, extra, eh) { MASKS.push({ id: id, name: name, candy: candy, ev: 'hw', kind: kind, isNew: true }); D[id] = { kind: kind, draw: draw, extra: extra || null, eh: eh || 1 }; }
+  function grad(c, y0, y1, a, b, m) { var g = c.createLinearGradient(0, y0, 0, y1); g.addColorStop(0, a); if (m) g.addColorStop(0.5, m); g.addColorStop(1, b); return g; }
+  function rgrad(c, x, y, r, a, b) { var g = c.createRadialGradient(x, y - r * 0.3, r * 0.1, x, y, r); g.addColorStop(0, a); g.addColorStop(1, b); return g; }
+  function ell(c, x, y, rx, ry, rot) { c.beginPath(); c.ellipse(x, y, rx, ry, rot || 0, 0, TAU); }
+  function all(c, fill) { c.fillStyle = fill; c.fillRect(-3, -2.5, 6, 5); }
+  function line(c, w, col, pts) { c.beginPath(); c.moveTo(pts[0], pts[1]); for (var i = 2; i < pts.length; i += 2) c.lineTo(pts[i], pts[i + 1]); c.lineWidth = w; c.strokeStyle = col; c.lineCap = 'round'; c.lineJoin = 'round'; c.stroke(); }
+  // eye-mask (domino) silhouette: a band round both eyes with soft cheek dips; s = how far it reaches out / up
+  function domino(c, up, down, out, tip) { up = up || 0.55; down = down || 0.42; out = out || 1.5; tip = tip || 0;
+    c.beginPath(); c.moveTo(-out, -0.1 - tip); c.bezierCurveTo(-out + 0.1, -up - 0.15, -0.3, -up, 0, -up * 0.72);
+    c.bezierCurveTo(0.3, -up, out - 0.1, -up - 0.15, out, -0.1 - tip);
+    c.bezierCurveTo(out - 0.05, down, 0.3, down + 0.06, 0.08, 0.26); c.quadraticCurveTo(0, 0.2, -0.08, 0.26);
+    c.bezierCurveTo(-0.3, down + 0.06, -out + 0.05, down, -out, -0.1 - tip); c.closePath(); }
+  function shine(c, x, y, rx, ry, a) { c.save(); c.globalAlpha = a || 0.45; c.fillStyle = '#ffffff'; ell(c, x, y, rx, ry, -0.4); c.fill(); c.restore(); }
+  function stitches(c, pts, col, w) { line(c, w, col, pts); for (var i = 0; i + 3 < pts.length; i += 2) { var mx = (pts[i] + pts[i + 2]) / 2, my = (pts[i + 1] + pts[i + 3]) / 2, dx = pts[i + 2] - pts[i], dy = pts[i + 3] - pts[i + 1], L = Math.hypot(dx, dy) || 1;
+      line(c, w * 0.8, col, [mx - dy / L * 0.09, my + dx / L * 0.09, mx + dy / L * 0.09, my - dx / L * 0.09]); } }
+  function ringEyes(c, col, w, k) { [-0.5, 0.5].forEach(function (x) { ell(c, x, 0, 0.42 * (k || 1), 0.4 * (k || 1)); c.lineWidth = w; c.strokeStyle = col; c.stroke(); }); }
+
+  // ------------------------------------------------------------------ full-face masks
+  def('jackmask', 'Jack-o\u2019-Lantern Mask', 30, 'full', function (c) {
+    all(c, grad(c, -1, 0.9, '#ffb04a', '#e0600e'));
+    c.strokeStyle = 'rgba(160,62,8,0.55)'; c.lineWidth = 0.06; [-1.05, -0.4, 0.4, 1.05].forEach(function (x) { c.beginPath(); c.moveTo(x * 0.7, -1.2); c.quadraticCurveTo(x * 1.12, 0, x * 0.75, 1.1); c.stroke(); });
+    c.fillStyle = '#ffd84a'; [-0.5, 0.5].forEach(function (x) { c.beginPath(); c.moveTo(x - 0.47, 0.3); c.lineTo(x, -0.52); c.lineTo(x + 0.47, 0.3); c.closePath(); c.fill(); });
+    c.fillStyle = '#5a2208'; c.beginPath(); c.moveTo(0.02, 0.28); c.lineTo(-0.1, 0.44); c.lineTo(0.14, 0.44); c.closePath(); c.fill();
+    c.beginPath(); c.moveTo(-0.82, 0.5); c.quadraticCurveTo(0.05, 1.05, 0.9, 0.5); c.lineTo(0.62, 0.6); c.lineTo(0.5, 0.52); c.lineTo(0.3, 0.66); c.lineTo(0.1, 0.56); c.lineTo(-0.1, 0.66); c.lineTo(-0.3, 0.56); c.lineTo(-0.5, 0.64); c.lineTo(-0.62, 0.55); c.closePath();
+    c.fillStyle = '#ffd84a'; c.fill(); c.lineWidth = 0.05; c.strokeStyle = '#7a3206'; c.stroke();
+    shine(c, -0.85, -0.45, 0.22, 0.1);
+  });
+  def('ghostmask', 'Friendly Ghost Mask', 22, 'full', function (c) {
+    all(c, grad(c, -1, 0.9, '#ffffff', '#d8def0'));
+    c.fillStyle = '#6a5a8a'; ell(c, 0.06, 0.6, 0.15, 0.2); c.fill(); c.fillStyle = '#3a2f55'; ell(c, 0.06, 0.63, 0.09, 0.13); c.fill();
+    c.fillStyle = 'rgba(255,150,190,0.55)'; ell(c, -0.95, 0.38, 0.22, 0.12); c.fill(); ell(c, 1.0, 0.38, 0.2, 0.11); c.fill();
+    ringEyes(c, 'rgba(110,100,150,0.55)', 0.07);
+    shine(c, -0.8, -0.5, 0.25, 0.1, 0.7);
+  });
+  def('candyskull', 'Candy Skull Mask', 32, 'full', function (c) {
+    all(c, grad(c, -1, 0.9, '#fffdf6', '#e9e2d4'));
+    var P = [['#ff7ab8', '#ffd1e6'], ['#4fd6c9', '#c9fff6']];
+    [-0.5, 0.5].forEach(function (x, i) { for (var k = 0; k < 8; k++) { var a = k / 8 * TAU; c.fillStyle = P[i][k % 2]; ell(c, x + Math.cos(a) * 0.43, Math.sin(a) * 0.41, 0.14, 0.14); c.fill(); } });
+    c.fillStyle = '#4a3550'; c.beginPath(); c.moveTo(0.05, 0.3); c.quadraticCurveTo(-0.12, 0.42, 0.05, 0.48); c.quadraticCurveTo(0.22, 0.42, 0.05, 0.3); c.fill();
+    line(c, 0.045, '#4a3550', [-0.55, 0.66, 0.65, 0.66]); for (var t = -0.45; t <= 0.56; t += 0.17) line(c, 0.04, '#4a3550', [t, 0.58, t, 0.74]);
+    c.fillStyle = '#ffcf3a'; [[0, -0.62], [-0.95, 0.42], [1.0, 0.42]].forEach(function (p) { for (var k = 0; k < 5; k++) { var a = k / 5 * TAU; ell(c, p[0] + Math.cos(a) * 0.09, p[1] + Math.sin(a) * 0.09, 0.07, 0.07); c.fill(); } });
+    c.fillStyle = '#ff7ab8'; [[0, -0.62], [-0.95, 0.42], [1.0, 0.42]].forEach(function (p) { ell(c, p[0], p[1], 0.06, 0.06); c.fill(); });
+    c.fillStyle = '#7fb6ff'; [-0.25, 0, 0.25].forEach(function (x) { ell(c, x + 0.05, 0.92, 0.05, 0.05); c.fill(); });
+  });
+  def('frankmask', 'Frankie Mask', 26, 'full', function (c) {
+    all(c, grad(c, -1, 0.9, '#9ee67a', '#55a346'));
+    c.fillStyle = '#2f3a2c'; c.fillRect(-3, -2.5, 6, 1.75);
+    for (var x = -1.5; x < 1.6; x += 0.25) { c.beginPath(); c.moveTo(x, -0.76); c.lineTo(x + 0.125, -0.64); c.lineTo(x + 0.25, -0.76); c.fill(); }
+    stitches(c, [-1.0, -0.42, -0.6, -0.5, -0.25, -0.44], '#2f3a2c', 0.045);
+    stitches(c, [0.7, 0.32, 1.1, 0.56], '#2f3a2c', 0.04);
+    line(c, 0.06, '#2f3a2c', [-0.4, 0.66, 0.45, 0.62]);
+    c.fillStyle = 'rgba(40,90,40,0.35)'; ell(c, -0.5, 0.1, 0.45, 0.25); c.fill(); ell(c, 0.5, 0.1, 0.45, 0.25); c.fill();
+  }, function (c, f) { // neck bolts at both sides of the jaw
+    [f.L, f.R].forEach(function (x) { c.fillStyle = grad(c, 0.48, 0.72, '#d9e0e8', '#8a95a3'); c.fillRect(x - 0.14, 0.5, 0.28, 0.2); c.lineWidth = f.lw; c.strokeStyle = '#4a525e'; c.strokeRect(x - 0.14, 0.5, 0.28, 0.2);
+      c.fillStyle = '#b9c2cc'; c.fillRect(x - 0.06, 0.44, 0.12, 0.32); c.strokeRect(x - 0.06, 0.44, 0.12, 0.32); });
+  });
+  def('mummymask', 'Mummy Wrap Mask', 22, 'full', function (c) {
+    all(c, '#efe6cf');
+    var cols = ['#fbf6e8', '#efe4c8', '#f6eedb', '#e6d9b8'];
+    for (var i = -8; i < 10; i++) { var y = i * 0.2; c.save(); c.translate(0, y); c.rotate(i % 2 ? -0.18 : 0.14); c.fillStyle = cols[(i + 8) % 4]; c.fillRect(-2.5, -0.01, 5, 0.22);
+      c.strokeStyle = 'rgba(130,105,70,0.6)'; c.lineWidth = 0.035; c.beginPath(); c.moveTo(-2.5, 0.205); c.lineTo(2.5, 0.205); c.stroke(); c.restore(); }
+    ringEyes(c, 'rgba(90,70,45,0.5)', 0.1, 0.98);
+  });
+  def('foxmask', 'Fox Spirit Mask', 34, 'full', function (c) {
+    all(c, '#fbfbf7');
+    c.fillStyle = grad(c, -1, 0.2, '#ff9a3a', '#f0741c'); c.beginPath(); c.moveTo(-1.8, -1.6); c.lineTo(1.8, -1.6); c.lineTo(1.8, 0.2); c.quadraticCurveTo(1.0, 0.55, 0.3, 0.2); c.quadraticCurveTo(0.05, 0.05, -0.2, 0.2); c.quadraticCurveTo(-1.0, 0.55, -1.8, 0.2); c.closePath(); c.fill();
+    c.fillStyle = '#d8324a'; [-1, 1].forEach(function (s) { c.beginPath(); c.moveTo(s * 0.18 + 0.02, -0.78); c.quadraticCurveTo(s * 0.5, -0.62, s * 0.6, -0.42); c.quadraticCurveTo(s * 0.4, -0.52, s * 0.12 + 0.02, -0.64); c.fill(); });
+    c.beginPath(); c.moveTo(0.02, -0.98); c.quadraticCurveTo(-0.08, -0.84, 0.02, -0.7); c.quadraticCurveTo(0.12, -0.84, 0.02, -0.98); c.fill();
+    c.fillStyle = '#2b1a14'; ell(c, 0.08, 0.38, 0.1, 0.07); c.fill();
+    line(c, 0.04, '#2b1a14', [0.08, 0.44, 0.08, 0.54]); c.beginPath(); c.moveTo(-0.15, 0.56); c.quadraticCurveTo(-0.03, 0.66, 0.08, 0.54); c.quadraticCurveTo(0.19, 0.66, 0.31, 0.56); c.lineWidth = 0.04; c.stroke();
+    c.fillStyle = '#d8324a'; [[-0.75, 0.48], [-0.9, 0.58], [0.9, 0.48], [1.05, 0.58]].forEach(function (p) { ell(c, p[0], p[1], 0.04, 0.04); c.fill(); });
+  });
+  def('robomask', 'Tin Robot Mask', 30, 'full', function (c) {
+    all(c, grad(c, -1, 0.9, '#e6ebf2', '#8d98a8', '#bcc6d3'));
+    c.strokeStyle = 'rgba(60,70,85,0.6)'; c.lineWidth = 0.035; c.beginPath(); c.moveTo(-2, -0.55); c.lineTo(2, -0.55); c.moveTo(-2, 0.36); c.lineTo(2, 0.36); c.moveTo(0.02, -1.5); c.lineTo(0.02, -0.55); c.stroke();
+    c.fillStyle = '#5c6676'; [[-0.9, -0.75], [0.95, -0.75], [-1.05, 0.5], [1.1, 0.5], [-0.3, -0.75], [0.35, -0.75]].forEach(function (p) { ell(c, p[0], p[1], 0.05, 0.05); c.fill(); });
+    c.fillStyle = '#39404f'; c.beginPath(); c.roundRect ? c.roundRect(-0.42, 0.48, 0.9, 0.3, 0.08) : c.rect(-0.42, 0.48, 0.9, 0.3); c.fill();
+    c.strokeStyle = '#9fe7ff'; c.lineWidth = 0.04; for (var y = 0.55; y < 0.76; y += 0.08) { c.beginPath(); c.moveTo(-0.34, y); c.lineTo(0.4, y); c.stroke(); }
+    c.fillStyle = '#3ff6ff'; ell(c, -0.95, 0.15, 0.08, 0.08); c.fill(); ell(c, 1.0, 0.15, 0.08, 0.08); c.fill();
+    ringEyes(c, '#5c6676', 0.08, 1.02); shine(c, -0.7, -0.95, 0.3, 0.08, 0.6);
+  }, function (c, f) { // little ear dials
+    [f.L, f.R].forEach(function (x, i) { c.fillStyle = rgrad(c, x, 0.1, 0.16, '#f2f5f9', '#7c8798'); ell(c, x, 0.1, 0.12, 0.16); c.fill(); c.lineWidth = f.lw; c.strokeStyle = '#4a525e'; c.stroke();
+      c.fillStyle = i ? '#ff6a5a' : '#3ff6ff'; ell(c, x, 0.1, 0.04, 0.05); c.fill(); });
+  });
+  def('fuzzymask', 'Fuzzy Monster Mask', 28, 'full', function (c) {
+    all(c, grad(c, -1, 0.9, '#b48cff', '#7a4ad6'));
+    c.strokeStyle = 'rgba(70,30,140,0.45)'; c.lineWidth = 0.04;
+    for (var i = 0; i < 90; i++) { var x = ((i * 97) % 300) / 100 - 1.5, y = ((i * 53) % 190) / 100 - 1.0, a = ((i * 37) % 10) / 10 - 0.5; c.beginPath(); c.moveTo(x, y); c.lineTo(x + a * 0.16, y + 0.12); c.stroke(); }
+    c.fillStyle = '#3a1a5a'; c.beginPath(); c.moveTo(-0.55, 0.46); c.quadraticCurveTo(0.05, 1.02, 0.65, 0.46); c.quadraticCurveTo(0.05, 0.62, -0.55, 0.46); c.fill();
+    c.fillStyle = '#ffffff'; [[-0.3, 0.52], [0.38, 0.52]].forEach(function (p) { c.beginPath(); c.moveTo(p[0] - 0.08, p[1] + 0.03); c.lineTo(p[0], p[1] + 0.18); c.lineTo(p[0] + 0.08, p[1] + 0.03); c.closePath(); c.fill(); });
+    c.fillStyle = '#ff8ad8'; ell(c, 0.06, 0.4, 0.12, 0.08); c.fill();
+    ringEyes(c, 'rgba(60,20,120,0.4)', 0.08, 1.0);
+  }, function (c, f) { // two little horns poking out by the temples
+    [f.L + 0.2, f.R - 0.2].forEach(function (x, i) { var s = i ? 1 : -1; c.beginPath(); c.moveTo(x - 0.12, -0.62); c.quadraticCurveTo(x + s * 0.08, -1.0, x + s * 0.2, -1.05); c.quadraticCurveTo(x + s * 0.1, -0.78, x + 0.12, -0.6); c.closePath();
+      c.fillStyle = grad(c, -1.05, -0.6, '#fff4c8', '#e0b84a'); c.fill(); c.lineWidth = f.lw; c.strokeStyle = '#8a6a1a'; c.stroke(); });
+  });
+  def('alienmask', 'Little Alien Mask', 26, 'full', function (c) {
+    all(c, grad(c, -1, 0.9, '#c8ffb0', '#6fd65a'));
+    c.fillStyle = '#1f3d22'; [-0.5, 0.5].forEach(function (x, i) { c.save(); c.translate(x, 0); c.rotate(i ? -0.35 : 0.35); ell(c, 0, 0, 0.52, 0.42); c.restore(); c.fill(); });
+    c.fillStyle = 'rgba(40,120,40,0.35)'; [[-1.0, -0.5, 0.09], [-0.8, -0.72, 0.06], [1.05, -0.55, 0.08], [0.95, 0.45, 0.07]].forEach(function (p) { ell(c, p[0], p[1], p[2], p[2]); c.fill(); });
+    c.beginPath(); c.moveTo(-0.2, 0.62); c.quadraticCurveTo(0.08, 0.76, 0.36, 0.62); c.lineWidth = 0.05; c.strokeStyle = '#1f3d22'; c.stroke();
+    shine(c, -0.75, -0.6, 0.25, 0.1, 0.6);
+  });
+  def('scaremask', 'Scarecrow Sack Mask', 24, 'full', function (c) {
+    all(c, grad(c, -1, 0.9, '#e8c98a', '#b8904e'));
+    c.strokeStyle = 'rgba(120,85,40,0.35)'; c.lineWidth = 0.025; for (var k = -2; k <= 2; k += 0.12) { c.beginPath(); c.moveTo(k, -1.6); c.lineTo(k, 1.2); c.stroke(); c.beginPath(); c.moveTo(-2, k * 0.6); c.lineTo(2, k * 0.6); c.stroke(); }
+    c.fillStyle = '#6a8ac8'; c.fillRect(0.72, 0.18, 0.36, 0.32); c.strokeStyle = '#c84a3a'; c.lineWidth = 0.035; c.beginPath(); c.moveTo(0.72, 0.3); c.lineTo(1.08, 0.3); c.moveTo(0.9, 0.18); c.lineTo(0.9, 0.5); c.stroke();
+    stitches(c, [0.72, 0.18, 1.08, 0.18, 1.08, 0.5], '#4a3218', 0.03);
+    c.fillStyle = '#4a3218'; c.beginPath(); c.moveTo(0.06, 0.28); c.lineTo(-0.08, 0.46); c.lineTo(0.2, 0.46); c.closePath(); c.fill();
+    c.beginPath(); c.moveTo(-0.6, 0.6); c.quadraticCurveTo(0.08, 0.9, 0.7, 0.6); c.lineWidth = 0.045; c.strokeStyle = '#4a3218'; c.stroke();
+    for (var s = -0.48; s <= 0.62; s += 0.18) line(c, 0.035, '#4a3218', [s, 0.62 + (Math.abs(s - 0.05) < 0.3 ? 0.1 : 0.04), s + 0.03, 0.82]);
+    ringEyes(c, 'rgba(70,45,15,0.6)', 0.06, 1.0);
+  });
+  // ------------------------------------------------------------------ half masks (round the eyes)
+  def('kittymask', 'Black Cat Mask', 20, 'half', function (c) {
+    domino(c, 0.6, 0.45, 1.6, 0.25); c.fillStyle = grad(c, -0.7, 0.5, '#4a4458', '#1c1826'); c.fill();
+    c.save(); c.clip(); shine(c, -0.75, -0.42, 0.3, 0.07, 0.35); c.restore();
+    c.fillStyle = '#ff8ab0'; c.beginPath(); c.moveTo(-0.04, 0.3); c.lineTo(0.2, 0.3); c.lineTo(0.08, 0.44); c.closePath(); c.fill();
+    c.strokeStyle = 'rgba(40,30,50,0.85)'; c.lineWidth = 0.035; [[-1, 0.42], [-1, 0.52], [1, 0.42], [1, 0.52]].forEach(function (w) { c.beginPath(); c.moveTo(0.08 + w[0] * 0.3, w[1]); c.lineTo(0.08 + w[0] * 1.0, w[1] + (w[1] - 0.47) * 1.2); c.stroke(); });
+  }, function (c, f) { // pointy ears tucked into the hair at the top corners
+    [-1, 1].forEach(function (s) { var x = s * 1.05; c.beginPath(); c.moveTo(x - 0.3, -0.62); c.lineTo(x + s * 0.18, -1.08); c.lineTo(x + 0.3, -0.62); c.closePath(); c.fillStyle = '#2a2436'; c.fill(); c.lineWidth = f.lw; c.strokeStyle = '#0e0b14'; c.stroke();
+      c.beginPath(); c.moveTo(x - 0.15, -0.66); c.lineTo(x + s * 0.12, -0.92); c.lineTo(x + 0.15, -0.66); c.closePath(); c.fillStyle = '#ff9ac0'; c.fill(); });
+  });
+  def('owlmask', 'Owl Feather Mask', 24, 'half', function (c) {
+    domino(c, 0.65, 0.55, 1.55, 0.1); c.fillStyle = grad(c, -0.7, 0.55, '#c8935a', '#7a4f2a'); c.fill();
+    c.save(); domino(c, 0.65, 0.55, 1.55, 0.1); c.clip(); c.strokeStyle = 'rgba(70,40,15,0.55)'; c.lineWidth = 0.035;
+    for (var r = 0; r < 4; r++) for (var k = -6; k <= 6; k++) { var x = k * 0.26 + (r % 2) * 0.13, y = -0.55 + r * 0.26; c.beginPath(); c.arc(x, y, 0.13, 0.15 * Math.PI, 0.85 * Math.PI); c.stroke(); }
+    c.fillStyle = '#f4e2c0'; [-0.5, 0.5].forEach(function (x) { ell(c, x, 0, 0.5, 0.48); c.fill(); }); c.restore();
+    c.fillStyle = grad(c, 0.1, 0.6, '#ffd24a', '#e08a1a'); c.beginPath(); c.moveTo(-0.08, 0.12); c.quadraticCurveTo(0.08, 0.06, 0.24, 0.12); c.quadraticCurveTo(0.14, 0.4, 0.08, 0.56); c.quadraticCurveTo(0.0, 0.4, -0.08, 0.12); c.fill(); c.lineWidth = 0.035; c.strokeStyle = '#8a4a0a'; c.stroke();
+  }, function (c, f) { // feather tufts
+    [-1, 1].forEach(function (s) { for (var k = 0; k < 3; k++) { var x = s * (0.75 + k * 0.18), y = -0.55 - k * 0.05; c.beginPath(); c.moveTo(x - s * 0.1, y + 0.05); c.quadraticCurveTo(x + s * 0.05, y - 0.45, x + s * 0.24, y - 0.5); c.quadraticCurveTo(x + s * 0.1, y - 0.15, x + s * 0.12, y + 0.05); c.closePath();
+      c.fillStyle = k % 2 ? '#a06a38' : '#7a4f2a'; c.fill(); c.lineWidth = f.lw; c.strokeStyle = '#4a2c12'; c.stroke(); } });
+  });
+  def('batmask', 'Bat Masquerade', 22, 'half', function (c) {
+    c.beginPath(); c.moveTo(-1.7, -0.6); c.quadraticCurveTo(-1.0, -0.62, -0.55, -0.48); c.quadraticCurveTo(-0.2, -0.62, 0.02, -0.4); c.quadraticCurveTo(0.24, -0.62, 0.6, -0.48); c.quadraticCurveTo(1.05, -0.62, 1.75, -0.6);
+    c.quadraticCurveTo(1.45, -0.2, 1.5, 0.15); c.quadraticCurveTo(1.25, 0.05, 1.12, 0.3); c.quadraticCurveTo(0.95, 0.18, 0.78, 0.4); c.quadraticCurveTo(0.45, 0.32, 0.1, 0.24);
+    c.quadraticCurveTo(-0.3, 0.32, -0.72, 0.4); c.quadraticCurveTo(-0.9, 0.18, -1.08, 0.3); c.quadraticCurveTo(-1.2, 0.05, -1.45, 0.15); c.quadraticCurveTo(-1.4, -0.2, -1.7, -0.6); c.closePath();
+    c.fillStyle = grad(c, -0.6, 0.4, '#8a5ad8', '#3a1a6a'); c.fill();
+    c.save(); c.clip(); c.strokeStyle = 'rgba(200,170,255,0.5)'; c.lineWidth = 0.035; [-1, 1].forEach(function (s) { [0.95, 1.2].forEach(function (x) { c.beginPath(); c.moveTo(s * 0.55, -0.35); c.quadraticCurveTo(s * x, -0.2, s * (x + 0.15), 0.2); c.stroke(); }); }); c.restore();
+    c.fillStyle = '#ffd36b'; ell(c, 0.02, -0.38, 0.07, 0.07); c.fill();
+  });
+  def('masquerade', 'Golden Masquerade', 34, 'half', function (c) {
+    domino(c, 0.58, 0.42, 1.55, 0.35); c.fillStyle = grad(c, -0.6, 0.45, '#fff0a0', '#d49a22', '#f4c84a'); c.fill();
+    c.save(); domino(c, 0.58, 0.42, 1.55, 0.35); c.clip(); c.strokeStyle = '#a8701a'; c.lineWidth = 0.035;
+    [-1, 1].forEach(function (s) { c.beginPath(); c.moveTo(s * 0.95, -0.38); c.bezierCurveTo(s * 1.35, -0.25, s * 1.3, 0.12, s * 1.05, 0.1); c.bezierCurveTo(s * 0.92, 0.08, s * 0.95, -0.08, s * 1.08, -0.06); c.stroke(); });
+    c.fillStyle = 'rgba(255,255,255,0.8)'; [[-1.2, -0.3], [1.25, -0.28], [-0.95, 0.25], [0.98, 0.26]].forEach(function (p) { ell(c, p[0], p[1], 0.035, 0.035); c.fill(); }); c.restore();
+    c.fillStyle = rgrad(c, 0.02, -0.42, 0.11, '#b9fff4', '#1f9a8a'); ell(c, 0.02, -0.42, 0.09, 0.11); c.fill(); c.lineWidth = 0.03; c.strokeStyle = '#8a5a10'; c.stroke();
+  }, function (c, f) { // a curled feather plume rising from the far side
+    var x = f.R - 0.15; c.save(); c.translate(x, -0.3); c.rotate(0.35); c.beginPath(); c.moveTo(0, 0); c.bezierCurveTo(0.25, -0.3, 0.3, -0.75, 0.05, -1.05); c.bezierCurveTo(-0.15, -0.7, -0.18, -0.3, 0, 0); c.closePath();
+    c.fillStyle = grad(c, -1.05, 0, '#ff9ad8', '#8a3ab8'); c.fill(); c.lineWidth = f.lw; c.strokeStyle = '#5a1a7a'; c.stroke();
+    line(c, f.lw, '#5a1a7a', [0.02, -0.05, 0.08, -0.85]); c.restore();
+  });
+  def('webmask', 'Spider Web Mask', 20, 'half', function (c) {
+    domino(c, 0.6, 0.45, 1.5, 0.15); c.fillStyle = grad(c, -0.6, 0.45, '#4a4a5a', '#1f1f2a'); c.fill();
+    c.save(); domino(c, 0.6, 0.45, 1.5, 0.15); c.clip(); c.strokeStyle = 'rgba(235,235,250,0.85)'; c.lineWidth = 0.03;
+    [-0.5, 0.5].forEach(function (x) { for (var k = 0; k < 8; k++) { var a = k / 8 * TAU; c.beginPath(); c.moveTo(x + Math.cos(a) * 0.4, Math.sin(a) * 0.38); c.lineTo(x + Math.cos(a) * 1.1, Math.sin(a) * 1.0); c.stroke(); }
+      [0.55, 0.75, 0.95].forEach(function (r) { c.beginPath(); for (var k = 0; k <= 8; k++) { var a = k / 8 * TAU, b = (k - 0.5) / 8 * TAU; if (!k) c.moveTo(x + Math.cos(a) * r, Math.sin(a) * r * 0.92); else c.quadraticCurveTo(x + Math.cos(b) * r * 0.88, Math.sin(b) * r * 0.82, x + Math.cos(a) * r, Math.sin(a) * r * 0.92); } c.stroke(); }); });
+    c.restore();
+  }, function (c, f) { // a tiny friendly spider hanging off the edge
+    var x = f.L + 0.35; line(c, f.lw, '#d8d8e8', [x, 0.2, x, 0.62]); c.fillStyle = '#2a2a36'; ell(c, x, 0.7, 0.09, 0.08); c.fill(); c.lineWidth = f.lw; c.strokeStyle = '#0e0e14'; c.stroke();
+    for (var k = -1; k <= 1; k += 2) for (var j = 0; j < 3; j++) line(c, f.lw, '#2a2a36', [x, 0.68 + j * 0.03, x + k * 0.16, 0.62 + j * 0.07]);
+    c.fillStyle = '#fff'; ell(c, x - 0.03, 0.68, 0.02, 0.02); c.fill(); ell(c, x + 0.03, 0.68, 0.02, 0.02); c.fill();
+  });
+  def('cornmask', 'Candy Corn Mask', 18, 'half', function (c) {
+    domino(c, 0.6, 0.45, 1.5, 0.1); c.save(); c.clip();
+    c.fillStyle = '#fff6e0'; c.fillRect(-2, -1, 4, 0.5); c.fillStyle = '#ff9a2e'; c.fillRect(-2, -0.5, 4, 0.42); c.fillStyle = '#ffd84a'; c.fillRect(-2, -0.08, 4, 1);
+    c.fillStyle = 'rgba(255,255,255,0.35)'; c.fillRect(-2, -0.5, 4, 0.06); c.restore();
+    shine(c, -0.85, -0.38, 0.22, 0.06, 0.5);
+  });
+  def('heromask', 'Hero Domino Mask', 16, 'half', function (c) {
+    domino(c, 0.52, 0.4, 1.45, 0.3); c.fillStyle = grad(c, -0.55, 0.4, '#3fe0d0', '#127a8a'); c.fill();
+    c.save(); c.clip(); shine(c, -0.7, -0.36, 0.32, 0.07, 0.4); c.restore();
+    c.fillStyle = '#ffe36b'; c.beginPath(); for (var i = 0; i < 10; i++) { var a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 0.06 : 0.14; c.lineTo(0.02 + Math.cos(a) * r, -0.34 + Math.sin(a) * r); } c.closePath(); c.fill(); c.lineWidth = 0.025; c.strokeStyle = '#a07a10'; c.stroke();
+  });
+  // ------------------------------------------------------------------ lower masks (nose / mouth / jaw)
+  def('jawmask', 'Skeleton Jaw', 20, 'lower', function (c) {
+    c.beginPath(); c.moveTo(-1.6, 0.26); c.quadraticCurveTo(-0.6, 0.18, 0.05, 0.24); c.quadraticCurveTo(0.7, 0.18, 1.7, 0.26); c.lineTo(1.7, 1.4); c.lineTo(-1.6, 1.4); c.closePath();
+    c.fillStyle = grad(c, 0.2, 0.95, '#ffffff', '#d9d2c3'); c.fill();
+    c.fillStyle = '#3b2f4a'; c.beginPath(); c.moveTo(0.05, 0.3); c.lineTo(-0.07, 0.46); c.lineTo(0.17, 0.46); c.closePath(); c.fill();
+    c.fillStyle = '#f7f3ea'; c.strokeStyle = '#6a5a4a'; c.lineWidth = 0.03;
+    for (var k = -3; k <= 3; k++) { var x = 0.05 + k * 0.16; c.beginPath(); c.roundRect ? c.roundRect(x - 0.07, 0.54, 0.14, 0.13, 0.03) : c.rect(x - 0.07, 0.54, 0.14, 0.13); c.fill(); c.stroke();
+      c.beginPath(); c.roundRect ? c.roundRect(x - 0.07, 0.68, 0.14, 0.11, 0.03) : c.rect(x - 0.07, 0.68, 0.14, 0.11); c.fill(); c.stroke(); }
+    c.strokeStyle = 'rgba(110,95,75,0.5)'; c.lineWidth = 0.035; [-1, 1].forEach(function (s) { c.beginPath(); c.moveTo(0.05 + s * 0.65, 0.4); c.quadraticCurveTo(0.05 + s * 0.85, 0.6, 0.05 + s * 0.62, 0.84); c.stroke(); });
+  });
+  def('fangmask', 'Fang Grin Mask', 18, 'lower', function (c) {
+    c.beginPath(); c.moveTo(-1.6, 0.3); c.quadraticCurveTo(0.05, 0.18, 1.7, 0.3); c.lineTo(1.7, 1.4); c.lineTo(-1.6, 1.4); c.closePath(); c.fillStyle = grad(c, 0.25, 0.95, '#6a3a9a', '#3a1a5a'); c.fill();
+    c.fillStyle = 'rgba(255,255,255,0.18)'; c.fillRect(-2, 0.3, 4, 0.05);
+    c.beginPath(); c.moveTo(-0.55, 0.5); c.quadraticCurveTo(0.05, 0.95, 0.65, 0.5); c.quadraticCurveTo(0.05, 0.64, -0.55, 0.5); c.fillStyle = '#ffffff'; c.fill();
+    c.fillStyle = '#ffffff'; [[-0.3, 0.56], [0.4, 0.56]].forEach(function (p) { c.beginPath(); c.moveTo(p[0] - 0.08, p[1]); c.lineTo(p[0], p[1] + 0.2); c.lineTo(p[0] + 0.08, p[1]); c.closePath(); c.fill(); c.lineWidth = 0.025; c.strokeStyle = '#7a6a8a'; c.stroke(); });
+    line(c, 0.03, '#2a0f40', [-0.55, 0.5, -0.25, 0.6, 0.05, 0.63, 0.35, 0.6, 0.65, 0.5]);
+  });
+  def('witchnose', 'Witchy Nose', 16, 'lower', function (c) {
+    c.fillStyle = 'rgba(120,200,90,0.9)'; ell(c, 0.08, 0.34, 0.9, 0.42); c.fill();
+    c.fillStyle = 'rgba(255,140,170,0.45)'; ell(c, -0.7, 0.42, 0.18, 0.1); c.fill(); ell(c, 0.85, 0.42, 0.16, 0.09); c.fill();
+  }, function (c, f) { // the long crooked nose points the way the pilot faces (and flips with them)
+    c.beginPath(); c.moveTo(-0.08, 0.06); c.quadraticCurveTo(0.12, 0.08, 0.28, 0.2); c.quadraticCurveTo(0.55, 0.32, 0.78, 0.5); c.quadraticCurveTo(0.6, 0.52, 0.3, 0.5); c.quadraticCurveTo(0.05, 0.48, -0.06, 0.4); c.quadraticCurveTo(-0.14, 0.24, -0.08, 0.06); c.closePath();
+    c.fillStyle = grad(c, 0.05, 0.52, '#9be07a', '#4f9a3e'); c.fill(); c.lineWidth = f.lw; c.strokeStyle = '#2f5a24'; c.stroke();
+    c.fillStyle = '#6aa84a'; ell(c, 0.42, 0.3, 0.05, 0.05); c.fill(); c.stroke(); shine(c, 0.1, 0.2, 0.08, 0.04, 0.5);
+  });
+  def('pumpsnout', 'Pumpkin Snout', 14, 'lower', function (c) {
+    c.beginPath(); c.moveTo(-1.6, 0.28); c.quadraticCurveTo(0.05, 0.14, 1.7, 0.28); c.lineTo(1.7, 1.4); c.lineTo(-1.6, 1.4); c.closePath(); c.fillStyle = grad(c, 0.25, 0.95, '#ffb04a', '#e0600e'); c.fill();
+    c.strokeStyle = 'rgba(160,62,8,0.5)'; c.lineWidth = 0.05; [-0.7, 0, 0.75].forEach(function (x) { c.beginPath(); c.moveTo(x, 0.26); c.quadraticCurveTo(x * 1.2, 0.6, x * 0.9, 1.0); c.stroke(); });
+    c.fillStyle = '#ffd84a'; c.beginPath(); c.moveTo(-0.6, 0.55); c.lineTo(-0.35, 0.68); c.lineTo(-0.15, 0.56); c.lineTo(0.05, 0.7); c.lineTo(0.25, 0.56); c.lineTo(0.45, 0.68); c.lineTo(0.7, 0.55); c.quadraticCurveTo(0.05, 0.95, -0.6, 0.55); c.fill(); c.lineWidth = 0.04; c.strokeStyle = '#7a3206'; c.stroke();
+    c.fillStyle = '#5a2208'; ell(c, -0.02, 0.4, 0.05, 0.04); c.fill(); ell(c, 0.16, 0.4, 0.05, 0.04); c.fill();
+  });
+  Cos.MASKS = MASKS; Cos.LISTS.mask = MASKS; if (Cos.SLOTS.indexOf('mask') < 0) Cos.SLOTS.push('mask'); Cos._draw.mask = D;
+  Cos.maskOf = function (av) { return av && av.mask && av.mask !== 'none' && D[av.mask] ? av.mask : null; };
+
+  // ------------------------------------------------------------------ painting one into a rider sprite
+  // c/W/H: the dressed sprite (already tinted); m: the rider skin/hair mask data (r = skin, g = hair); E: [eyeY, leftX, rightX, halfW]
+  function lum(p, i) { return (0.3 * p[i] + 0.59 * p[i + 1] + 0.11 * p[i + 2]) / 255; }
+  Cos.paintMask = function (c, W, H, id, m, E, rm) {
+    var d = D[id]; if (!d || !m) return false;
+    var ex1 = E[1] * W, ex2 = E[2] * W, ey = E[0] * H, s = ex2 - ex1, cx = (ex1 + ex2) / 2, er = E[3] * W;
+    var y0 = Math.max(0, Math.floor(ey - s * 1.6)), y1 = Math.min(H, Math.ceil(E[4] ? E[4] * H : (E[0] + 0.14) * H)); // E[4]: optional bottom limit (icons)
+    // 1) face area: skin, plus the holes inside it (eyes, brows, mouth), inside the face oval (no ears)
+    var reg = new Uint8Array(W * H), seen = new Uint8Array(W * H), q = [], x, y, i;
+    var ocx = cx + s * 0.04, ocy = ey + s * 0.1, orx = s * 1.62, ory = s * 1.45;
+    function inOval(x, y) { var a = (x - ocx) / orx, b = (y - ocy) / ory; return a * a + b * b <= 1; }
+    for (y = y0; y < y1; y++) for (x = 0; x < W; x++) { i = y * W + x; if (m[i * 4] > 100 && inOval(x, y)) reg[i] = 1; }
+    // flood the non-face from the box edges; what stays unreached inside the box is a hole -> part of the face
+    var bx0 = Math.max(0, Math.floor(ocx - orx)), bx1 = Math.min(W - 1, Math.ceil(ocx + orx));
+    function push(x, y) { if (x < bx0 || x > bx1 || y < y0 || y >= y1) return; var k = y * W + x; if (seen[k] || reg[k]) return; seen[k] = 1; q.push(k); }
+    for (x = bx0; x <= bx1; x++) { push(x, y0); push(x, y1 - 1); } for (y = y0; y < y1; y++) { push(bx0, y); push(bx1, y); }
+    while (q.length) { var k = q.pop(), kx = k % W, ky = (k - kx) / W; push(kx + 1, ky); push(kx - 1, ky); push(kx, ky + 1); push(kx, ky - 1); }
+    var L = W, R = 0, T = H, B = 0;
+    for (y = y0; y < y1; y++) for (x = bx0; x <= bx1; x++) { i = y * W + x; if (!seen[i] && inOval(x, y) && m[i * 4 + 1] < 140) reg[i] = 1; if (reg[i]) { if (x < L) L = x; if (x > R) R = x; if (y < T) T = y; if (y > B) B = y; } }
+    if (R <= L) return false;
+    // 2) the design, drawn in the face frame, clipped to the face area
+    var ly = document.createElement('canvas'); ly.width = W; ly.height = H; var lc = ly.getContext('2d');
+    var f = { L: (L - cx) / s, R: (R - cx) / s, T: (T - ey) / s, B: (B - ey) / s, lw: 1.3 / s };
+    lc.save(); lc.translate(cx, ey); lc.scale(s, s); d.draw(lc, f); lc.restore();
+    var md = lc.getImageData(0, 0, W, H), mp = md.data, base = c.getImageData(0, 0, W, H), bp = base.data;
+    // skin luminance reference (median-ish: mean of the face skin) for carrying the painted shading over
+    var sum = 0, n = 0; for (i = 0; i < W * H; i++) if (reg[i] && m[i * 4] > 160) { sum += lum(bp, i * 4); n++; } var Lm = n ? sum / n : 0.75;
+    // eye holes: the pilot's own painted eyes show through (and their blinks)
+    var hrx = er * 1.12 * d.eh, hry = er * 1.06 * d.eh;
+    for (i = 0; i < W * H; i++) { var p4 = i * 4; if (!mp[p4 + 3]) continue;
+      x = i % W; y = (i - x) / W;
+      if (!reg[i]) { mp[p4 + 3] = 0; continue; }
+      if (d.kind !== 'lower') { var a1 = (x - ex1) / hrx, b1 = (y - ey) / hry, a2 = (x - ex2) / (hrx * 0.94), b2 = (y - ey) / hry; if (a1 * a1 + b1 * b1 < 1 || a2 * a2 + b2 * b2 < 1) { mp[p4 + 3] = 0; continue; } }
+      var sk = m[p4] / 255, fl = sk > 0.4 && Lm > 0.05 && bp[p4 + 3] > 0 ? Math.max(0.8, Math.min(1.08, lum(bp, p4) / Lm)) : 1; // painted cheek / jaw shading
+      mp[p4] *= fl; mp[p4 + 1] *= fl; mp[p4 + 2] *= fl; }
+    // 3) thin outline in a dark tone of the local colour, on the mask's own edge (1 px solid + a soft half px)
+    var A = new Uint8Array(W * H); for (i = 0; i < W * H; i++) A[i] = mp[i * 4 + 3] > 110 ? 1 : 0;
+    function edge(i, x, y) { return (x > 0 && !A[i - 1]) || (x < W - 1 && !A[i + 1]) || (y > 0 && !A[i - W]) || (y < H - 1 && !A[i + W]); }
+    var E1 = new Uint8Array(W * H);
+    for (i = 0; i < W * H; i++) { if (!A[i]) continue; x = i % W; y = (i - x) / W; if (edge(i, x, y)) E1[i] = 1; }
+    for (i = 0; i < W * H; i++) { var o = i * 4; if (E1[i]) { mp[o] *= 0.42; mp[o + 1] *= 0.4; mp[o + 2] *= 0.45; mp[o + 3] = 255; }
+      else if (A[i]) { x = i % W; y = (i - x) / W; if ((x > 0 && E1[i - 1]) || (x < W - 1 && E1[i + 1]) || (y > 0 && E1[i - W]) || (y < H - 1 && E1[i + W])) { mp[o] *= 0.78; mp[o + 1] *= 0.77; mp[o + 2] *= 0.8; } } }
+    lc.putImageData(md, 0, 0); c.drawImage(ly, 0, 0);
+    // 4) worn-on extras (bolts, ears, plumes, a nose…): drawn over, with the same thin dark outline
+    if (d.extra) { c.save(); c.translate(cx, ey); c.scale(s, s); d.extra(c, f); c.restore(); }
+    return { L: L, R: R, T: T, B: B, s: s };
+  };
+
+  // shop / inventory icon: the mask on a plain little face shape (no pilot)
+  Cos.maskIcon = function (id, size) {
+    size = size || 64; var cv = document.createElement('canvas'); cv.width = cv.height = size; var c = cv.getContext('2d'), d = D[id]; if (!d) return cv;
+    var W = size, H = size, s = size / 3.9, m = new Uint8ClampedArray(W * H * 4), cx = W / 2, ey = H * 0.42;
+    for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) { var a = (x - cx) / (s * 1.5), b = (y - ey - s * 0.08) / (s * (y < ey ? 1.1 : 0.98)); if (a * a + b * b <= 1) m[(y * W + x) * 4] = 255; }
+    var E = [ey / H, (cx - s / 2) / W, (cx + s / 2) / W, s * 0.34 / W, 1];
+    Cos.paintMask(c, W, H, id, m, E, null); return cv;
+  };
+  // the icon hook used by the shop / inventory cards
+  var icon0 = Cos.icon; Cos.icon = function (slot, id, size, av) { if (slot === 'mask') return Cos.maskIcon(id, size); return icon0.apply(this, arguments); };
+  // (masks are NOT added to Cos.eventItems('hw'): they have their own 🎭 Masks shop tab, next to 🎃 Halloween)
+})(window.AG);
+
+</script>
+<script>
 /* js/perks.js */
 // perks.js — item tiers and their effects.
 //  • GOLD items (bought with gold earned in battle) grant SMALL combat bonuses,
@@ -5515,11 +5830,12 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var r = R.of(xp);
     return r.icon ? '<img class="rankic ' + (cls || '') + '" src="' + r.icon + '" alt="" title="Rank ' + r.n + ' · ' + r.name + '">' : '';
   };
-  // Rewards for one pilot. Bot matches (any bot/AI pilot at the start) pay only 1 XP + 1 gold for a win and
+  // Rewards for one pilot. Bot matches (any bot/AI pilot at the start) pay only 50 XP + 1 gold for a win (batch 12) and
   // nothing otherwise: no damage/kill/survival parts, no gear or pet gold bonuses.
-  R.BOT_NOTE = 'Bot matches give only 1 XP and 1 gold for a win';
+  R.BOT_XP = 50;
+  R.BOT_NOTE = 'Bot matches give 50 XP and 1 gold for a win';
   R.reward = function (p, win, botMatch) {
-    if (botMatch) { var w = win != null && p.team === win ? 1 : 0; return { gold: w, xp: { total: w, parts: [['Bot match', w]], bot: true } }; }
+    if (botMatch) { var w = win != null && p.team === win ? 1 : 0, bx = w * R.BOT_XP; return { gold: w, xp: { total: bx, parts: [['Bot match', bx]], bot: true } }; }
     return { gold: Math.round(p.stats.damage / 3) + (p.team === win ? 300 : 80) + p.stats.kills * 100, xp: R.matchXP(p, win) };
   };
   // canvas images for nameplates
@@ -7075,7 +7391,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     }
     var fa = this._fireAt != null ? now - this._fireAt : 1e9, ha = this._hitAt != null ? now - this._hitAt : 1e9;
     if (fa >= 0 && fa < 800) { var ff = fa / 800; P.arm = reduced ? null : { k: 'pump', f: ff }; P.tilt -= 0.09 * Math.sin(ff * Math.PI); P.look = 0; }
-    if (ha >= 0 && ha < 650) { var hf = 1 - ha / 650; P.flinch = hf; P.blink = hf > 0.45 ? 1 : P.blink; if (!reduced) { P.tilt += Math.sin(ha * 0.06) * 0.12 * hf; P.lean = -0.12 * hf; } P.arm = null; }
+    if (ha >= 0 && ha < 650) { var hf = 1 - ha / 650; P.flinch = hf; P.blink = hf > 0.45 ? 1 : P.blink; if (!reduced) { P.tilt += Math.sin(ha * 0.012) * 0.06 * hf; P.lean = -0.1 * hf; } P.arm = null; } // gentle flinch (was a 9 Hz shake)
     return P;
   };
 
@@ -7102,10 +7418,12 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       this.kx *= 0.86; if (Math.abs(this.kx) < 0.25) this.kx = 0;
     }
     if (this.footSolid(terrain, this.x, this.y)) {
-      this.grounded = true; this.vy = 0;
+      this.grounded = true; this.vy = 0; this.softDrop = false;
     } else {
       this.grounded = false;
-      this.vy = Math.min(this.vy + AG.CONFIG.GRAVITY, 9);
+      // respawn drop-in (batch 12 #7d): a gentle float down, half the top speed and about half the pull
+      if (this.softDrop) this.vy = Math.min(this.vy + AG.CONFIG.GRAVITY * 0.48, 4.5);
+      else this.vy = Math.min(this.vy + AG.CONFIG.GRAVITY, 9);
       var steps = Math.ceil(this.vy);
       for (var s = 0; s < steps; s++) {
         this.y += this.vy / steps;
@@ -7178,6 +7496,18 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     return Math.round(AG.deg(Math.atan2(-d.y, Math.abs(d.x))));
   };
 
+  // Aim range arc + angle tick for the pilot whose turn it is (only ever drawn on the owner's screen, see Battle.render).
+  // Drawn after the rig and rider, full opacity, with a dark under-stroke so it reads over any hull, hat or sky.
+  function drawAim(c, m, rig, b) {
+    c.save(); c.globalAlpha = 1; c.lineCap = 'round';
+    var R0 = b.len + 14, a = -AG.rad(m.angle), a0 = -AG.rad(rig.angleMax), a1 = -AG.rad(rig.angleMin);
+    c.strokeStyle = 'rgba(10,14,30,0.45)'; c.lineWidth = 4; c.beginPath(); c.arc(b.x, b.y, R0, a0, a1); c.stroke();
+    c.strokeStyle = 'rgba(255,255,255,0.6)'; c.lineWidth = 2; c.beginPath(); c.arc(b.x, b.y, R0, a0, a1); c.stroke();
+    var i0 = b.len + 4, i1 = b.len + 24;
+    c.strokeStyle = 'rgba(40,24,0,0.7)'; c.lineWidth = 4.5; c.beginPath(); c.moveTo(b.x + Math.cos(a) * i0, b.y + Math.sin(a) * i0); c.lineTo(b.x + Math.cos(a) * i1, b.y + Math.sin(a) * i1); c.stroke();
+    c.strokeStyle = 'rgba(255,230,120,1)'; c.lineWidth = 2.5; c.beginPath(); c.moveTo(b.x + Math.cos(a) * i0, b.y + Math.sin(a) * i0); c.lineTo(b.x + Math.cos(a) * i1, b.y + Math.sin(a) * i1); c.stroke();
+    c.restore();
+  }
   Mobile.prototype.draw = function (c, isActive) {
     if (!this.alive) return;
     var rig = this.rig, b = rig.barrel;
@@ -7204,15 +7534,6 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     this.idleWheel = idl ? idl.wheel : 0; this.idleRev = idl ? idl.rev : 0; this._idlDy = idl ? idl.dy * S : 0;
     if (idl) { c.translate(idl.dx, idl.dy); c.rotate(idl.rot); c.scale(1, idl.sy); }
     if (this.hurt > 0 && (this.hurt >> 2) % 2) c.globalAlpha = 0.5;
-    // Aim range arc (active only)
-    if (isActive) {
-      c.strokeStyle = 'rgba(255,255,255,0.35)'; c.lineWidth = 2;
-      c.beginPath(); c.arc(b.x, b.y, b.len + 14, -AG.rad(rig.angleMax), -AG.rad(rig.angleMin)); c.stroke();
-      c.strokeStyle = 'rgba(255,230,120,0.9)'; c.lineWidth = 2;
-      var a = -AG.rad(this.angle);
-      c.beginPath(); c.moveTo(b.x + Math.cos(a) * (b.len + 4), b.y + Math.sin(a) * (b.len + 4));
-      c.lineTo(b.x + Math.cos(a) * (b.len + 20), b.y + Math.sin(a) * (b.len + 20)); c.stroke();
-    }
     var ss = spriteSize(rig);
     if (ss) drawSpriteRig(c, rig, this, ss);
     else {
@@ -7220,11 +7541,12 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       drawBarrel(c, rig, this);
       // Rider: avatar sits on the rig's mount point, bobbing with movement, leaning on recoil.
       var bob = this.moving ? Math.sin(this.walkPhase * 2) * 1.5 : Math.sin(this.anim * 0.05) * 0.4;
-      if (rig.id === 'lancer') bob += Math.sin(this.anim * 0.08) * 1.5;
+      if (rig.id === 'lancer') bob += Math.sin(this.anim * 0.05) * 1.0;
       var pz = this.pilotPose();
       AG.Avatar.drawRider(c, this.player.avatar, rig.mount.x, rig.mount.y + bob + (this.idleBob || 0) - 2, -this.recoil * 0.35 + (this.idleLean || 0) + (pz.lean || 0), this.player, pz);
     }
     if (idl) AG.RigIdle.drawFx(c, this, idl, ss || { w: 40, h: 30 }, rig.sprite && rig.sprite.ax != null ? rig.sprite.ax : 0.5);
+    if (isActive) drawAim(c, this, rig, b); // drawn ON TOP of hull + rider (it used to sit underneath and tall art / hats hid it)
     var chill = this.chilled();
     if (chill) drawChill(c, this, ss || { w: 40, h: 30 }, rig.sprite && rig.sprite.ax != null ? rig.sprite.ax : 0.5);
     c.restore();
@@ -7770,7 +8092,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       p.x += p.bdx * step; p.y += p.bdy * step; p.burrowed += step;
       p.vx = p.bdx * step * sub; p.vy = p.bdy * step * sub; // for drawing + client extrapolation
       if (p.x < 0 || p.x > t.w || p.y > t.h - 2 || p.y < 0) { p.dead = true; g.lastImpact = { x: AG.clamp(p.x, 0, t.w), y: Math.min(p.y, t.h) }; return; }
-      var hm5 = rigHit(g, p, 0); if (hm5) { p.burrowing = false; p.inGround = false; erupted(g, p, true); detonate(g, p, hm5); return; }
+      var hm5 = rigHit(g, p, 0); if (hm5) { var inG = t.solid(p.x, p.y); p.burrowing = false; p.inGround = false; erupted(g, p, !inG); p.erupted = true; detonate(g, p, hm5); return; } // rose into a rig while still in the ground: open the mouth crater (a buried burst carves nothing) and count it as the eruption
       if (t.solid(p.x, p.y) || inTunnel(t, p.x, p.y, tr) || (p.spiderling && !p.rising && p.burrowed < 5 * tr + 10)) { // a spiderling's first few px run through the shared entry crater its siblings carve
         // no tunnel is carved (a long linear cut traps rigs): the shell travels hidden underground, kicking up dirt
         if (!p.rising && ((p.burrowed / step) | 0) % 24 === 0) dirt(g, p.x, groundTop(t, p.x, p.y), p.dir, 2); // dirt kicked up along the skim line
@@ -8604,15 +8926,20 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     PICK_SECONDS: 20,         // then a safe spot is auto-picked so the match never stalls
     BOT_PICK_SECONDS: 1.5,
     DELAY_PAD: 60,            // respawn delay = highest living delay + this
-    DROP_H: 260               // px the rig drops in from
+    DROP_H: 260,              // px the rig drops in from
+    CHANGES: 1,               // batch 12: the spot is picked right at death; it can be changed once ("Change spot (1 left)")
+    MAP_DELAY: 66             // frames after death before the zoomed-out map opens (see your rig go down first)
   };
+  // Batch 12 #7: a dead pilot chooses the drop spot right away on a zoomed-out full-map view (tap/click, no dragging),
+  // while the RESPAWN_TURNS countdown runs; the rig drops in there (gently) when it is up. One change allowed.
+  // p.rspSpot = [x, y] | null and p.rspCh (changes used) are host-authoritative and synced (hidden from other teams).
 
   function teamAlive(g, p) { return g.players.some(function (q) { return q !== p && q.team === p.team && q.mobile && q.mobile.alive; }); }
   function teamSize(g, p) { return g.players.filter(function (q) { return q.team === p.team; }).length; }
   R.enabled = function (g, p) { return !g.demo && teamSize(g, p) >= 2; };
   R.init = function (g) {
     g.rspReq = {};
-    g.players.forEach(function (p) { p.respawnsLeft = R.RESPAWNS_PER_MATCH; p.deadTurn = -1; p.respawnAt = -1; p.out = false; p.protect = false; p.pickT = 0; p.pickLeft = 0; });
+    g.players.forEach(function (p) { p.respawnsLeft = R.RESPAWNS_PER_MATCH; p.deadTurn = -1; p.respawnAt = -1; p.out = false; p.protect = false; p.pickT = 0; p.pickLeft = 0; p.rspSpot = null; p.rspCh = 0; });
   };
   // 'alive' | 'wait' (counting down) | 'pick' (choosing a spot) | 'out'
   R.state = function (g, p) {
@@ -8666,14 +8993,25 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
 
   // Host/local: a pilot asks to respawn at (x, y).
   R.request = function (g, p, x, y) {
-    if (R.state(g, p) !== 'pick') return { ok: false, why: 'Not ready to respawn' };
+    var st = R.state(g, p);
+    if (st !== 'pick' && st !== 'wait') return { ok: false, why: 'Not ready to respawn' };
+    if (st === 'wait' && !(p.respawnAt >= 0)) return { ok: false, why: 'Not ready to respawn' };
+    if (p.rspSpot && (p.rspCh || 0) >= R.CHANGES) return { ok: false, why: 'No spot changes left' };
     var c = R.check(g, p, x, y); if (!c.ok) return c;
+    if (p.rspSpot) p.rspCh = (p.rspCh || 0) + 1;
+    p.rspSpot = [c.x, c.y];
     g.rspReq[p.id] = { x: c.x, y: c.y };
     return c;
   };
+  R.changesLeft = function (p) { return Math.max(0, R.CHANGES - (p.rspCh || 0)); };
+  // the chosen spot got blocked while waiting (an enemy walked up, the ground was blasted): nearest valid spot
+  R.nearSpot = function (g, p, x, y) {
+    for (var dx = 30; dx <= 600; dx += 30) for (var sg = -1; sg <= 1; sg += 2) { var c = R.check(g, p, x + sg * dx, 0); if (c.ok) return c; }
+    return R.autoSpot(g, p);
+  };
   R.remoteReq = function (g, owner, v) {
     if (!Array.isArray(v) || typeof v[0] !== 'number' || typeof v[1] !== 'number') return;
-    var p = g.players.filter(function (q) { return q.owner === owner && !q.bot && R.state(g, q) === 'pick'; })[0];
+    var p = g.players.filter(function (q) { var s = R.state(g, q); return q.owner === owner && !q.bot && (s === 'pick' || s === 'wait'); })[0];
     if (p) R.request(g, p, v[0], v[1]); // invalid → ignored; the client already showed why, the timeout still applies
   };
 
@@ -8688,7 +9026,8 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     p.ssCharge = 0; if (p.shotIndex === 2) p.shotIndex = 0;
     var mx = 0; g.players.forEach(function (q) { if (q !== p && q.mobile.alive) mx = Math.max(mx, q.delay); });
     p.delay = Math.round(mx + R.DELAY_PAD);
-    p.respawnsLeft--; p.deadTurn = -1; p.respawnAt = -1; p.pickT = 0; p.pickLeft = 0; p.slowTurns = 0; p.slowNow = false; // a fresh rig comes back un-chilled
+    m.softDrop = true; // gentle float down (mobiles.js)
+    p.respawnsLeft--; p.deadTurn = -1; p.respawnAt = -1; p.pickT = 0; p.pickLeft = 0; p.rspSpot = null; p.rspCh = 0; p.slowTurns = 0; p.slowNow = false; // a fresh rig comes back un-chilled
     p.protect = true; // until their own next turn starts (cleared in startTurn)
     p.stats.respawns = (p.stats.respawns || 0) + 1;
     delete g.rspReq[p.id];
@@ -8710,7 +9049,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       if (p.deadTurn < 0 && !p.out) { // just died
         p.protect = false;
         if (m.retreated || p.retreated || p.respawnsLeft <= 0 || !R.enabled(g, p) || !teamAlive(g, p)) { p.out = true; }
-        else { p.deadTurn = g.turns.turn; p.respawnAt = g.turns.turn + R.RESPAWN_TURNS; }
+        else { p.deadTurn = g.turns.turn; p.respawnAt = g.turns.turn + R.RESPAWN_TURNS; p.rspSpot = null; p.rspCh = 0; }
         return;
       }
       if (p.out) return;
@@ -8723,19 +9062,58 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       p.pickLeft = Math.max(0, Math.ceil(lim - p.pickT));
       if (!canPlaceNow(g)) return;
       var rq = g.rspReq[p.id];
-      if (rq) { var c = R.check(g, p, rq.x, rq.y); if (c.ok) return R.spawn(g, p, c); delete g.rspReq[p.id]; }
+      if (rq) {
+        var c = R.check(g, p, rq.x, rq.y); if (c.ok) return R.spawn(g, p, c);
+        var nc = R.nearSpot(g, p, rq.x, rq.y); // picked long ago and blocked since: drop at the nearest safe spot
+        if (nc) { R.spawn(g, p, nc); if (!auto) g.flash(p.name + ': your spot was blocked — dropped in nearby'); return; }
+        delete g.rspReq[p.id];
+      }
       if (p.pickT >= lim) { var a = R.autoSpot(g, p); if (a) { R.spawn(g, p, a); if (!auto) g.flash(p.name + ': time up — auto-picked a safe spot (' + p.mobile.hp + ' HP)'); } }
     });
   };
 
   // ---------------------------------------------------------------- local picker (UI)
-  R.localPicker = function (g) {
+  // my dead pilot that has (or is about to have) a drop spot: 'wait' after the death is processed, or 'pick'
+  R.myDead = function (g) {
     if (!g || g.demo || g.phase === 'over' || !g.players) return null;
     for (var i = 0; i < g.players.length; i++) {
-      var p = g.players[i];
-      if (!p.bot && g.isMine(p) && R.state(g, p) === 'pick' && teamAlive(g, p) && !(g.rspSent && g.rspSent.pid === p.id)) return p;
+      var p = g.players[i], st;
+      if (p.bot || !g.isMine(p) || !teamAlive(g, p)) continue;
+      st = R.state(g, p);
+      if (st === 'pick' || (st === 'wait' && p.respawnAt >= 0)) return p;
     }
     return null;
+  };
+  function earlyOk(g, p) { // never steal the taps of another local (hot-seat) human who is aiming right now
+    var cur = g.turns && g.turns.current;
+    return !(cur && cur !== p && !cur.bot && g.isMine(cur) && cur.mobile && cur.mobile.alive);
+  }
+  function seenDeath(g, p) { // local frames since I noticed this death (the map opens after MAP_DELAY)
+    var k = g.rspSeen || (g.rspSeen = {});
+    if (!k[p.id] || k[p.id].turn !== p.deadTurn) k[p.id] = { turn: p.deadTurn, f: g.frame };
+    return g.frame - k[p.id].f;
+  }
+  R.spotOf = function (g, p) { return g.rspSent && g.rspSent.pid === p.id ? [g.rspSent.x, g.rspSent.y] : p.rspSpot || null; };
+  // choosing now = the zoomed-out map is open and taps pick the spot
+  R.localPicker = function (g) {
+    var p = R.myDead(g); if (!p) return null;
+    if (g.rspSent && g.rspSent.pid === p.id) return null; // waiting for the host to confirm
+    var st = R.state(g, p), has = !!R.spotOf(g, p);
+    if (has && !(g.rspRedo === p.id && R.changesLeft(p) > 0)) return null;
+    var sd = has ? 1e9 : seenDeath(g, p); // (timed from the death, even while a hot-seat pilot is aiming)
+    if (st !== 'pick' && !earlyOk(g, p)) return null;
+    if (st !== 'pick' && !has && sd < R.MAP_DELAY) return null;
+    return p;
+  };
+  R.mapView = function (g) { return !!R.localPicker(g); };
+  // fit the whole map (zoomed out) while choosing; eased, never dragged
+  R.mapCam = function (g, W, H) {
+    var t = g.terrain, cam = g.cam, top = Math.min(t.h * 0.12, 120), th = t.h - top;
+    var z = Math.min(W / t.w, H / (th + 20)), oz = cam.zoom || 1, nz = AG.lerp(oz, z, 0.14);
+    if (Math.abs(nz - z) < 0.002) nz = z;
+    var tx = (t.w - W / nz) / 2, ty = top + (th - H / nz) / 2 + 10;
+    cam.x = AG.lerp(cam.x, tx, 0.2); cam.y = AG.lerp(cam.y, ty, 0.2); cam.zoom = nz; cam.manual = 0; cam.zoomLock = 0;
+    if (Math.abs(nz - z) < 0.002 && Math.abs(cam.x - tx) < 0.5 && Math.abs(cam.y - ty) < 0.5) { cam.x = tx; cam.y = ty; }
   };
   R.tap = function (g, cx, cy) {
     var p = R.localPicker(g); if (!p) return false;
@@ -8743,12 +9121,18 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var c = R.check(g, p, wx, wy);
     g.rspPreview = { x: c.ok ? c.x : wx, y: c.ok ? c.y : wy, ok: c.ok, why: c.why, t: 120 };
     if (!c.ok) { g.flash(c.why); g.rspWhy = c.why; AG.audio.tone && AG.audio.tone(140, 0.12, 'square', 0.04); return true; }
+    var redo = g.rspRedo === p.id; g.rspRedo = null;
     if (g.net && g.net.mode === 'client') {
       g.rspSent = { x: c.x, y: c.y, t: 180, pid: p.id };
       // tagged with the sender's sequence number (no turn tag: a pick stays valid across a turn change)
       AG.Net.send(AG.Online.conn, { t: 'cmd', c: 'respawn', v: [c.x, c.y], n: g.seqN = (g.seqN || 0) + 1 });
-      g.flash('Dropping in…');
-    } else { R.request(g, p, c.x, c.y); g.flash(canPlaceNow(g) ? 'Dropping in…' : 'Spot locked in — dropping in after this shot'); }
+      g.flash(R.state(g, p) === 'pick' ? 'Dropping in…' : redo ? 'Spot changed' : 'Spot set — you drop in there when your timer is up');
+    } else {
+      var r = R.request(g, p, c.x, c.y);
+      if (!r.ok) { g.flash(r.why); return true; }
+      g.flash(R.state(g, p) === 'pick' ? (canPlaceNow(g) ? 'Dropping in…' : 'Spot locked in — dropping in after this shot') : redo ? 'Spot changed' : 'Spot set — you drop in there when your timer is up');
+    }
+    if (AG.audio && AG.audio.click) AG.audio.click();
     return true;
   };
   R.hover = function (g, cx, cy) {
@@ -8758,8 +9142,19 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     if (c.ok && g.rspWhy && g.message === g.rspWhy) { g.messageT = 0; g.message = ''; g.rspWhy = null; } // stale reject hint
   };
   // world-space marker
+  function spotMark(c, g, x, y, ghost) { // the drop spot: a soft beacon + arrow, in my team colour
+    var a = ghost ? 0.45 : 0.9, bob = AG.LobbyFX && AG.LobbyFX.reduced() ? 0 : Math.sin(g.frame * 0.05) * 3;
+    c.save(); c.globalAlpha = a; c.lineCap = 'round';
+    c.strokeStyle = 'rgba(10,30,20,0.8)'; c.lineWidth = 6; c.beginPath(); c.arc(x, y - 14, 16, 0, Math.PI * 2); c.stroke();
+    c.strokeStyle = '#6dff9e'; c.lineWidth = 3; c.beginPath(); c.arc(x, y - 14, 16, 0, Math.PI * 2); c.stroke();
+    c.beginPath(); c.moveTo(x, y - 96 + bob); c.lineTo(x, y - 40 + bob); c.moveTo(x - 9, y - 51 + bob); c.lineTo(x, y - 38 + bob); c.lineTo(x + 9, y - 51 + bob); c.stroke();
+    c.restore();
+  }
   R.drawWorld = function (c, g) {
-    var p = R.localPicker(g); if (!p) { g.rspHover = null; return; }
+    var me = R.myDead(g), sp = me && R.spotOf(g, me);
+    var p = R.localPicker(g);
+    if (!p) { g.rspHover = null; if (sp) spotMark(c, g, sp[0], sp[1], false); return; }
+    if (sp) spotMark(c, g, sp[0], sp[1], true); // changing: the old spot stays faint
     var mk = g.rspPreview && g.rspPreview.t > 0 ? g.rspPreview : g.rspHover;
     // safe-zone hint: red rings around enemies
     c.save();
@@ -8782,11 +9177,15 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   R.drawOverlay = function (c, g, W, H) {
     if (g.rspPreview && g.rspPreview.t > 0) g.rspPreview.t--;
     if (g.rspSent && --g.rspSent.t <= 0) g.rspSent = null;
-    var p = R.localPicker(g); if (!p) return;
+    var p = R.localPicker(g);
+    R.syncBubble(g);
+    if (!p) return;
     var F = (AG.Render && AG.Render.FONT) || 'sans-serif', sc = Math.min(1, W / 700);
     var t1 = (g.isMine && g.players.filter(function (q) { return g.isMine(q) && !q.bot; }).length > 1 ? p.name + ': ' : '') + 'Choose where to respawn';
     var touch = !!(AG.Touch && AG.Touch.enabled);
-    var t2 = (touch ? 'Tap' : 'Click') + ' open ground away from enemies · auto-pick in ' + (p.pickLeft || R.PICK_SECONDS) + 's';
+    var tl = R.turnsLeft(g, p), wait = R.state(g, p) === 'wait';
+    var t2 = (touch ? 'Tap' : 'Click') + ' open ground away from enemies · ' + (wait ? 'you drop in after ' + tl + ' turn' + (tl === 1 ? '' : 's') : 'auto-pick in ' + (p.pickLeft || R.PICK_SECONDS) + 's');
+    if (g.rspRedo === p.id) t1 = 'Pick a new spot (last change)';
     var hv = g.rspHover; if (hv && !hv.ok && !touch) t2 = hv.why;
     // sit just below the DOM wind dial so it never covers the banner
     var top = 8, wd = document.querySelector('.hud-wind'), cv = document.getElementById('game');
@@ -8800,6 +9199,34 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     c.fillStyle = '#9effc0'; c.font = 'bold ' + Math.round(26 * sc) + 'px ' + F; c.fillText('♥ ' + t1, W / 2, y);
     c.fillStyle = '#e8f4ff'; c.font = Math.round(16 * sc) + 'px ' + F; c.fillText(t2, W / 2, y + 24 * sc);
     c.restore();
+  };
+  // DOM bubble while waiting with a spot set: "Change spot (1 left)" (+ "Keep spot" while changing)
+  R.syncBubble = function (g) {
+    var p = R.myDead(g), sp = p && R.spotOf(g, p), choosing = !!R.localPicker(g);
+    var canChange = p && sp && R.changesLeft(p) > 0 && R.state(g, p) === 'wait' && !(g.rspSent && g.rspSent.pid === p.id) && earlyOk(g, p);
+    var mode = !p ? '' : choosing && g.rspRedo === p.id ? 'keep' : canChange && !choosing ? 'change' : '';
+    var b = document.getElementById('rspBubble');
+    if (!mode) { if (b) b.hidden = true; return; }
+    if (!b) {
+      b = document.createElement('button'); b.id = 'rspBubble'; b.className = 'rspbubble'; b.type = 'button';
+      b.addEventListener('click', function (e) {
+        e.stopPropagation(); var gg = AG.game, pp = gg && R.myDead(gg); if (!pp) return;
+        if (AG.audio && AG.audio.click) AG.audio.click();
+        gg.rspRedo = gg.rspRedo === pp.id ? null : pp.id; gg.rspHover = null; R.syncBubble(gg);
+      });
+      document.body.appendChild(b);
+    }
+    var tl = R.turnsLeft(g, p);
+    var txt = mode === 'keep' ? '✓ Keep my spot' : '↺ Change spot (' + R.changesLeft(p) + ' left)';
+    var sub = mode === 'keep' ? '' : 'Drop-in in ' + tl + ' turn' + (tl === 1 ? '' : 's');
+    var key = mode + '|' + txt + '|' + sub;
+    if (b.dataset.k !== key) { b.dataset.k = key; b.innerHTML = '<b>' + txt + '</b>' + (sub ? '<small>' + sub + '</small>' : ''); }
+    b.dataset.mode = mode; b.hidden = false;
+    // sit just under the canvas banner when it is up (changing), else under the wind dial
+    var cv = document.getElementById('game'), r = cv && cv.getBoundingClientRect(), top = null;
+    if (g.rspBanner && g.rspBanner.f >= g.frame - 2 && r && r.width) top = r.top + g.rspBanner.bottom * (r.width / (cv.clientWidth || r.width)) + 8;
+    else { var wd = document.querySelector('.hud-wind'), a = wd && wd.getBoundingClientRect(); if (a && a.height) top = a.bottom + 10; }
+    b.style.top = top != null ? Math.round(top) + 'px' : '';
   };
   // Canvas tap / hover binding (a tap = short press with little movement, so camera drags still work).
   R.bind = function (canvas) {
@@ -9253,6 +9680,51 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       drums: { k: 'x.......x.x.....', s: '....x.......x...', h: '..x...x...x...x.', c: '..........x.....' }
     }
 ,
+    // ---- batch 12 #5: a second ORIGINAL match track for every map (same chiptune-adventure genre); a match plays its
+    // map's tracks in rotation (AG.music.nextForTheme). Sudden Death ('sudden') is unchanged.
+    map0b: {
+      name: 'Meadow Sprint', bpm: 150, swing: 0, lead: 'pulse', bass: 'gallop', stab: 'offbeat', pad: false,
+      chords: ['G', 'D', 'Em', 'C', 'G', 'D', 'C', 'D'],
+      melody: 'D5 - G5 - B5 - A5 G5|F#5 - A5 - D6 - - A5|G5 - B5 - E6 - D6 B5|C6 - - B5 A5 - G5 E5|' +
+              'D5 G5 B5 D6 - B5 G5 -|A5 D6 F#6 - E6 D6 A5 -|G5 C6 E6 - D6 C6 G5 E5|F#5 - A5 - D6 - - .',
+      drums: { k: 'x...x..xx...x...', s: '....x.......x...', h: 'x.x.x.x.x.x.x.x.' }
+    },
+    map1b: {
+      name: 'Mirage Run', bpm: 132, swing: 0.06, lead: 'square', double: -12, bass: 'pump', stab: 'arp', pad: true,
+      chords: ['Dm', 'Bb', 'C', 'A', 'Dm', 'Bb', 'Gm', 'A'],
+      melody: 'D5 - F5 A5 - F5 E5 D5|F5 - - D5 Bb4 - D5 F5|E5 - G5 - C6 - G5 E5|C#5 - E5 - A5 - G5 E5|' +
+              'A5 - D6 - C6 A5 F5 A5|Bb5 - F5 - D5 - F5 Bb5|G5 Bb5 D6 - C6 Bb5 A5 G5|A5 - C#6 - E6 - - .',
+      drums: { k: 'x..x....x.x.....', s: '....x.......x...', h: 'x.xxx.x.x.xxx.x.', c: '......x.......x.' }
+    },
+    map2b: {
+      name: 'Snowdrift Glide', bpm: 140, swing: 0, lead: 'bell', bass: 'half', stab: 'arp', pad: true,
+      chords: ['Bm', 'G', 'D', 'A', 'Bm', 'G', 'Em', 'F#'],
+      melody: 'F#5 . D5 . B4 . D5 F#5|G5 . D5 . B4 . D5 G5|A5 . F#5 . D5 . F#5 A5|E5 - C#5 - A4 - C#5 E5|' +
+              'B5 . F#5 . D6 . C#6 B5|B5 . G5 . D6 - B5 G5|G5 . E5 . B5 . A5 G5|A#5 - - - C#6 - F#5 .',
+      drums: { k: 'x.......x...x...', s: '....x.......x...', h: 'x.x.x.x.x.x.x.xx' }
+    },
+    map3b: {
+      name: 'Wind-Up Workshop', bpm: 124, swing: 0, lead: 'square', bass: 'pump', stab: 'offbeat', pad: false,
+      chords: ['F', 'C', 'Dm', 'Bb', 'F', 'C', 'Bb', 'C'],
+      melody: 'C5 F5 A5 F5 C5 F5 A5 C6|G5 - E5 - C5 - E5 G5|A5 F5 D5 F5 A5 - D6 -|Bb5 - F5 - D5 - . .|' +
+              'A5 G5 F5 C5 F5 A5 C6 -|G5 E5 C5 E5 G5 C6 E6 -|D6 - Bb5 - F5 - D5 F5|E5 - G5 - C6 - - .',
+      drums: { k: 'x.......x.......', s: '....x.......x.x.', h: 'x.x.x.x.x.x.x.x.', c: '........x.......' }
+    },
+    map4b: {
+      name: 'Gumdrop Hop', bpm: 136, swing: 0.12, lead: 'triangle', double: 12, bass: 'walk', stab: 'swing', pad: true,
+      chords: ['C', 'Am', 'Dm7', 'G7', 'C', 'Am', 'F', 'G7'],
+      melody: 'E5 . G5 E5 C5 . E5 G5|A5 - E5 - C5 . A4 C5|D5 . F5 A5 C6 . A5 F5|G5 - B5 - D6 - F5 .|' +
+              'C6 . B5 C6 G5 . E5 G5|A5 C6 E6 - D6 C6 A5 .|F5 A5 C6 - B5 A5 F5 .|G5 - B5 - D6 - G5 .',
+      drums: { k: 'x.....x.x.......', s: '....x.......x...', h: 'x.xx.xx.x.xx.xx.' }
+    },
+    map5b: {
+      name: 'Lantern Hollow', bpm: 112, swing: 0.18, lead: 'bell', bass: 'walk', stab: 'arp', pad: true,
+      chords: ['Em', 'C', 'Am', 'B7', 'Em', 'C', 'Am', 'B7'],
+      melody: 'E5 . G5 B5 E6 . B5 G5|E5 . G5 C6 E6 . C6 G5|A5 . C6 E6 A5 . E5 C5|D#5 - F#5 - A5 - B5 .|' +
+              'G5 - B5 - E6 - D6 B5|C6 - E6 - G6 - E6 C6|A5 C6 E6 C6 A5 - F#5 -|B5 - D#6 - F#6 - B5 .',
+      drums: { k: 'x.......x.x.....', s: '....x.......x...', h: '..x...x...x...x.', c: '..x.......x.....' }
+    }
+,
     // Sudden Death (original): a driving minor-key chase, crossfaded in on the SUDDEN DEATH banner.
     sudden: {
       name: 'Last Gear Standing', bpm: 164, swing: 0, lead: 'saw', double: -12, bass: 'gallop', stab: 'arp', pad: true, gain: 1.15,
@@ -9466,7 +9938,17 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       if (on) { if (this.wanted === 'sudden') return; if (this.wanted == null && !this.current) return; this.resume = this.wanted; this.intense = false; this.play('sudden'); this.resume = this.resume || null; }
       else if (this.wanted === 'sudden') { var r = this.resume; this.play(r || null); }
     },
-    trackForTheme: function (i) { return TRACKS['map' + i] ? 'map' + i : 'map0'; }
+    trackForTheme: function (i) { return TRACKS['map' + i] ? 'map' + i : 'map0'; },
+    // every match track that belongs to map i: 'map<i>' then 'map<i>b', 'map<i>c'… (in order)
+    tracksForTheme: function (i) { var b = this.trackForTheme(i), out = [b]; 'bcdef'.split('').forEach(function (s) { if (TRACKS[b + s]) out.push(b + s); }); return out; },
+    // the next track for a new match on map i: rotates through the map's tracks (remembered on this device)
+    nextForTheme: function (i) {
+      var list = this.tracksForTheme(i), key = 'gearbound.musicRot', rot = {};
+      try { rot = JSON.parse(localStorage.getItem(key) || '{}') || {}; } catch (e) { rot = {}; }
+      var k = (+rot[list[0]] || 0) % list.length; rot[list[0]] = (k + 1) % list.length;
+      try { localStorage.setItem(key, JSON.stringify(rot)); } catch (e) {}
+      return list[k];
+    }
   };
 
   AG.music = Music;
@@ -10286,14 +10768,16 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       cls('sl' + i, s.card, 'locked', sh.special && p.ssCharge < 100);
       cls('sp' + i, s.card, 'special', !!sh.special);
     });
-    drawGauge(m, g, g.isMine(p));
+    // privacy: someone else's turn (teammate, rival or bot) shows no item list, no shot pick and no angle needle
+    cls('priv', root, 'private', !own);
+    drawGauge(m, g, own);
     if (frame % 6 === 1) drawMini(g, W, H);
   };
 
   function esc(s) { return String(s).replace(/[&<>"]/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]; }); }
 
   function drawGauge(m, g, own) {
-    var key = m.angle + ':' + m.rig.id + ':' + m.worldAngle() + ':' + own;
+    var key = own ? m.angle + ':' + m.rig.id + ':' + m.worldAngle() + ':1' : m.rig.id + ':' + m.player.name + ':0';
     if (last.gauge === key) return; last.gauge = key;
     var c = gaugeC, w = gauge.width, h = gauge.height, cx = w / 2, cy = h - 22, r = 112;
     c.clearRect(0, 0, w, h);
@@ -10302,6 +10786,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var gr = c.createLinearGradient(cx - r, 0, cx + r, 0); gr.addColorStop(0, '#5fd3ff'); gr.addColorStop(1, '#b28bff');
     c.strokeStyle = gr; c.lineWidth = 16; c.beginPath(); c.arc(cx, cy, r, -AG.rad(m.rig.angleMax), -AG.rad(m.rig.angleMin)); c.stroke();
     for (var d = 0; d <= 90; d += 10) { var a = -AG.rad(d); c.strokeStyle = 'rgba(255,255,255,0.35)'; c.lineWidth = 2; c.beginPath(); c.moveTo(cx + Math.cos(a) * (r - 14), cy + Math.sin(a) * (r - 14)); c.lineTo(cx + Math.cos(a) * (r - 22), cy + Math.sin(a) * (r - 22)); c.stroke(); }
+    if (!own) { set('aimtxt', $.aimtxt, 'text', m.player.name + ' is aiming…'); return; } // no needle, no numbers for anyone else
     var an = -AG.rad(m.angle);
     c.shadowColor = 'rgba(255,210,100,0.8)'; c.shadowBlur = 12;
     c.strokeStyle = '#ffd36b'; c.lineWidth = 6; c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + Math.cos(an) * (r + 8), cy + Math.sin(an) * (r + 8)); c.stroke();
@@ -10520,6 +11005,21 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     rs.forEach(function (r) { var w = Math.min(x1, r.x1) - Math.max(x0, r.x0), h = Math.min(y1, r.y1) - Math.max(y0, r.y0); if (w > 0 && h > 0) s += w * h; });
     return s;
   }
+  // Whose turn: a big gold chevron over the tag (about 2.4× the old one), gently bobbing on a slow eased sine.
+  UI.TURN_ARROW = { w: 34, h: 26 };
+  UI.drawTurnArrow = function (c, x, tagY, frame) {
+    var reduced = AG.LobbyFX && AG.LobbyFX.reduced && AG.LobbyFX.reduced();
+    var bob = reduced ? 0 : (Math.sin(frame * 0.06) * 0.5 + 0.5) * 4; // 0..4 px, ~1.75 s period, smooth both ends
+    var w = UI.TURN_ARROW.w, h = UI.TURN_ARROW.h, tipY = tagY - 30 + bob, topY = tipY - h;
+    c.save();
+    c.shadowColor = 'rgba(255,190,60,0.85)'; c.shadowBlur = 12;
+    c.beginPath(); c.moveTo(x - w / 2, topY); c.lineTo(x - w * 0.2, topY); c.lineTo(x, topY + h * 0.42); c.lineTo(x + w * 0.2, topY); c.lineTo(x + w / 2, topY); c.lineTo(x, tipY); c.closePath();
+    var gr = c.createLinearGradient(0, topY, 0, tipY); gr.addColorStop(0, '#fff1b8'); gr.addColorStop(1, '#ffb83a');
+    c.fillStyle = gr; c.fill();
+    c.shadowBlur = 0; c.lineJoin = 'round'; c.lineWidth = 2.5; c.strokeStyle = 'rgba(70,40,0,0.85)'; c.stroke();
+    c.restore();
+    return { tipY: tipY, topY: topY, w: w, h: h };
+  };
   UI.drawMobileTags = function (c, g) {
     var F = AG.Render.FONT, occ = hudOccluders(c, g);
     g.mobiles.forEach(function (m) {
@@ -10559,9 +11059,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       if (frac > 0.35) { hg.addColorStop(0, '#3ee07a'); hg.addColorStop(1, '#b6ff6a'); } else { hg.addColorStop(0, '#ff3b30'); hg.addColorStop(1, '#ff9f43'); }
       c.fillStyle = hg; if (frac > 0.02) { AG.roundRect(c, x - bw / 2, y - 3, bw * frac, 6, 3); c.fill(); }
       if (g.turns.current === m.player && g.phase === 'aim') {
-        c.fillStyle = '#ffd36b'; c.shadowColor = 'rgba(255,200,80,0.9)'; c.shadowBlur = 8;
-        var bob = Math.sin(g.frame * 0.15) * 3;
-        c.beginPath(); c.moveTo(x - 7, y - 38 + bob); c.lineTo(x + 7, y - 38 + bob); c.lineTo(x, y - 29 + bob); c.fill();
+        UI.drawTurnArrow(c, x, (m._tagBelow ? m.y + (m.rig.sprite ? Math.min(m.rig.mount.y - 24, -40) * AG.CONFIG.RIG_SCALE : -90) - 18 : y) - (crn ? 30 : 0), g.frame || 0);
       }
       c.restore();
     });
@@ -10805,7 +11303,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var A = AG.Avatar; a = a || {};
     return { skin: pick(A.SKINS, a.skin, A.SKINS[0]), outfit: pick(A.OUTFITS, a.outfit, 'scout'), hat: pick(A.HATS, a.hat, 'none'),
       pet: pick(A.PETS, a.pet, 'none'), face: pick(A.FACES, a.face, A.FACES[0].id), hair: pick(A.HAIRS, a.hair, 'natural'), rigskin: pick(A.RIGSKINS, a.rigskin, 'none'), roombg: AG.RoomBG ? pick(AG.RoomBG.LIST, a.roombg, 'none') : 'none', fx: AG.Collector ? AG.Collector.clean(a.fx) : {},
-      head: cos('head', a.head), body: cos('body', a.body), wings: cos('wings', a.wings), headpiece: cos('headpiece', a.headpiece) };
+      head: cos('head', a.head), body: cos('body', a.body), wings: cos('wings', a.wings), headpiece: cos('headpiece', a.headpiece), mask: cos('mask', a.mask) };
     function cos(sl, id) { return AG.Cos && AG.Cos.has(sl, id) ? id : 'none'; }
   };
   O.cleanProfile = function (p) {
@@ -10879,7 +11377,9 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   // A pilot's seat is keyed by `owner` (their first peer id). After a reconnect the new connection is mapped
   // back to the same owner (c._owner), so they resume their seat.
   function ownerOf(c) { return c._owner || c.peer; }
+  var connSeq = 0;
   function onHostConnection(c) {
+    c._at = ++connSeq; // arrival order: a retried join opens a newer connection from the same peer
     c.on('data', function (m) { hostReceive(c, m); });
     c.on('close', function () { hostLost(c); });
     c.on('error', function () { if (!c.open) hostLost(c); }); // PeerJS also emits transient errors on open channels: ignore those
@@ -10997,6 +11497,18 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     if (m.t === 'hello') {
       if (R.pw && m.pw !== R.pw) return Net().send(c, { t: 'deny', why: 'Wrong room password' });
       if (R.status !== 'waiting') return Net().send(c, { t: 'deny', why: 'Match already in progress' });
+      // a retried join (slow link: the client gave up on its first connection and opened another) can deliver two
+      // hellos from the same peer. Never seat them twice: a hello on an older connection than the current one is
+      // stale; a newer one takes over the existing seat (closing the old link then no longer drops the pilot).
+      var cur = O.conns[c.peer], seat = R.players.filter(function (p) { return p.owner === c.peer; })[0];
+      if (cur && cur !== c && (cur._at || 0) > (c._at || 0)) { try { c.close(); } catch (e) {} return; }
+      if (seat) {
+        O.conns[c.peer] = c;
+        if (cur && cur !== c) { try { cur.close(); } catch (e) {} }
+        Net().send(c, { t: 'welcome', you: c.peer, room: O.publicRoom() });
+        publish();
+        return;
+      }
       if (R.players.length >= MAX_PLAYERS) return Net().send(c, { t: 'deny', why: 'Room is full (4v4)' });
       var pr = O.cleanProfile(m.profile);
       O.conns[c.peer] = c;
@@ -11513,9 +12025,22 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   // fairness: each client only gets the 'last power' of its own pilots
   function hideFor(snap, owner, g) {
     var out = {}; for (var key in snap) out[key] = snap[key];
-    out.p = snap.p.map(function (b, i) { if (g.players[i].owner === owner) return b; var c = b.slice(); c[3] = null; return c; });
+    var myTeams = {}; g.players.forEach(function (q) { if (q.owner === owner) myTeams[q.team] = 1; });
+    out.p = snap.p.map(function (b, i) {
+      if (g.players[i].owner === owner) return b; var c = b.slice(); c[3] = null;
+      if (!myTeams[g.players[i].team] && c.length > 21) { c[21] = -1; c[22] = -1; } // an enemy's chosen respawn spot stays secret
+      return c;
+    });
+    // privacy: while someone aims, nobody else is sent their live angle, shot pick or item use (it arrives with the shot)
+    var cur = g.turns.current;
+    if (snap.ph === 'aim' && cur && cur.owner !== owner) {
+      var ci = g.players.indexOf(cur), mi = g.mobiles.indexOf(cur.mobile);
+      if (ci >= 0 && out.p[ci]) { var pc = out.p[ci].slice(); pc[2] = null; pc[8] = null; pc[9] = null; out.p[ci] = pc; }
+      if (mi >= 0 && snap.m[mi]) { out.m = snap.m.slice(); var mc = snap.m[mi].slice(); mc[2] = null; out.m[mi] = mc; }
+    }
     return out;
   }
+  O._hideFor = hideFor; // tests
   function r1(v) { return Math.round(v * 10) / 10; }
   function r3(v) { return Math.round(v * 1000) / 1000; }
   O.snapshot = function (g) {
@@ -11529,7 +12054,8 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       }),
       p: g.players.map(function (p) {
         return [p.delay, r1(p.ssCharge), p.shotIndex, p.lastPower, p.stats.damage, p.stats.kills, p.stats.shots, p.shield, p.itemsUsed.map(function (u) { return u ? 1 : 0; }), p.itemTurn, p.tieBreak,
-          p.respawnsLeft, p.deadTurn, p.respawnAt, p.out ? 1 : 0, p.protect ? 1 : 0, p.pickLeft || 0, p.stats.respawns || 0, p.slowTurns || 0, p.slowNow ? 1 : 0, p.slowMul || 0];
+          p.respawnsLeft, p.deadTurn, p.respawnAt, p.out ? 1 : 0, p.protect ? 1 : 0, p.pickLeft || 0, p.stats.respawns || 0, p.slowTurns || 0, p.slowNow ? 1 : 0, p.slowMul || 0,
+          p.rspSpot ? r1(p.rspSpot[0]) : -1, p.rspSpot ? r1(p.rspSpot[1]) : -1, p.rspCh || 0];
       }),
       pr: g.projectiles.map(function (pr) {
         if (!pr._id) pr._id = ++g._pid;
@@ -11577,15 +12103,16 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       var mb = g.mobiles[i], a = s.m[i]; if (!a) continue;
       mb.tx = a[0]; mb.ty = a[1];
       if (Math.abs(mb.x - a[0]) > 80 || Math.abs(mb.y - a[1]) > 80) { mb.x = a[0]; mb.y = a[1]; }
-      mb.angle = a[2]; mb.facing = a[3]; mb.hp = a[4]; mb.maxHp = a[5]; mb.alive = !!a[6]; mb.fuel = a[7]; mb.maxFuel = a[8]; mb.moving = !!a[9];
+      if (a[2] != null) mb.angle = a[2]; mb.facing = a[3]; mb.hp = a[4]; mb.maxHp = a[5]; mb.alive = !!a[6]; mb.fuel = a[7]; mb.maxFuel = a[8]; mb.moving = !!a[9];
       mb.tilt = a[10]; mb.grounded = !!a[11]; mb.fellOff = !!a[12]; if (a[13] > mb.recoil) mb.recoil = a[13]; if (a[14] > mb.hurt) mb.hurt = a[14]; mb.retreated = !!a[15];
     }
     for (i = 0; i < g.players.length; i++) {
       var p = g.players[i], b = s.p[i]; if (!b) continue;
-      p.delay = b[0]; p.ssCharge = b[1]; if (!(g.turns.current === p && g.isMine(p))) p.shotIndex = b[2]; p.lastPower = b[3];
-      p.stats.damage = b[4]; p.stats.kills = b[5]; p.stats.shots = b[6]; p.shield = b[7]; p.itemsUsed = b[8].map(function (u) { return !!u; }); p.itemTurn = b[9]; p.tieBreak = b[10];
+      p.delay = b[0]; p.ssCharge = b[1]; if (!(g.turns.current === p && g.isMine(p)) && b[2] != null) p.shotIndex = b[2]; p.lastPower = b[3];
+      p.stats.damage = b[4]; p.stats.kills = b[5]; p.stats.shots = b[6]; p.shield = b[7]; if (b[8]) { p.itemsUsed = b[8].map(function (u) { return !!u; }); p.itemTurn = b[9]; } p.tieBreak = b[10];
       if (b.length > 11) { p.respawnsLeft = b[11]; p.deadTurn = b[12]; p.respawnAt = b[13]; p.out = !!b[14]; p.protect = !!b[15]; p.pickLeft = b[16]; p.stats.respawns = b[17]; }
       if (b.length > 18) { p.slowTurns = b[18] | 0; p.slowNow = !!b[19]; p.slowMul = b[20] || 0.5; } // Glacier slow (host-authoritative)
+      if (b.length > 21) { p.rspSpot = b[21] >= 0 ? [b[21], b[22]] : null; p.rspCh = b[23] | 0; if (g.rspSent && g.rspSent.pid === p.id && p.rspSpot && Math.abs(p.rspSpot[0] - g.rspSent.x) < 2) g.rspSent = null; } // respawn spot (batch 12)
     }
     var byId = {}; g.projectiles.forEach(function (pr) { byId[pr._id] = pr; });
     g.projectiles = s.pr.map(function (a) {
@@ -11863,7 +12390,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     if (F.peer || F.state === 'opening' || !Net() || !Net().available()) return;
     var code = F.myCode(); F.state = 'opening'; emit();
     Net().open(F.peerId(code)).then(function (p) {
-      F.peer = p; F.state = 'on'; backoff = 4000;
+      F.peer = p; F.state = 'on'; backoff = 4000; if (F.openedAt == null) F.openedAt = Date.now();
       if (!P().friendCodeOk) { P().friendCodeOk = true; AG.Screens.save(); }
       p.on('connection', serve);
       p.on('disconnected', function () { if (F.peer === p) { try { p.reconnect(); } catch (e) {} } });
@@ -11915,16 +12442,29 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     if (!F.isFriend(code)) return;
     var f = F.list().filter(function (x) { return x.code === code; })[0], nm = NF().safeName(m.name, code);
     if (f.name !== nm || f.xp !== AG.Ranks.clamp(m.xp)) { f.name = nm; f.xp = AG.Ranks.clamp(m.xp); AG.Screens.save(); }
-    var wasAdm = F.st[code] && F.st[code].admin;
+    var wasAdm = F.st[code] && F.st[code].admin, wasOn = !!(F.st[code] && F.st[code].online);
     if (!f.lastSeen || Date.now() - f.lastSeen > 300000) { f.lastSeen = Date.now(); AG.Screens.save(); }
     F.st[code] = { admin: !!wasAdm, online: true, status: String(m.status || 'Online').replace(/[<>]/g, '').slice(0, 24), room: String(m.room || '').replace(/[^A-Z0-9]/g, '').slice(0, 6), open: !!m.open, at: Date.now() };
     emit();
+    if (!wasOn) F.cameOnline(code, nm);
     F.seenHooks.forEach(function (f) { try { f(code); } catch (e) {} });
   }
+  F._seen = seen; // tests
   function checkBadge(code, nonce, sig) {
     if (!AG.Admin || !sig) { if (F.st[code] && F.st[code].admin) { F.st[code].admin = false; emit(); } return; }
     AG.Admin.verifyAdmin(AG.Admin.badgeText(code, nonce), sig).then(function (ok) { if (F.st[code] && F.st[code].admin !== ok) { F.st[code].admin = ok; emit(); } });
   }
+  // ---- "friend came online" (batch 12): offline -> online transitions only. The first sweep after my own presence
+  // peer opens just fills the list (no burst of toasts for everyone already on); one toast per friend per 10 min.
+  F.ARM_MS = 20000; F.REPEAT_MS = 600000; F.onlineHooks = []; F._toasted = {};
+  F.armed = function () { return F.openedAt != null && Date.now() - F.openedAt >= F.ARM_MS; };
+  F.cameOnline = function (code, name) {
+    if (!F.armed()) return false;
+    if (F._toasted[code] && Date.now() - F._toasted[code] < F.REPEAT_MS) return false;
+    F._toasted[code] = Date.now();
+    F.onlineHooks.forEach(function (f) { try { f(code, name); } catch (e) {} });
+    return true;
+  };
   // one request → one reply over a short connection to a friend's presence peer
   F.request = function (code, msg, wantT, ms) {
     if (!F.peer || F.peer.disconnected) return Promise.reject('offline');
@@ -12369,8 +12909,8 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var st = pv.idle || (pv.idle = { next: 120 + rnd(pv.t) * 200, f: null, ft: 0, base: m.angle, blink: 0, nb: 60 + rnd(pv.t + 1) * 150 }), t = pv.t;
     var o = { dy: 0, rot: 0, sx: 1, sy: 1, petDy: 0 };
     if (L.reduced()) { m.angle = st.base; m.moving = false; m.recoil = 0; m.idleBob = 0; m.idleLean = 0; m.blink = 0; return o; }
-    m.angle = st.base + Math.sin(t * 0.021) * 5 + Math.sin(t * 0.0071) * 3; // gentle barrel sway
-    m.idleBob = Math.sin(t * 0.045) * 0.6; m.idleLean = Math.sin(t * 0.017) * 0.06; // rider head bob / look around
+    m.angle = st.base + Math.sin(t * 0.014) * 3 + Math.sin(t * 0.0051) * 2; // gentle, slow barrel sway
+    m.idleBob = Math.sin(t * 0.03) * 0.45; m.idleLean = Math.sin(t * 0.012) * 0.04; // rider head bob / look around
     st.nb -= k; if (st.nb <= 0) { st.blink = 8; st.nb = 90 + rnd(t) * 200; } // blink every 1.5–5 s
     m.blink = st.blink > 0 ? 1 : 0; if (st.blink > 0) st.blink -= k;
     m.moving = false; m.recoil = Math.max(0, (m.recoil || 0) - 0.06 * k);
@@ -12378,11 +12918,11 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     if (!st.f && st.next <= 0) { st.f = ['hop', 'rev', 'puff', 'sweep', 'pet'][(rnd(t * 0.37) * 5) | 0]; st.ft = 0; }
     if (st.f) {
       st.ft += k; var f = st.ft;
-      if (st.f === 'hop') { var p = Math.min(1, f / 30); o.dy = -Math.sin(p * Math.PI) * 7; o.sy = 1 + (p < 0.15 || p > 0.85 ? -0.06 : 0.04); o.sx = 2 - o.sy; if (f >= 30) st.f = null; }
+      if (st.f === 'hop') { var p = Math.min(1, f / 48), hp = Math.sin(p * Math.PI); o.dy = -hp * hp * 3.5; o.sy = 1 + 0.02 * Math.sin(p * Math.PI * 2); o.sx = 2 - o.sy; if (f >= 48) st.f = null; } // soft eased float-up, no snap squash
       else if (st.f === 'rev') { if (f <= k && AG.RigIdle) AG.RigIdle.rev(m); o.rev = 1; if (f >= 50) st.f = null; } // the rig's own rev (rigidle.js): engine roar, wheels spin, exhaust burst
       else if (st.f === 'puff') { if (f <= k) m.recoil = 1; if (f >= 30) st.f = null; o.puff = f; }
       else if (st.f === 'sweep') { m.angle += Math.sin(Math.min(1, f / 60) * Math.PI) * 14; if (f >= 60) st.f = null; }
-      else if (st.f === 'pet') { o.petDy = -Math.abs(Math.sin(f * 0.21)) * 6; if (f >= 45) st.f = null; }
+      else if (st.f === 'pet') { o.petDy = -(1 - Math.cos(Math.min(1, f / 45) * Math.PI * 4)) * 2; if (f >= 45) st.f = null; } // two smooth little hops
       if (!st.f) st.next = 200 + rnd(t * 1.3) * 300; // next flourish in ~3–8 s
     }
     return o;
@@ -12403,7 +12943,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
 /* js/rigidle.js */
 // rigidle.js — every rig's own idle life (drawing only, never gameplay): engine shake, suspension bounce, rocking,
 // exhaust / steam / sparks / embers, spinning parts, plus a periodic "rev" burst. Used by Mobile.draw whenever a rig
-// is alive, on the ground (or hovering) and not driving, so the match and the waiting room show the SAME motion.
+// (batch 12: all slow eased sines, no buzz) is alive, on the ground (or hovering) and not driving, so the match and the waiting room show the SAME motion.
 // Driven by the wall clock (m.idleClock overrides it in tests) and a per-pilot phase, so it needs no network sync and
 // costs a handful of canvas ops per rig. Reduced motion: no shake, no particles.
 (function (AG) {
@@ -12416,14 +12956,14 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     skipper:   { shake: 0.08, shz: 9,  bounce: 1.1,  bhz: 1.7, rock: 0.01,  rhz: 0.5,  sq: 0.035, fx: 'steam',  rev: 4.5, revLen: 0.7, wheel: 0.8, kick: 'boing' },
     lancer:    { shake: 0,    shz: 0,  bounce: 0.4,  bhz: 0.6, rock: 0.025, rhz: 0.3,  sq: 0,     fx: 'crystal',rev: 6,   revLen: 0.9, wheel: 0,   kick: 'flare' },
     lodestone: { shake: 0.18, shz: 13, bounce: 0.3,  bhz: 0.8, rock: 0.004, rhz: 0.4,  sq: 0.008, fx: 'magnet', rev: 5,   revLen: 1.0, wheel: 0.6, kick: 'pulse' },
-    carom:     { shake: 0.12, shz: 10, bounce: 0.35, bhz: 1.3, rock: 0.022, rhz: 0.8,  sq: 0.01,  fx: 'exhaust',rev: 4,   revLen: 0.9, wheel: 2.2, kick: 'wheelie' },
+    carom:     { shake: 0.12, shz: 10, bounce: 0.35, bhz: 1.3, rock: 0.016, rhz: 0.8,  sq: 0.01,  fx: 'exhaust',rev: 4,   revLen: 0.9, wheel: 2.2, kick: 'wheelie' },
     beetle:    { shake: 0.06, shz: 6,  bounce: 0.25, bhz: 0.5, rock: 0.008, rhz: 0.25, sq: 0.022, fx: 'dust',   rev: 5.5, revLen: 0.8, wheel: 0.9, kick: 'scuttle' },
     hornet:    { shake: 0.35, shz: 22, bounce: 1.2,  bhz: 0.9, rock: 0.02,  rhz: 0.6,  sq: 0,     fx: 'wings',  rev: 4.5, revLen: 0.8, wheel: 0,   kick: 'zoom' },
     mason:     { shake: 0.1,  shz: 5,  bounce: 0.3,  bhz: 0.7, rock: 0.018, rhz: 0.4,  sq: 0.015, fx: 'dust',   rev: 6,   revLen: 0.9, wheel: 0.5, kick: 'stomp' },
     glacier:   { shake: 0.12, shz: 15, bounce: 0.35, bhz: 0.9, rock: 0.006, rhz: 0.45, sq: 0.01,  fx: 'frost',  rev: 5,   revLen: 1.0, wheel: 0.7, kick: 'shiver' },
     volt:      { shake: 0.15, shz: 12, bounce: 0.4,  bhz: 1.2, rock: 0.008, rhz: 0.6,  sq: 0.012, fx: 'sparks', rev: 4,   revLen: 0.9, wheel: 2.4, kick: 'zap' },
     flak:      { shake: 0.32, shz: 9,  bounce: 0.45, bhz: 1.4, rock: 0.007, rhz: 0.5,  sq: 0.014, fx: 'smoke',  rev: 4.5, revLen: 0.8, wheel: 1.6, kick: 'backfire' },
-    gyro:      { shake: 0.08, shz: 10, bounce: 0.25, bhz: 0.9, rock: 0.045, rhz: 0.55, sq: 0.006, fx: 'exhaust',rev: 4,   revLen: 1.0, wheel: 3.2, kick: 'spin' },
+    gyro:      { shake: 0.08, shz: 10, bounce: 0.25, bhz: 0.9, rock: 0.028, rhz: 0.55, sq: 0.006, fx: 'exhaust',rev: 4,   revLen: 1.0, wheel: 3.2, kick: 'spin' },
     orrery:    { shake: 0,    shz: 0,  bounce: 0.9,  bhz: 0.45,rock: 0.015, rhz: 0.25, sq: 0,     fx: 'orbit',  rev: 6,   revLen: 1.2, wheel: 0,   kick: 'orbit' },
     spindle:   { shake: 0.05, shz: 8,  bounce: 0.3,  bhz: 0.6, rock: 0.012, rhz: 0.45, sq: 0.02,  fx: 'dust',   rev: 4.5, revLen: 0.6, wheel: 0,   kick: 'twitch' },
     phoenix:   { shake: 0.1,  shz: 14, bounce: 1.0,  bhz: 0.7, rock: 0.02,  rhz: 0.35, sq: 0,     fx: 'embers', rev: 5,   revLen: 1.0, wheel: 0,   kick: 'flame' },
@@ -12435,7 +12975,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   function phash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0) % 10007) / 10007; }
   function reduced() { return AG.LobbyFX && AG.LobbyFX.reduced && AG.LobbyFX.reduced(); }
   function now(m) { return m.idleClock != null ? m.idleClock : (window.performance && performance.now ? performance.now() : Date.now()); }
-  var RI = { PROFILES: P };
+  var RI = { PROFILES: P, SWAY_HZ: 0.45, MAX_HZ: 0.9, AMP: 0.6 }; // batch 12: slow + low amplitude everywhere
   RI.profile = function (rig) { return P[rig && rig.id] || DEF; };
   RI.active = function (m) { return !!(m && m.alive && !m.moving && !m.kx && (m.grounded || (m.rig && m.rig.hover)) && !m.noIdle); };
   // Kick a rev now (waiting-room flourish, or anything that wants the engine to roar)
@@ -12447,30 +12987,31 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var sd = m._iseed, t = ms / 1000 + sd * 50;
     var o = { dx: 0, dy: 0, rot: 0, sy: 1, wheel: 0, rev: 0, t: t, p: p, kick: p.kick };
     if (reduced()) return o;
-    // periodic rev (own phase per pilot) or a kicked one
-    var B = m.idleBoost || 1; // menus (lobby / waiting room / Wardrobe / shop) show the rig bigger-than-life: clearly visible motion
-    var per = p.rev * (0.85 + sd * 0.4) / Math.sqrt(B), ph = (t % per) / per, rl = p.revLen / per, rev = ph < rl ? Math.sin(ph / rl * Math.PI) : 0;
-    if (m._revAt != null) { var ka = (ms - m._revAt) / 1000; if (ka >= 0 && ka < p.revLen) rev = Math.max(rev, Math.sin(ka / p.revLen * Math.PI)); }
+    // Batch 12 (gentle motion): no high-frequency engine buzz any more (it read as jitter at 7–22 Hz). Every term is a
+    // slow, eased sine: sway / bob <= ~1 Hz, lower amplitudes, and the rev is a smooth sin^2 swell instead of a kick.
+    var B = m.idleBoost || 1; // menus (lobby / waiting room / Inventory / shop) show a little more life than a match
+    var per = p.rev * (0.85 + sd * 0.4) * 1.4, ph = (t % per) / per, rl = p.revLen * 1.5 / per, rev = ph < rl ? Math.pow(Math.sin(ph / rl * Math.PI), 2) : 0;
+    if (m._revAt != null) { var rL = p.revLen * 1.5, ka = (ms - m._revAt) / 1000; if (ka >= 0 && ka < rL) rev = Math.max(rev, Math.pow(Math.sin(ka / rL * Math.PI), 2)); }
     o.rev = rev;
-    var sh = p.shake * (1 + rev * 2.2) * B;
-    o.dx = Math.sin(t * TAU * p.shz) * sh * 0.6; o.dy = Math.sin(t * TAU * p.shz * 1.37 + 1) * sh;
-    var b = Math.sin(t * TAU * p.bhz); o.dy += b * p.bounce * (p.sq ? 0.5 : 1) * B; o.sy = 1 + (p.sq ? -b * p.sq * B : 0);
-    o.rot = Math.sin(t * TAU * p.rhz + sd * 6) * p.rock * B;
+    var SW = RI.SWAY_HZ, sh = p.shake * 0.5 * (1 + rev * 0.8) * B; // the old "shake" is now a slow engine sway
+    o.dx = Math.sin(t * TAU * SW + sd * 3) * sh * 0.6; o.dy = Math.sin(t * TAU * SW * 1.3 + 1) * sh * 0.5;
+    var bh = Math.min(p.bhz, RI.MAX_HZ) * 0.8, bb = Math.sin(t * TAU * bh); o.dy += bb * p.bounce * RI.AMP * (p.sq ? 0.5 : 1) * B; o.sy = 1 + (p.sq ? -bb * p.sq * RI.AMP * B : 0);
+    o.rot = Math.sin(t * TAU * Math.min(p.rhz, RI.MAX_HZ) * 0.8 + sd * 6) * p.rock * RI.AMP * B;
     var dt = m._iwl != null ? Math.min(0.1, Math.max(0, (ms - m._iwl) / 1000)) : 0; m._iwl = ms;
-    m._iwa = ((m._iwa || 0) + rev * p.wheel * 9 * dt) % (TAU * 100); // wheels / treads spin up on a rev
-    o.wheel = m._iwa + Math.sin(t * TAU * 0.4) * 0.05 * p.wheel * B; // ...and rock a hair on the brakes
-    if (B > 1) o.wheel += Math.sin(t * TAU * 0.25) * 0.35 * p.wheel; // menus: wheels / treads visibly rock back and forth
-    var k = p.kick, r = rev * Math.min(B, 1.6);
-    if (k === 'boing') { o.dy -= r * 3.2; o.sy -= r * 0.05 * Math.cos(r * Math.PI); }
-    else if (k === 'wheelie') o.rot -= r * 0.09;
-    else if (k === 'zoom') o.dy -= r * 3;
-    else if (k === 'stomp') { o.dy += r * 0.8; o.sy -= r * 0.04; }
-    else if (k === 'scuttle') o.dx += Math.sin(t * TAU * 6) * r * 0.9;
-    else if (k === 'spin') o.rot += Math.sin(t * TAU * 1.2) * r * 0.05;
-    else if (k === 'flame' || k === 'shoot') o.dy -= r * 2.2;
-    else if (k === 'splash') o.rot += Math.sin(t * TAU * 0.9) * r * 0.04;
-    else if (k === 'backfire') o.dx -= r * 0.8;
-    else if (k === 'chug') o.dy += Math.abs(Math.sin(t * TAU * 2.2)) * r * -0.9;
+    m._iwa = ((m._iwa || 0) + rev * p.wheel * 6 * dt) % (TAU * 100); // wheels / treads roll a little on a rev (smoothly)
+    o.wheel = m._iwa + Math.sin(t * TAU * 0.25) * 0.04 * p.wheel * B;
+    if (B > 1) o.wheel += Math.sin(t * TAU * 0.2) * 0.18 * p.wheel; // menus: wheels / treads slowly rock back and forth
+    var k = p.kick, r = rev * Math.min(B, 1.3) * 0.6, e = (1 - Math.cos(t * TAU * 0.9)) / 2; // e: smooth 0..1 pulse
+    if (k === 'boing') { o.dy -= r * 1.8; o.sy -= r * 0.025; }
+    else if (k === 'wheelie') o.rot -= r * 0.05;
+    else if (k === 'zoom') o.dy -= r * 1.8;
+    else if (k === 'stomp') { o.dy += r * 0.5; o.sy -= r * 0.02; }
+    else if (k === 'scuttle') o.dx += Math.sin(t * TAU * 1.2) * r * 0.5;
+    else if (k === 'spin') o.rot += Math.sin(t * TAU * 0.7) * r * 0.02;
+    else if (k === 'flame' || k === 'shoot') o.dy -= r * 1.4;
+    else if (k === 'splash') o.rot += Math.sin(t * TAU * 0.6) * r * 0.025;
+    else if (k === 'backfire') o.dx -= r * 0.5;
+    else if (k === 'chug') o.dy -= e * r * 0.6;
     return o;
   };
   // particle stream: n slots cycling with period life (s); f(phase, index)
@@ -12573,10 +13114,10 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   // ---------------------------------------------------------------- profile
   function defaultPlayer(n, team) {
     // Starter kit has no combat perks; perks come from gold items bought in the Shop.
-    var av = { skin: AG.Avatar.SKINS[(n * 2) % AG.Avatar.SKINS.length], outfit: 'scout', hat: 'none', pet: 'none', rigskin: 'none', head: 'none', body: 'none', wings: 'none', headpiece: 'none', roombg: 'none',
+    var av = { skin: AG.Avatar.SKINS[(n * 2) % AG.Avatar.SKINS.length], outfit: 'scout', hat: 'none', pet: 'none', rigskin: 'none', head: 'none', body: 'none', wings: 'none', headpiece: 'none', mask: 'none', roombg: 'none',
       face: AG.Avatar.FACES[(n - 1) % AG.Avatar.FACES.length].id, hair: AG.Avatar.HAIRS[((n - 1) * 2) % AG.Avatar.HAIRS.length].id };
     return { name: 'Pilot ' + n, team: team, rigId: AG.RIGS[(n - 1) % AG.RIGS.length].id, avatar: av, ready: false,
-      gold: START_GOLD, xp: 0, owned: ['hat:none', 'outfit:scout', 'pet:none', 'rigskin:none', 'head:none', 'body:none', 'wings:none', 'headpiece:none', 'roombg:none'], candy: 0, items: { heal: 1, calm: 1 }, loadout: ['heal', 'calm'] };
+      gold: START_GOLD, xp: 0, owned: ['hat:none', 'outfit:scout', 'pet:none', 'rigskin:none', 'head:none', 'body:none', 'wings:none', 'headpiece:none', 'mask:none', 'roombg:none'], candy: 0, items: { heal: 1, calm: 1 }, loadout: ['heal', 'calm'] };
   }
   S.defaultPlayer = defaultPlayer;
   // ---- save robustness: a save is NEVER deleted or replaced by a fresh one. Unreadable / odd-shaped saves are kept
@@ -12895,7 +13436,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     }
     var t0 = pv.t; pv.t += k;
     if (pv.random && Math.floor(pv.t / 75) !== Math.floor(t0 / 75)) { var nr = AG.RIGS[(pv.t / 75 | 0) % AG.RIGS.length]; pv.m.rig = nr; } // Random: shuffle through the roster
-    var m = pv.m; m.anim = pv.t; m.moving = false; m.grounded = true; m.alive = true; m.idleBoost = 2.2; // menus: clearly visible idle life
+    var m = pv.m; m.anim = pv.t; m.moving = false; m.grounded = true; m.alive = true; m.idleBoost = 1.3; // menus: a little more idle life than a match (batch 12: was 2.2 — read as jittery)
     var io = AG.LobbyFX ? AG.LobbyFX.idle(pv, m, k) : { dy: 0, rot: 0, sx: 1, sy: 1, petDy: 0 }; // idle life: sway, bob, blink, flourishes
     m.player.blink = m.blink;
     // batch 11: fit the MEASURED bounding box (rig + pilot + head gear + pet + idle-motion headroom) with padding, so no
@@ -13058,7 +13599,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     shop.innerHTML = (hatImg ? '<img src="' + hatImg.src + '" alt="">' : '') + '<span><b>SHOP</b><em>Outfits · Hats · Pets · Power-ups</em></span>';
     shop.onclick = function () { AG.audio.init(); AG.audio.click(); S.go('shop', function () { S.showShop(0, S.showMain); }); };
     left.appendChild(shop);
-    var ward = btn('ghost wardbig', '👕 My Stuff — wardrobe', function () { S.go('shop', function () { S.showWardrobe(0, S.showMain); }); }); ward.id = 'wardrobeBtn';
+    var ward = btn('ghost wardbig', '🎒 Inventory', function () { S.go('shop', function () { S.showWardrobe(0, S.showMain); }); }); ward.id = 'wardrobeBtn';
     left.appendChild(ward);
     var prac = btn('ghost', '🎮 Practice / Local room (hot-seat)', function () { S.go('room', function () { O().openLocal(); S.showRoom(); }); });
     prac.id = 'practiceBtn';
@@ -13288,7 +13829,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     if (online && mySlot) { var rd = btn(mySlot.ready ? 'readyon big' : 'readyoff big', mySlot.ready ? '✔ READY' : 'READY UP', function () { O().act(mySlot, 'ready', !mySlot.ready); if (R.mode === 'client') { mySlot.ready = !mySlot.ready; S.showRoom(); } }); rd.id = 'readyBtn'; foot.appendChild(rd); }
     var shopB = btn('ghost', '🛒 Shop', function () { S.go('shop', function () { S.showShop(0, function () { O().syncProfile(); S.go('room', S.showRoom); }); }); }); shopB.id = 'roomShopBtn';
     if (online) foot.appendChild(shopB);
-    var wardB = btn('ghost', '👕 My Stuff', function () { S.go('shop', function () { S.showWardrobe(0, function () { O().syncProfile(); S.go('room', S.showRoom); }); }); }); wardB.id = 'roomWardBtn';
+    var wardB = btn('ghost', '🎒 Inventory', function () { S.go('shop', function () { S.showWardrobe(0, function () { O().syncProfile(); S.go('room', S.showRoom); }); }); }); wardB.id = 'roomWardBtn';
     if (online) foot.appendChild(wardB);
     if (host) {
       var start = btn('primary big', can.ok ? 'START ▶' : 'Waiting for ready…', function () {
@@ -13407,7 +13948,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     }
     var lv = btn('ghost', 'Leave arena', function () { A.leave(); }); lv.id = 'arenaLeave'; row.appendChild(lv);
     box.appendChild(row);
-    box.appendChild(el('p', 'note', 'Arena rounds are bot matches: a win pays 1 XP and 1 gold, a loss pays nothing, and power-ups are not used. Watching is free. Up to 4 pilots play per round (first asked, first seated); bots fill the rest.'));
+    box.appendChild(el('p', 'note', 'Arena rounds are bot matches: a win pays 50 XP and 1 gold, a loss pays nothing, and power-ups are not used. Watching is free. Up to 4 pilots play per round (first asked, first seated); bots fill the rest.'));
     var msg = el('div', 'flashmsg'); msg.id = 'lobbyMsg'; box.appendChild(msg);
     show(box, 'dim');
     clearInterval(S.arenaT);
@@ -13525,7 +14066,13 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
 
   // ---------------------------------------------------------------- shop
   var shopTab = 'hat', shopView = 'pilot';
+  // batch 12 #9: try-on. Tap a card's picture (or the card) to see it on the big preview before buying: the pilot alone,
+  // with idle life, for looks; rig skins switch the preview to the rig; backgrounds play behind. Several slots can be
+  // tried together. Nothing is saved; leaving the shop clears it (buying / equipping that slot clears that slot).
+  var shopTry = {};
+  S.shopTry = function () { return shopTry; }; // (tests)
   S.showShop = function (idx, back) {
+    if (S.current !== 'shop') shopTry = {};
     S.current = 'shop';
     if (back) S.shopBack = back;
     AG.music.play('shop');
@@ -13539,14 +14086,18 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     head.innerHTML = '<div class="roomno">SHOP</div><div class="roomname">Brass &amp; Bolts Outfitters</div>';
     var bk = btn('ghost small', S.shopBack === S.showMain ? '◀ Main lobby' : '◀ Back to Room', function () { S.save(); var f = S.shopBack || S.showMain; if (f === S.showMain) S.go('lobby', S.showMain); else f(); });
     var hbs = el('div', 'wardhb');
-    var myb = btn('ghost small', '👕 My Stuff', function () { S.save(); var f = function () { S.go('shop', function () { S.showShop(idx); }); }; f._fromShop = true; S.go('shop', function () { S.showWardrobe(idx, f); }); }); myb.id = 'shopWardBtn';
+    var myb = btn('ghost small', '🎒 Inventory', function () { S.save(); var f = function () { S.go('shop', function () { S.showShop(idx); }); }; f._fromShop = true; S.go('shop', function () { S.showWardrobe(idx, f); }); }); myb.id = 'shopWardBtn';
     hbs.appendChild(myb); bk.id = 'shopBack'; hbs.appendChild(bk); head.appendChild(hbs);
     box.appendChild(head);
     var wrap = el('div', 'shopwrap');
     var left = el('div', 'shopleft');
     // pilot alone by default (full chibi body); the Rig skins tab (or the toggle) shows the rig under them
-    var pvc = preview(300, 220, function () { return pl; }, 2.6), pvo = previews[previews.length - 1];
-    pvo.pilot = function () { return shopView === 'pilot' && shopTab !== 'rigskin'; }; pvc.id = 'shopPreview';
+    var tryPl = null, tryK = '';
+    function tryLook() { var ks = Object.keys(shopTry).filter(function (k) { return k !== 'roombg'; }); if (!ks.length) return pl;
+      var key = JSON.stringify(shopTry); if (key !== tryK || !tryPl) { tryPl = JSON.parse(JSON.stringify(pl)); ks.forEach(function (k) { tryPl.avatar[k] = shopTry[k]; }); tryK = key; } return tryPl; }
+    S._shopLook = tryLook; // (tests)
+    var pvc = preview(300, 220, tryLook, 2.6), pvo = previews[previews.length - 1];
+    pvo.pilot = function () { return shopView === 'pilot' && shopTab !== 'rigskin' && !shopTry.rigskin; }; pvc.id = 'shopPreview';
     // room backgrounds play live behind the pilot preview: the equipped one on the Room BGs tab, or whichever card you
     // hover / tap (so you see how it looks in the waiting room before buying)
     var pvbox = el('div', 'pvbg'), bgcv = null, bgShown = null; pvbox.appendChild(pvc); left.appendChild(pvbox);
@@ -13554,11 +14105,25 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       if (bgcv) { bgcv.remove(); bgcv = null; } if (id) { bgcv = document.createElement('canvas'); bgcv.className = 'roombg pvbgcv'; pvbox.insertBefore(bgcv, pvc); AG.RoomBG.mount(bgcv, id); }
       pvbox.classList.toggle('hasbg', !!id); pvbox.dataset.bg = id || ''; drawPreview(pvo, 0); }
     pvo.noBack = function () { return !!bgShown; };
-    var shopBgDefault = function () { return shopTab === 'roombg' ? pl.avatar.roombg : null; };
+    var shopBgDefault = function () { return shopTry.roombg || (shopTab === 'roombg' ? pl.avatar.roombg : null); };
     S._shopBg = shopBg; // (tests)
     shopBg(shopBgDefault());
     var pvt = btn('ghost small pvtoggle', '', function () { shopView = pvo.pilot() ? 'rig' : 'pilot'; if (shopTab === 'rigskin' && shopView === 'pilot') shopTab = 'hat'; S.showShop(idx); });
     pvt.id = 'pvMode'; pvt.textContent = pvo.pilot() ? '⚙ Show my rig' : '🧍 Pilot only'; left.appendChild(pvt);
+    // the try-on bar: what's being previewed + clear (hidden when nothing is tried)
+    var tryBar = el('div', 'trybar'); tryBar.id = 'shopTryBar'; tryBar.hidden = true; left.appendChild(tryBar);
+    function itemName(slot, id) { var L = slot === 'hat' ? AG.Avatar.HATS : slot === 'outfit' ? AG.Avatar.OUTFITS : slot === 'pet' ? AG.Avatar.PETS : slot === 'rigskin' ? AG.Avatar.RIGSKINS : slot === 'roombg' ? AG.RoomBG.LIST :
+        slot === 'face' ? AG.Avatar.FACES : slot === 'hair' ? AG.Avatar.HAIRS : AG.Cos && AG.Cos.LISTS[slot] ? AG.Cos.LISTS[slot] : [];
+      var f = (L || []).filter(function (x) { return x.id === id; })[0]; return f ? f.name : id; }
+    function syncTry() {
+      var ks = Object.keys(shopTry); tryBar.hidden = !ks.length; tryBar.innerHTML = '';
+      if (ks.length) { tryBar.appendChild(el('span', 'trylbl', '👀 Trying on: ' + ks.map(function (k) { return itemName(k, shopTry[k]); }).join(', ')));
+        var cl = btn('ghost small tryclear', '✕ Clear', function () { shopTry = {}; syncTry(); }); cl.id = 'shopTryClear'; tryBar.appendChild(cl); }
+      Array.prototype.forEach.call(document.querySelectorAll('.shop .item[data-key]'), function (cd) { var k = cd.dataset.key.split(':'); cd.classList.toggle('trying', shopTry[k[0]] === k[1]); });
+      shopBg(shopBgDefault()); pvt.textContent = pvo.pilot() ? '⚙ Show my rig' : '🧍 Pilot only'; drawPreview(pvo, 0);
+    }
+    S._shopTryOn = function (slot, id) { if (shopTry[slot] === id) delete shopTry[slot]; else shopTry[slot] = id; syncTry(); }; // tap again = take it off
+    setTimeout(function () { if (S.current === 'shop') syncTry(); }, 0);
     var sname = el('div', 'shopname', pl.name), nmk = AG.Collector && AG.Collector.nameClass(pl); if (nmk) sname.classList.add(nmk); left.appendChild(sname);
     var gold = el('div', 'gold big', '◈ ' + pl.gold + ' gold'); left.appendChild(gold);
     if (AG.Halloween && (AG.Halloween.active() || pl.candy)) { var cd = el('div', 'hwcandy big', '🍬 ' + (pl.candy || 0) + ' candy'); cd.id = 'shopCandy'; left.appendChild(cd); }
@@ -13580,6 +14145,9 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     if (!AG.RoomBG) TABS = TABS.filter(function (t) { return t[0] !== 'roombg'; });
     if (!AG.Cos) TABS = TABS.filter(function (t) { return !/^(head|body|wings|headpiece)$/.test(t[0]); });
     if (hwTab) TABS.unshift(['hw', '🎃 Halloween']); else if (shopTab === 'hw') shopTab = 'hat';
+    // batch 12 #10: Halloween masks get their own tab (candy only; shown while the event runs or once you own one)
+    var maskTab = AG.Cos && AG.Cos.MASKS && AG.Halloween && (AG.Halloween.active() || AG.Cos.MASKS.some(function (m) { return pl.owned.indexOf('mask:' + m.id) >= 0 && m.id !== 'none'; }));
+    if (maskTab) TABS.splice(hwTab ? 1 : 0, 0, ['mask', '🎭 Masks']); else if (shopTab === 'mask') shopTab = 'hat';
     TABS.forEach(function (t) {
       var tb = btn('tab' + (shopTab === t[0] ? ' on' : '') + (t[0] === 'hw' ? ' hwtab' : ''), t[1], function () { shopTab = t[0]; S.showShop(idx); }); tb.dataset.tab = t[0]; tabs.appendChild(tb);
     });
@@ -13622,7 +14190,11 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     }
     var FREE = { face: 1, skin: 1, hair: 1 }, free = !!FREE[shopTab], Cos = AG.Cos;
     var entries;
-    if (shopTab === 'hw') {
+    if (shopTab === 'mask') {
+      right.appendChild(el('p', 'note hwnote', '🎭 Halloween masks are fitted to your pilot\u2019s face (under the hair and any helm) and show in battle, rooms and your profile. ' +
+        (AG.Halloween.active() ? 'Candy only, ' + AG.Halloween.endsText().replace(/^E/, 'e') + '.' : 'The candy shop is closed; masks you got stay yours.') + ' Purely cosmetic.'));
+      entries = Cos.MASKS.filter(function (it) { return it.id === 'none' || AG.Halloween.active() || pl.owned.indexOf('mask:' + it.id) >= 0; }).map(function (it) { return { slot: 'mask', it: it }; });
+    } else if (shopTab === 'hw') {
       var H = AG.Halloween;
       right.appendChild(el('p', 'note hwnote', (H.active() ? '🎃 ' + H.endsText() + '. ' : '🎃 The event is over: the candy shop is closed, but everything you got stays yours. ') +
         'Earn 🍬 candy in every match (bot win = 1; online: win 3 / play 1, + big-hit and knockout bonuses, + 2 for your first match each day). Leftover candy is kept as a keepsake for future events (it never turns into gold).'));
@@ -13654,7 +14226,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       if (slot === 'roombg') { (function (id) { // hover (mouse) or tap the picture: preview it behind the pilot
           card.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') shopBg(id); });
           card.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') shopBg(shopBgDefault()); });
-          pw.addEventListener('click', function () { shopBg(id); }); pw.title = 'Tap to preview behind your pilot'; })(it.id); }
+          pw.title = 'Tap to preview behind your pilot'; })(it.id); }
       if (slot === 'roombg') { pw.classList.add('bgprev'); if (it.id === 'none') pw.appendChild(el('div', 'bgnone', 'No background')); else { var bcv = document.createElement('canvas'); bcv.className = 'roombg shopbg'; pw.appendChild(bcv); AG.RoomBG.mount(bcv, it.id); } } // live animated preview
       else pw.appendChild(preview(150, 96, function () { return tryOn; }, 1.5));
       if (slot === 'roombg') {} else if (Cos && Cos.LISTS[slot]) previews[previews.length - 1].pilot = function () { return true; }; // helms / outfits / wings / headpieces: try on the standing pilot
@@ -13666,15 +14238,17 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       else if (Cos && Cos.LISTS[slot] && it.id !== 'none') { var cic = Cos.icon(slot, it.id, 40, tryOn.avatar); cic.className = 'itemicon cosicon'; pw.appendChild(cic); }
       if (slot === 'skin' || (slot === 'hair' && it.color)) { var sw = el('span', 'swatch'); sw.style.background = slot === 'skin' ? it.id : it.color; pw.appendChild(sw); }
       card.appendChild(pw);
+      pw.classList.add('trytap'); if (!pw.title) pw.title = 'Tap to try it on';
+      card.addEventListener('click', function (e) { if (e.target.closest('button')) return; S._shopTryOn(slot, it.id); });
       card.appendChild(el('div', 'iname', it.name));
       var setD = Cos && (slot === 'head' || slot === 'body') && Cos.SETS.filter(function (x) { return x.id === it.id; })[0], setN = setD ? setD.name + ' set' : null;
-      card.appendChild(el('div', 'istat' + (perk ? ' has' : ''), perk ? AG.Perks.describe(perk) : (free ? (it.desc || 'Cosmetic') : candy ? ({ head: 'Halloween helm', body: 'Halloween costume', wings: 'Halloween wings', headpiece: 'Halloween headpiece', pet: 'Halloween pet', rigskin: it.anim ? 'Animated rig skin' : 'Rig paint', roombg: 'Halloween room background' }[slot] || 'Halloween') :
+      card.appendChild(el('div', 'istat' + (perk ? ' has' : ''), perk ? AG.Perks.describe(perk) : (free ? (it.desc || 'Cosmetic') : candy ? ({ head: 'Halloween helm', body: 'Halloween costume', wings: 'Halloween wings', headpiece: 'Halloween headpiece', pet: 'Halloween pet', rigskin: it.anim ? 'Animated rig skin' : 'Rig paint', roombg: 'Halloween room background', mask: { full: 'Full-face mask', half: 'Eye mask', lower: 'Half-face mask' }[it.kind] }[slot] || 'Halloween') :
         setN ? setN : (slot === 'wings' ? 'Animated wings' : slot === 'headpiece' ? 'Headpiece' : slot === 'rigskin' && price ? (it.anim ? 'Animated rig skin' : 'Cosmetic paint') : slot === 'roombg' && price ? AG.RoomBG.tierName(it) + ' room background' : 'No bonus'))));
       if (candy) card.appendChild(el('div', 'tier hw', '🍬 CANDY')); else if (price) card.appendChild(el('div', 'tier gold', 'GOLD'));
       var adminFree = AG.Admin && AG.Admin.active, shopOpen = !candy || AG.Halloween.active();
       var label = equipped ? (it.id !== 'none' && Cos && Cos.LISTS[slot] ? '✓ Equipped · Remove' : 'Equipped') : owned ? 'Equip' : !shopOpen ? 'Event over' : adminFree ? '★ Free · Get' : candy ? '🍬 ' + candy + ' · Buy' : '◈ ' + price + ' · Buy';
       var b = btn(equipped ? 'ghost small' : owned ? 'small' : 'buy small', label, function () {
-        if (equipped) { if (it.id !== 'none' && Cos && Cos.LISTS[slot]) { pl.avatar[slot] = 'none'; S.save(); S.showShop(idx); } return; }
+        if (equipped) { if (it.id !== 'none' && Cos && Cos.LISTS[slot]) { delete shopTry[slot]; pl.avatar[slot] = 'none'; S.save(); S.showShop(idx); } return; }
         if (!owned) {
           if (!shopOpen) return;
           var free = AG.Admin && AG.Admin.active; // admin: any item free
@@ -13683,7 +14257,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
           else { if (!free && pl.gold < price) { b.textContent = 'Not enough gold'; return; } if (!free) pl.gold -= price; }
           pl.owned.push(key); AG.audio.buy();
         }
-        pl.avatar[slot] = it.id; S.save(); S.showShop(idx);
+        delete shopTry[slot]; pl.avatar[slot] = it.id; S.save(); S.showShop(idx);
       });
       b.dataset.key = key; b.classList.add('buybtn');
       if (price && AG.GiftsUI && AG.Friends) {
@@ -13699,13 +14273,13 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     show(box);
   };
 
-  // ---------------------------------------------------------------- wardrobe ("My Stuff")
+  // ---------------------------------------------------------------- wardrobe ("Inventory", was "My Stuff")
   // Everything the pilot owns, per slot, with instant equip / unequip on the live standing-pilot preview (the rig shows
   // under them for rig skins or with the toggle; room backgrounds get a waiting-room card preview). Equips go through
   // pl.avatar exactly like the shop's, so S.save() stores them locally + in the cloud and the room sync picks them up.
   // Three saved outfit loadouts (pl.outfits) remember a whole look; wearing one skips anything no longer owned.
   var wardTab = 'head', wardQ = '', wardF = 'all', wardView = 'pilot';
-  var WARD_TABS = [['head', 'Helms'], ['body', 'Outfits'], ['hat', 'Hats'], ['outfit', 'Basics'], ['headpiece', 'Headpieces'], ['wings', 'Wings'], ['pet', 'Pets'], ['rigskin', 'Rig skins'], ['roombg', 'Backgrounds'], ['face', 'Face'], ['hair', 'Hair'], ['skin', 'Skin tone']];
+  var WARD_TABS = [['head', 'Helms'], ['body', 'Outfits'], ['hat', 'Hats'], ['outfit', 'Basics'], ['headpiece', 'Headpieces'], ['mask', 'Masks'], ['wings', 'Wings'], ['pet', 'Pets'], ['rigskin', 'Rig skins'], ['roombg', 'Backgrounds'], ['face', 'Face'], ['hair', 'Hair'], ['skin', 'Skin tone']];
   S.WARD_SLOTS = WARD_TABS.map(function (t) { return t[0]; });
   function wardList(slot) {
     var A = AG.Avatar, Cos = AG.Cos;
@@ -13757,12 +14331,15 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var tabs0 = WARD_TABS.filter(function (t) { return t[0] !== 'roombg' || AG.RoomBG; }).filter(function (t) { return AG.Cos || !/^(head|body|wings|headpiece)$/.test(t[0]); });
     var box = el('div', 'menu shop wardrobe'); box.id = 'wardrobe';
     var head = el('div', 'roomhead');
-    head.innerHTML = '<div class="roomno">MY STUFF</div><div class="roomname">Wardrobe</div>';
+    head.innerHTML = '<div class="roomno">INVENTORY</div><div class="roomname">Your items</div>';
     var hb = el('div', 'wardhb');
     var toShop = btn('ghost small', '🛒 Shop', wardToShop); var wb = S.wardBack;
     function wardToShop() { S.save(); if (wb && wb._fromShop) return wb(); S.go('shop', function () { S.showShop(idx, wb || S.showMain); }); } toShop.id = 'wardShop'; hb.appendChild(toShop);
     var bk = btn('ghost small', S.wardBack && S.wardBack._fromShop ? '◀ Back to Shop' : S.wardBack === S.showMain || !S.wardBack ? '◀ Main lobby' : '◀ Back to Room', function () { S.save(); var f = S.wardBack || S.showMain; if (f === S.showMain) S.go('lobby', S.showMain); else f(); });
-    bk.id = 'wardBack'; hb.appendChild(bk); head.appendChild(hb);
+    bk.id = 'wardBack'; hb.appendChild(bk);
+    // batch 12: a clear way home from the Inventory (opened from the shop the back button returns to the shop)
+    if (S.wardBack && S.wardBack._fromShop) { var home = btn('ghost small', '🏠 Main lobby', function () { S.save(); S.wardBack = null; S.go('lobby', S.showMain); }); home.id = 'wardHome'; hb.appendChild(home); }
+    head.appendChild(hb);
     box.appendChild(head);
     var wrap = el('div', 'shopwrap'), left = el('div', 'shopleft wardleft');
     var showRig = wardTab === 'rigskin' || wardView === 'rig';
@@ -13810,7 +14387,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var right = el('div', 'shopright');
     // search + filter
     var bar = el('div', 'wardbar');
-    var q = document.createElement('input'); q.type = 'search'; q.id = 'wardSearch'; q.placeholder = 'Search my stuff…'; q.value = wardQ; q.maxLength = 30;
+    var q = document.createElement('input'); q.type = 'search'; q.id = 'wardSearch'; q.placeholder = 'Search inventory…'; q.value = wardQ; q.maxLength = 30;
     q.oninput = function () { wardQ = q.value; var pos = q.selectionStart; re(); var q2 = document.getElementById('wardSearch'); if (q2) { q2.focus(); try { q2.setSelectionRange(pos, pos); } catch (e) {} } };
     bar.appendChild(q);
     var fsel = select([['all', 'All'], ['gold', 'Gold'], ['hw', 'Halloween 🎃'], ['starter', 'Starter / free']], wardF, function (v) { wardF = v; re(); }); fsel.id = 'wardFilter'; bar.appendChild(fsel);
@@ -14159,7 +14736,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var xpRows = [], candyRows = [];
     function settle(p, prof) {
       if (!prof) return;
-      // collector boosts (+20% gold / XP): economy only, never in bot matches (their 1 XP / 1 gold rule stays)
+      // collector boosts (+20% gold / XP): economy only, never in bot matches (their 50 XP / 1 gold rule stays)
       if (!g.botMatch && AG.Perks.has(prof, 'boost_gold') && p.earned > 0) { var bg = Math.round(p.earned * 0.2); p.earned += bg; p.goldBoost = bg; }
       if (!g.botMatch && AG.Perks.has(prof, 'boost_xp') && p.xpGain.total > 0) { var bx = Math.round(p.xpGain.total * 0.2); p.xpGain = { total: p.xpGain.total + bx, parts: p.xpGain.parts.concat([['XP Boost +20%', bx]]) }; }
       prof.gold += p.earned; prof.ready = false;
@@ -14208,7 +14785,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       AG.audio.click(); AG.Friends.add(t.dataset.fc, t.dataset.name, +t.dataset.xp); t.textContent = '✔'; t.disabled = true; t.classList.add('done');
     };
     box.appendChild(tbl);
-    if (g.botMatch) { var bn = el('p', 'note botnote', '🤖 Bot match: 1 XP, 1 gold for a win (0 for a loss or draw). Human-only matches pay full rewards.'); bn.id = 'botNote'; box.appendChild(bn); }
+    if (g.botMatch) { var bn = el('p', 'note botnote', '🤖 Bot match: 50 XP, 1 gold for a win (0 for a loss or draw). Human-only matches pay full rewards.'); bn.id = 'botNote'; box.appendChild(bn); }
     // XP gained → animated progress bar per pilot saved on this device; rank-up celebration
     var xpb = el('div', 'xpresults'); xpb.id = 'xpResults';
     xpRows.forEach(function (x) {
@@ -14344,6 +14921,9 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       '<label class="txt">UI size <select id="uiSize"><option value="auto">Auto (' + (Math.min(innerWidth, innerHeight) < 500 ? 'Small' : 'Medium') + ')</option><option value="s">Small (compact)</option><option value="m">Medium</option><option value="l">Large</option></select></label>' +
       '<label class="chk"><input type="checkbox" id="touchCtl"> On-screen touch controls</label>' +
       '<label class="chk"><input type="checkbox" id="reduceMo"> Reduce motion (still rigs, pets and lobby effects)</label>' +
+      '<h4>Notifications</h4>' +
+      '<label class="chk"><input type="checkbox" id="frToastSet"> Show a toast when a friend comes online</label>' +
+      '<label class="chk"><input type="checkbox" id="frNotifySet"> Browser notification too (when the game is in the background)</label>' +
       '<h4>Online</h4>' +
       '<label class="txt">TURN server <input id="turnUrl" placeholder="turn:host:3478"></label>' +
       '<label class="txt">TURN user <input id="turnUser"></label>' +
@@ -14378,6 +14958,10 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     var rmo = panel.querySelector('#reduceMo'); rmo.checked = st.reduceMotion === true;
     rmo.onchange = function () { st.reduceMotion = rmo.checked; AG.saveSettings(); document.body.classList.toggle('reducemo', rmo.checked); };
     document.body.classList.toggle('reducemo', st.reduceMotion === true);
+    var fts = panel.querySelector('#frToastSet'), fns = panel.querySelector('#frNotifySet');
+    fts.checked = st.friendToasts !== false; fts.onchange = function () { st.friendToasts = fts.checked; AG.saveSettings(); };
+    fns.checked = st.friendNotify === true && !!window.Notification && Notification.permission === 'granted';
+    fns.onchange = function () { if (AG.FriendsUI) AG.FriendsUI.setNotify(fns.checked, fns); };
     panel.querySelector('#emoMuteSet').onchange = function (e) { st.emoteMute = e.target.checked; AG.saveSettings(); };
     panel.querySelector('#volMute').onchange = function (e) { st.muted = e.target.checked; AG.saveSettings(); AG.audio.applySettings(); };
     ['turnUrl', 'turnUser', 'turnPass', 'broker'].forEach(function (k) {
@@ -14555,6 +15139,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   U.init = function () {
     if (!F()) return;
     F().on(function () { badge(); render(); });
+    F().onlineHooks.push(U.friendOnline);
     F().onInvite = function (inv) { if (!document.body.classList.contains('inbattle')) invite(inv); };
     F().start();
     if (AG.FriendChat) { AG.FriendChat.init(); AG.FriendChat.on(function () { badge(); render(); }); }
@@ -14567,6 +15152,33 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
       for (var i = 0; i < v.length; i++) if (rows[i].dataset.code !== v[i].code || rows[i].classList.contains('online') !== !!v[i].online) return render();
       v.forEach(function (f, i) { var st = rows[i].querySelector('.frst'); if (st && st.textContent !== f.status) st.textContent = f.status; });
     }, 30000);
+  };
+  // ---- friend came online (batch 12): a small in-game toast (menus AND matches, never blocks input) plus, if the
+  // player opted in under Settings > Notifications, a browser Notification while the tab is in the background.
+  var onT = null;
+  U.friendOnline = function (code, name) {
+    var st = AG.settings || {}, nm = String(name || 'A friend').slice(0, 24);
+    if (st.friendToasts !== false) {
+      var t = document.getElementById('friendOnToast'); if (t) t.remove();
+      t = el('div', 'frontoast'); t.id = 'friendOnToast'; t.setAttribute('role', 'status');
+      t.appendChild(el('span', 'frondot')); t.appendChild(el('b', '', nm)); t.appendChild(el('span', '', ' is online'));
+      if (!document.body.classList.contains('inbattle')) t.appendChild(b('ghost small', 'Friends', function () { t.remove(); U.open(); }, 'friendOnOpen'));
+      t.appendChild(b('ghost small', '✕', function () { t.remove(); }));
+      document.body.appendChild(t); clearTimeout(onT); onT = setTimeout(function () { t.remove(); }, 6000);
+      if (AG.audio && AG.audio.click && !st.muted) try { AG.audio.click(); } catch (e) {}
+    }
+    if (st.friendNotify === true && window.Notification && Notification.permission === 'granted' && document.hidden) {
+      try { var n = new Notification('Gearbound', { body: nm + ' is online', tag: 'gb-friend-' + code, icon: 'icons/icon-192.png' }); setTimeout(function () { try { n.close(); } catch (e) {} }, 8000); } catch (e) {}
+    }
+    U.lastOnline = { code: code, name: nm, at: Date.now() };
+  };
+  // Settings toggle for browser notifications: asks for permission only when the player ticks it (opt-in)
+  U.setNotify = function (on, box) {
+    var st = AG.settings;
+    if (!on) { st.friendNotify = false; AG.saveSettings(); return Promise.resolve(false); }
+    if (!window.Notification) { st.friendNotify = false; if (box) box.checked = false; AG.saveSettings(); return Promise.resolve(false); }
+    var ask = Notification.permission === 'granted' ? Promise.resolve('granted') : Notification.requestPermission ? Promise.resolve(Notification.requestPermission()) : Promise.resolve('denied');
+    return ask.then(function (r) { var ok = r === 'granted'; st.friendNotify = ok; if (box) box.checked = ok; AG.saveSettings(); if (!ok && AG.Screens.setMsg) AG.Screens.setMsg('Browser notifications are blocked for this site — allow them in the browser to use this.'); return ok; });
   };
   AG.FriendsUI = U;
 })(window.AG);
@@ -14604,7 +15216,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   function newId() { var b = crypto.getRandomValues(new Uint8Array(9)), s = ''; for (var i = 0; i < b.length; i++) s += ('0' + b[i].toString(16)).slice(-2); return s; }
 
   // ---------------------------------------------------------------- catalogue
-  var TABS = { hat: 'HATS', outfit: 'OUTFITS', pet: 'PETS', rigskin: 'RIGSKINS' }, COS = { head: 1, body: 1, wings: 1, headpiece: 1 };
+  var TABS = { hat: 'HATS', outfit: 'OUTFITS', pet: 'PETS', rigskin: 'RIGSKINS' }, COS = { head: 1, body: 1, wings: 1, headpiece: 1, mask: 1 };
   G.describe = function (g) {
     if (g.kind === 'gold') return { name: g.n + ' gold', icon: '◈' };
     if (g.kind === 'xp') return { name: g.n + ' XP', icon: '⭐' };
@@ -16087,6 +16699,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     canvas.addEventListener('pointerdown', function (e) { pts[e.pointerId] = { x: e.clientX, y: e.clientY }; if (count() === 2) pinch0 = null; });
     canvas.addEventListener('pointermove', function (e) {
       var g = AG.game; if (!pts[e.pointerId] || !g || g.demo) return;
+      if (AG.Respawn && AG.Respawn.mapView(g)) { pts[e.pointerId] = { x: e.clientX, y: e.clientY }; return; } // full-map respawn pick: no drag/pinch
       var prev = pts[e.pointerId]; pts[e.pointerId] = { x: e.clientX, y: e.clientY };
       var z = g.cam.zoom || 1;
       if (count() === 1) { g.cam.x -= (e.clientX - prev.x) / z; g.cam.y -= (e.clientY - prev.y) / z; g.cam.manual = 180; return; }
@@ -16102,7 +16715,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   T.bindMinimap = function (mini) {
     mini.style.pointerEvents = 'auto'; mini.style.touchAction = 'none';
     mini.addEventListener('pointerdown', function (e) {
-      var g = AG.game; if (!g || g.demo) return;
+      var g = AG.game; if (!g || g.demo || (AG.Respawn && AG.Respawn.mapView(g))) return;
       var r = mini.getBoundingClientRect(), fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
       var z = g.cam.zoom || 1;
       g.cam.x = fx * g.terrain.w - window.innerWidth / z / 2; g.cam.y = fy * g.terrain.h - window.innerHeight / z / 2; g.cam.manual = 300;
@@ -16531,6 +17144,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
   // Smooth follow camera with eased zoom: slightly closer while aiming, pulls back
   // to frame the arc in flight, settles in between.
   Battle.prototype.updateCamera = function () {
+    if (AG.Respawn && AG.Respawn.mapView(this)) { AG.Respawn.mapCam(this, W, H); return; } // respawn pick: whole map, no drag
     var cam = this.cam, speed = 14 / (cam.zoom || 1), manual = false;
     var zt = cam.zoomLock ? cam.zoomLock : this.phase === 'aim' ? 1.18 : this.phase === 'flight' ? 0.96 : 1.08;
     var oldZ = cam.zoom || 1, nz = AG.lerp(oldZ, zt, 0.035);
@@ -16573,7 +17187,15 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     AG.Weather.draw(c, this);
     AG.Physics.drawHazards(c, this);
     var cur = this.turns.current, active = this.phase === 'aim';
-    this.mobiles.forEach(function (m) { m.draw(c, cur && cur.mobile === m && active); });
+    var self = this;
+    this.mobiles.forEach(function (m) {
+      // privacy: only the pilot's own screen sees the aim arc/tick and the live barrel angle; everyone else
+      // (teammates and spectators included) sees the barrel where it was at the last public moment, then the shot
+      var turnOf = cur && cur.mobile === m && active, mine = turnOf && self.isMine(cur);
+      if (turnOf && !mine) { var ra = m.angle; m.angle = m._pubAngle != null ? m._pubAngle : ra; m.draw(c, false); m.angle = ra; return; }
+      m._pubAngle = m.angle;
+      m.draw(c, mine);
+    });
     this.pets.forEach(function (pt) { pt.draw(c); });
     AG.Physics.drawProjectiles(c, this);
     AG.Physics.drawEffects(c, this);
@@ -16615,7 +17237,7 @@ AG.RANK_ART = ["data:image/webp;base64,UklGRqIOAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQ
     if (AG.music.setIntense) AG.music.setIntense(false);
     g = new Battle(setup, { net: net || null });
     AG.game = g;
-    AG.music.play(AG.music.trackForTheme(g.themeIndex));
+    AG.music.play(AG.music.nextForTheme ? AG.music.nextForTheme(g.themeIndex) : AG.music.trackForTheme(g.themeIndex)); // batch 12: each map's tracks in rotation
   }
   var backdropKind = null;
   AG.setBackdrop = function (kind) {

@@ -226,7 +226,7 @@ streams snapshots (positions, HP, projectiles, effects, sounds, terrain carves) 
   eligible voters (everyone but the target, starter counts Yes) **and** at least 2 Yes, so ties fail; 30 s timeout (no vote = No),
   one vote at a time, 60 s cooldown per starter. The kicked pilot forfeits (turns skipped), sees "You were voted out" and can't rejoin
   that room this session. If the host is voted out the match ends for everyone with a notice (no host migration).
-- **Bot matches** (any seat flagged `bot`) pay only **1 XP + 1 gold for a win** and nothing otherwise, and only to the viewer's own
+- **Bot matches** (any seat flagged `bot`) pay only **50 XP + 1 gold for a win** and nothing otherwise, and only to the viewer's own
   human seat (a bot's win never pays the host).
 
 ### Bot Arena (`js/arena.js`, arena parts of `js/online.js`)
@@ -238,7 +238,7 @@ streams snapshots (positions, HP, projectiles, effects, sounds, terrain carves) 
 - **Watch or jump in:** a pilot who joins mid-round gets the round setup plus every terrain carve so far and watches live. *Jump in*
   (arena screen, battle chip or results) queues them for the **next** round; up to 4 humans are seated (longest-queued first,
   alternating teams) and bots fill the rest. *Watch only* gives the seat back.
-- **Rewards:** arena rounds are bot matches: a win pays **1 XP + 1 gold** to each human on the winning team, nothing otherwise;
+- **Rewards:** arena rounds are bot matches: a win pays **50 XP + 1 gold** to each human on the winning team, nothing otherwise;
   spectators and the host (unless seated) earn nothing.
 - **Host migration:** when the arena host leaves on purpose (Leave, closing the tab) they hand the arena to the longest-watching
   pilot, who claims the id; the others reconnect to them. If the host just vanishes, everyone retries join/claim with jitter for up to
@@ -375,7 +375,7 @@ everywhere the pilot is drawn: battle, waiting-room cards, the lobby/profile pre
 - Waiting-room pets use the in-game behaviour (follow/perch/bob, yawn → doze mood clock), survive room re-renders, and
   cheer when their pilot hits READY or emotes.
 
-- My Stuff (wardrobe) Room BGs tab: hover or tap a background card to preview it live on your waiting-room card.
+- Inventory (wardrobe, formerly My Stuff) Room BGs tab: hover or tap a background card to preview it live on your waiting-room card.
 - Phone portrait results screen: the win title shrinks to fit and stays clear of the ⚙ gear button.
 
 ### Glacier chill and slow
@@ -437,12 +437,19 @@ as browser autoplay rules require.
 | Title / login | **GearBound Overture** | C major, 132 BPM, heroic march |
 | Room / lobby | **Hangar Lounge** | F major, 108 BPM, swung jazzy lounge with a walking bass |
 | Shop | **Brass & Bolts Bazaar** | G major, 120 BPM, bouncy staccato with clockwork "clank" percussion |
-| Map: Verdant Ridge | **Green Ridge Gallop** | D major, 144 BPM, galloping adventure |
-| Map: Ember Dunes | **Ember Caravan** | A harmonic minor, 126 BPM, desert caravan |
-| Map: Frostmere | **Frostmere Chimes** | E minor, 136 BPM, FM bell lead and arpeggios |
+| Map: Verdant Ridge | **Green Ridge Gallop** / **Meadow Sprint** | D major 144 BPM galloping adventure / G major 150 BPM pulse-lead sprint |
+| Map: Ember Dunes | **Ember Caravan** / **Mirage Run** | A harmonic minor 126 BPM desert caravan / D minor 132 BPM driving arpeggios |
+| Map: Frostmere | **Frostmere Chimes** / **Snowdrift Glide** | E minor 136 BPM FM bells / B minor 140 BPM bell lead, gliding arps |
+| Map: Toy World | **Toybox March** / **Wind-Up Workshop** | C major 120 BPM toy march / F major 124 BPM square-lead clockwork bounce |
+| Map: Candy Land | **Sugar Rush Shuffle** / **Gumdrop Hop** | F major 128 BPM swung shuffle / C major 136 BPM swung walking-bass hop |
+| Map: Haunted Pumpkin Patch | **Pumpkin Parade** / **Lantern Hollow** | D minor 116 BPM spooky-fun parade / E minor 112 BPM bell lead, swung (family-friendly) |
 | Sudden Death | **Last Gear Standing** | A minor, 164 BPM, galloping saw-lead chase; crossfades in on the SUDDEN DEATH banner, and the next match goes back to its map track |
 | Victory sting | **Gears of Glory** | about 3 s fanfare, then the lobby track fades back in |
 | Defeat / draw sting | **Rusty Sunset** | about 4 s descending chromatic line |
+
+Each map has two match tracks (`AG.music.tracksForTheme(i)`): every new match on a map plays the next one in turn
+(`nextForTheme`, remembered on the device), so the music changes between matches and between areas. All are in the same
+chiptune style (same voices, grooves and drum kit). Sudden Death is unchanged.
 
 To add a track, add an entry to `TRACKS` with `bpm`, `chords` (one per bar), `melody` (8th-note tokens, `-` = hold, `.` = rest),
 the `bass`/`stab` styles and `drums` patterns.
@@ -526,6 +533,45 @@ It contains no GunBound sprites, names or likenesses. Everything is embedded in 
   The near layer is a flipped, enlarged copy, so there are no mirrored repeats.
 - **Ember Dunes pits:** each map now has one wide sloping basin (about 420–560 px) with a lava chute in the middle, instead of a slot canyon.
 
+### Batch 12
+- **Gentle rig motion:** the idle "engine shake" (a 7–22 Hz buzz) is replaced by a slow 0.45 Hz sway. Bounce and rock are
+  capped at 0.9 Hz and scaled ×0.6, the rev is a smooth swell, and menus use a 1.3× idle (was 2.2×). Lobby flourishes are
+  eased too: a 3.5 px float instead of a snap hop, smooth pet hops, a smaller barrel sway, and a 2 Hz hit flinch instead of 9 Hz.
+  Per-rig numbers before and after are in `screenshots/batch12/motion-before-after.txt` (`tools/motionmetrics.js`, `tools/rigidletest.js`).
+- **Friends online:** a small toast, "*name* is online", pops up when a friend comes online. Settings has an opt-in
+  **browser notification** for when the tab is hidden; it asks the browser's permission the first time. `tools/friendontest.js`.
+- **Aim indicator fix:** the aim arc and tick were drawn *before* the hull sprite and rider, so on some rigs and angles the
+  rig covered them completely (Spindle at mid angles: 0 visible pixels). Hats and hair hid them more, and the hurt flicker
+  halved them. Now the aim is drawn after the rig, with an outline. `tools/aimtest.js`.
+- **Privacy:** only the pilot whose turn it is sees their aim arc, angle needle and numbers, shot pick and item list.
+  Everyone else, teammates and spectators included, sees "*name* is aiming…" and the barrel at its last public angle.
+  While someone aims, the host doesn't send their live angle, shot choice or item use to anyone else; those arrive with the shot.
+- **Bigger turn arrow:** a gold chevron about 2.4× the old size, outlined, with a slow gentle bob (still when Reduce motion is on).
+- **Respawn:**
+  - About a second after you go down, a zoomed-out full-map view opens, and you tap or click your drop spot (no dragging).
+  - You can pick right away instead of waiting for the respawn turns to pass. The rig drops in when its timer is up.
+  - A **↺ Change spot (1 left)** bubble lets you move it once; "✓ Keep my spot" cancels the change.
+  - The drop-in is a gentle float, at about half the pull and half the top speed. Other teams never see your spot.
+  - `tools/respawnmaptest.js`, plus `tools/respawntest.js`.
+- **Bot matches** now pay **50 XP** (and 1 gold) for a win (was 1 XP).
+- **Shop try-on:** tap a card's preview to try an item on your pilot (rig, skins, outfits, masks and room backgrounds),
+  shown idling in the shop header with a "Trying" badge. **Clear** removes it. Nothing is saved, and the try-on clears when you leave the shop.
+- **Halloween masks (21, new 🎭 Masks shop tab, candy only, on sale until Nov 7):**
+  - 10 full-face: Jack-o'-Lantern, Friendly Ghost, Candy Skull, Frankie, Mummy Wrap, Fox Spirit, Tin Robot, Fuzzy Monster, Little Alien, Scarecrow Sack.
+  - 7 eye masks: Black Cat, Owl Feather, Bat Masquerade, Golden Masquerade, Spider Web, Candy Corn, Hero Domino.
+  - 4 half-face (lower): Skeleton Jaw, Fang Grin, Witchy Nose, Pumpkin Snout.
+  - Each mask is painted *into* the pilot's face. It is clipped to the face shape, sits under the hair and hoods, keeps the face
+    shading and the pilot's own eyes, and has a thin dark outline. It follows the head and both facings.
+  - Inventory has a Masks slot. Masks you own stay yours after the event.
+  - `tools/masktest.js`; sheets from `tools/masksheet.js`.
+- **"My Stuff" is now "Inventory"** everywhere, with a **🏠 Main lobby** button (and "◀ Main lobby" when opened from the lobby).
+- **More match music:** six new original tracks, so each map now has two that alternate per match. `tools/musictest.js`.
+- **Spindle fix (regression from batch 11):** a burrowing shell that rises into a rig while still underground now opens its
+  mouth crater and counts as an eruption (it used to burst buried, leaving no crater). `tools/shottest.js`.
+- **Online join fix:** on a slow link a retried join could reach the host twice from the same pilot; the host seated
+  them twice and closing the timed-out first link then dropped the pilot from the room. Now a hello on an older link is
+  ignored and a newer one takes over the existing seat. `tools/socialtest.js`.
+
 ### Batch 11 fixes
 - **Reduce motion is a game setting now** (Settings > Graphics > "Reduce motion", saved with your settings, **off by default**).
   Before, the game followed the operating system's `prefers-reduced-motion` (for example macOS "Reduce motion"), which froze
@@ -570,7 +616,7 @@ It contains no GunBound sprites, names or likenesses. Everything is embedded in 
   Cost: the full-resolution art adds about 250-300 ms to building a Toy World map in headless software rendering
   (old about 150-450 ms, new about 400-1300 ms), once per match at load. The lid is a 0.8 Mpx cache and blits in under 0.01 ms.
   Before and after shots are in `screenshots/toyredo/` (overview, desktop battle, phone, and rim views).
-- **Wardrobe / My Stuff:** open it from the lobby (**My Stuff**), from the shop header and from the online waiting room. It lists
+- **Inventory (wardrobe, formerly My Stuff):** open it from the lobby (**Inventory**), from the shop header and from the online waiting room. It lists
   only items you own, with a tab per slot (Halloween items sit in their own slot, marked 🎃). Tap to wear, tap again to take
   off (an outfit always stays on). It has a live pilot preview with a **Show my rig** toggle (the Rig skins tab shows the rig),
   animated background thumbnails plus a waiting-room card preview, an **Equipped** summary, search and a filter (All / Gold / Halloween / Starter),
@@ -675,7 +721,7 @@ TURN_URL='turn:host:3478?transport=tcp,user,pass' tools/runall.sh
 - Progress is stored on each player's device (and copied to the cloud with an account), so a determined player could edit their own save; signatures prevent impersonating the admin or forging admin gifts.
 - Normal (non-admin) gifts are not provably paid for: a player who edits their own save could send gifts without really spending gold.
   Admin "free" purchases are local to the admin device.
-- Bots: the 1 XP + 1 gold bot rule is keyed on the `bot` flag. Easy bots hit about 25% of shots (measured 24.85% over 12 easy matches; bottest allows 17-30%).
+- Bots: the 50 XP + 1 gold bot rule is keyed on the `bot` flag. Easy bots hit about 25% of shots (measured 24.85% over 12 easy matches; bottest allows 17-30%).
 - Emote 8 is now **Aww, come on!** (pout face; `COMEON!`, `GRR!`, `AWW!` all work) with its own recorded "come on" clip. It still travels as `grr` on the wire, so older builds show their Grr for it.
 - **Emote voices (v5):** two recorded sets, `fem` and `masc`, 11 clips each, embedded in `js/emote_audio.js` (built by `node tools/emotevoices5.js [dir]` from `fem_<id>.mp3` / `masc_<id>.mp3`; trimmed, mono 24 kHz 40 kbps, about 178 KB; it replaces the old espeak `tools/emotevoices.sh`). Each pilot face picks a set: fem = Wren, Juno, Ivy, Tam; masc = Kit, Rook, Milo, Pax (unknown face = masc). Online, the sender's set travels with the emote (`{t:'emote', id, v}`, relayed as `e.v`), so everyone hears the sender's voice; an emote from an older build (no `v`) uses the sender's pilot face. Older builds ignore `v` and play their own old clips. Mute and the SFX volume apply. There is no manual voice override yet.
 - Leaderboard: saves are client-authoritative, so XP can be inflated by editing a save (capped at 10,000,000; the server
