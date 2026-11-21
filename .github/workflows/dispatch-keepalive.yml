@@ -1,0 +1,26 @@
+# Temporary helper: the cloud agent token cannot call workflow_dispatch (Actions read only).
+# GITHUB_TOKEN can, and that event does start a run. Removed after the keepalive run.
+name: Dispatch Supabase keepalive
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/dispatch-keepalive.yml
+
+permissions:
+  actions: write
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: workflow_dispatch supabase-keepalive.yml
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/EmberAlban/GearBound/actions/workflows/supabase-keepalive.yml/dispatches" \
+            -f ref=main
