@@ -1,0 +1,36 @@
+# Ping the public leaderboard so the free-tier Supabase project is not paused after 7 days of inactivity.
+name: Supabase keepalive
+
+on:
+  schedule:
+    - cron: '17 9 */2 * *'
+  workflow_dispatch:
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping leaderboard_ranked
+        run: |
+          url='https://msvjemuwhkroqbkmsptc.supabase.co/rest/v1/leaderboard_ranked?select=rank&limit=1'
+          attempt=1
+          while true; do
+            if curl -fsS \
+              --connect-timeout 20 \
+              --max-time 30 \
+              -H 'apikey: sb_publishable_iiovpvwUxeD_M7AXiyIXqw_CqRI2vll' \
+              -H 'Accept: application/json' \
+              "$url"; then
+              echo
+              echo "Supabase keepalive succeeded on attempt ${attempt}."
+              exit 0
+            fi
+            echo "Attempt ${attempt} failed."
+            if [ "$attempt" -ge 3 ]; then
+              echo "All 3 attempts failed."
+              exit 1
+            fi
+            echo "Waiting 20s before retry."
+            sleep 20
+            attempt=$((attempt + 1))
+          done
