@@ -293,6 +293,23 @@ Offline friends show when they were last online, and 💬 opens a 1:1 chat (see 
   for offline play after the first visit (online matches still need a connection).
 - `node tools/mobiletest.js` runs iPhone 14 and iPad (landscape + portrait) emulation, plays touch turns and saves screenshots to `screenshots/mobile/`.
 
+## Snowfall Festival (Christmas event, Nov 20 2026 – end of Jan 1 2027, local time)
+- **Clock:** `js/xmas.js` (`AG.Xmas`). Active from Nov 20 2026 00:00 until the first instant of **Jan 2 2027** (local), the same
+  hard-end mechanism as the Halloween Candy Hunt (which stays out of season).
+- **Currency ❄ snowflakes** — same rules as candy: **bot-match win = +1 ❄** (alongside the usual 50 XP and 1 gold; bot losses 0),
+  online win 3 / play 1, +1 for 300+ damage, +1 per kill (cap 2), +2 for the first online match of the day, forfeits 0.
+  Ledger `flakeLog` (60 entries, admin-signed `GBFLAKE1|…`), merged on cloud sync (larger balance wins). Flakes are a keepsake after the end.
+- **Christmas shop tab 🎄** (lobby banner → *Christmas Shop*): 60 items, flakes only, not giftable, owned forever, no stats:
+  8 outfits (worn: recolour the painted cloth + knitted / striped / button motifs, never stamped on), 7 hats, 10 headpieces,
+  5 wings (gentle shimmer, rooted on the back shoulder of the 3/4 pilots), 7 pets, 8 rig skins (4 animated), 10 face paints
+  (painted into the face like the Halloween masks), 5 painted waiting-room backgrounds with live snow / firelight / fairy-light twinkles.
+- **Look:** snowy Christmas key art behind the menus, festive banner with twinkling bulbs, falling snow over the menus
+  (26 / 55 / 95 flakes by quality tier, halved on phones; sleeps in battle, in hidden tabs and with reduced motion),
+  **Frostmere in festive dress** (painted fairy-lit village, presents, candy canes, holly-and-lights terrain lip; Low + High WebP,
+  layered parallax) with tier-scaled snowfall (80 / 130 / 190, ×0.6 on phones; six-armed crystals on Medium/High). Visual only —
+  terrain shape, physics and balance are unchanged.
+- Tests: `node tools/xmastest.js` (screenshots in `screenshots/xmas/`), item sheet `node tools/xmassheet.js`.
+
 ## Deploying (GitHub Pages or any static host)
 `node build.js` writes **`dist/web/`**: `index.html` (the whole game inlined, ~4.9 MB), `manifest.webmanifest`, `icons/`, `sw.js`, `.nojekyll`.
 Upload that folder to any https static host. For GitHub Pages: push the contents of `dist/web/` to a `gh-pages` branch (or a `/docs`
@@ -321,6 +338,13 @@ everywhere the pilot is drawn: battle, waiting-room cards, the lobby/profile pre
   (breathing, sway, weight shift, looking around, blinking and a small hop) plus animated wings and headpieces. It
   updates live. "⚙ Show my rig" switches back to the rig, and the Rig skins tab always shows the rig. The item
   cards for helms, armour, wings and headpieces let you try the item on the standing pilot.
+- **Pilots (v3 art):** every pilot is a chibi with bold outlines, seated low in the hatch in battle (about two heads tall,
+  mitten fists on the controls, the hull lip in front) and a compact forward-leaning runner holding a flag in the
+  Inventory. Every outfit, hat, helm, headpiece, wing set and face paint is fitted to all 8 faces (painted into the
+  clothes, seated on the hair, wings behind the back, paints following the 3/4 face).
+- **Face picker:** the Inventory's first tab, **🙂 Pilot face**, and the **🙂 Change face** button under the preview offer
+  all 8 faces (Kit, Wren, Rook, Juno, Milo, Ivy, Tam, Pax) free, each card with a live try-on preview. Swap at any time;
+  the choice saves locally and to the cloud, and other players see it online (it rides in the synced avatar).
 
 ### Halloween Candy Hunt (event, ends at the end of Nov 7 2026)
 - **When it runs:** from deploy until **Nov 8 2026 00:00 in the player's local time** (a hard end; `AG.Halloween.END`).
